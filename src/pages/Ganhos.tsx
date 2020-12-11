@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal } from 'react-native'
@@ -7,11 +7,34 @@ import { useNavigation } from '@react-navigation/native';
 
 import Footer from './components/footer'
 
+import GanhosBD from '../services/ganhos'
+import Valores from '../services/valores';
+
+
 export default function Ganhos({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigation2 = useNavigation()
 
     function showModal() {
         setModalVisible(true);
+    }
+
+    interface EarningsValues {
+        id: number,
+        titulo: string,
+        dia: number,
+        dtInicio: number,
+        dtFim: number,
+        mensal: boolean,
+        recebido: boolean,
+    }
+
+    interface ValuesValues {
+        descricao: string,
+        valor: number,
+        dtInicio: number,
+        dtFim: number,
+        ganhos_id: number,
+        dia: number,
     }
 
     const [modalVisible, setModalVisible] = useState(false)
@@ -25,13 +48,38 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
     const [colorBorderFooter, setColorBorderFooter] = useState('#fff')
 
+    const [selectedMonth, setSelectedMonth] = useState(10)
+    const [selectedYear, setSelectedYear] = useState(2020)
 
+    const [totalCurrentValues, setTotalCurrentValues] = useState(0)
+    const [totalEstimatedValues, setTotalEstimatedValues] = useState(0)
+
+    const [earnings, setEarnings] = useState<EarningsValues[]>([])
+    const [valuesList, setValuesList] = useState<ValuesValues[]>([])
+
+    const todayDate = new Date()
+    const CurrentMonth = todayDate.getMonth() + 1
+    const CurrentYear = todayDate.getFullYear()
 
     const { item } = route.params
 
     function handleNavigateNovo() {
         navigation2.navigate('NovoGanho', { item: item })
     }
+    const setData = (date: Date) => {
+        return new Promise((resolve,reject)=>{
+            let cont: any = []
+            let cont2: any = []
+        valuesList.map(value => {
+            if (value.valor != null && value.valor != 0) cont.push(value.valor)
+            if (value.dia <= date.getDate()) cont2.push(value.valor)
+        })
+        resolve(cont)
+        })
+
+    }
+    let cont: any = []
+    let cont2: any = []    
 
     useEffect(() => {
         if (item === 'Ganhos') {
@@ -57,34 +105,58 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             setTextAddButton('Adicionar Nova Despesa')
         }
 
-    })
+        setSelectedMonth(CurrentMonth)
+        setSelectedYear(CurrentYear)
+        setData(todayDate)
 
+        let firstDate
+        if (CurrentMonth < 10) {
+            firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
+        } else {
+            firstDate = CurrentYear.toString() + CurrentMonth.toString()
+        }
+        GanhosBD.findByDate(parseInt(firstDate)).then(res => {
+            setEarnings(res._array)
+        }).catch(err => {
+            console.log(err)
+        })
+        Valores.findByDate(parseInt(firstDate)).then(res => {
+            setValuesList(res._array)
+
+        }).catch(err => {
+            console.log(err)
+        })
+  
+    }, [])
 
     return (
-        <LinearGradient 
-            colors={[mainColor1, mainColor2]} 
-            start={{ x: -0.4, y: 0.1 }} 
+        <LinearGradient
+            colors={[mainColor1, mainColor2]}
+            start={{ x: -0.4, y: 0.1 }}
             style={styles.container}>
-        <StatusBar style="light" translucent />
+            <StatusBar style="light" translucent />
             <View style={styles.monthView}>
                 <TouchableOpacity onPress={() => { }}>
                     <Feather name="arrow-left" size={30} color={colorMonth} />
                 </TouchableOpacity>
                 <Text style={[styles.monthText, { color: colorMonth }]}>
-                    Nov 2020
+                    {selectedMonth} / {selectedYear}
                 </Text>
                 <TouchableOpacity onPress={() => { }}>
                     <Feather name="arrow-right" size={30} color={colorMonth} />
                 </TouchableOpacity>
             </View>
-
+            {valuesList.map(value => {
+            if (value.valor != null && value.valor != 0) cont.push(value.valor)
+            if (value.dia <= todayDate.getDate()) cont2.push(value.valor)
+            })}
             <View style={styles.balanceView}>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.currentBalanceText}>
                         {mainText1}
                     </Text>
                     <Text style={styles.currentBalanceTextValue}>
-                        R$ 700,00
+                        R$ {cont2.reduce((a: any, b: any) => a + b, 0)}
                     </Text>
                 </View>
                 <View style={styles.currentBalanceView}>
@@ -92,37 +164,46 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                         {mainText2}
                     </Text>
                     <Text style={styles.estimatedBalanceTextValue}>
-                        R$ 1.400,00
+                        R$ {cont.reduce((a: any, b: any) => a + b, 0)}
                     </Text>
                 </View>
             </View>
 
             <View style={styles.mainContainer}>
                 <ScrollView style={styles.scrollViewContainer}>
-                    <TouchableOpacity style={styles.earningsItemView} onPress={showModal}>
-                        <Feather name="dollar-sign" size={40} color={colorText} />
-                        <View style={styles.earningTextView}>
-                            <Text style={[styles.earningTittleText, { color: colorText }]}>Sálario</Text>
-                            <Text style={[styles.earningDateText, { color: colorText }]}>07 Jul</Text>
-                        </View>
-                        <Text style={[styles.earningValueText, { color: colorText }]}>R$ 700,00</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.earningsItemView, styles.earningsItemViewOpacity]}>
-                        <Feather name="dollar-sign" size={40} color={colorText} />
-                        <View style={styles.earningTextView}>
-                            <Text style={[styles.earningTittleText, { color: colorText }]}>Sálario</Text>
-                            <Text style={[styles.earningDateText, { color: colorText }]}>07 Jul</Text>
-                        </View>
-                        <Text style={[styles.earningValueText, { color: colorText }]}>R$ 700,00</Text>
-                    </TouchableOpacity>
+                    {earnings.map((earning, index) => {
+                        return (
+                            <TouchableOpacity style={styles.earningsItemView} onPress={showModal} key={index}>
+                                <Feather name="dollar-sign" size={40} color={colorText} />
+                                <View style={styles.earningTextView}>
+                                    <Text style={[styles.earningTittleText, { color: colorText }]}>
+                                        {earning.titulo}
+                                        {earnings[index].id}
+                                    </Text>
+                                    <Text style={[styles.earningDateText, { color: colorText }]}>
+                                        {earning.dia}/{earning.dtInicio}
+                                    </Text>
+                                </View>
+                                {valuesList.map(value => {
+
+                                    if (earnings[index].id == value.ganhos_id) {
+
+                                        return (
+                                            <Text style={[styles.earningValueText, { color: colorText }]}>R$ {value.valor}</Text>
+                                        )
+                                    }
+                                })}
+                            </TouchableOpacity>
+                        )
+                    })}
                 </ScrollView>
 
                 <View style={{ justifyContent: 'flex-end', flex: 1 }}>
-                    <LinearGradient 
-                        colors={['#FFFFFF', colorBorderFooter]} 
-                        start={{ x: -0.1, y: 0.1 }} 
+                    <LinearGradient
+                        colors={['#FFFFFF', colorBorderFooter]}
+                        start={{ x: -0.1, y: 0.1 }}
                         style={[styles.addNewButton, { borderColor: colorBorderAddButton }]}>
-                        <TouchableOpacity style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]} 
+                        <TouchableOpacity style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
                             onPress={handleNavigateNovo}>
                             <Text style={[styles.addNewButtonText, { color: colorText }]}>
                                 {TextAddButton}

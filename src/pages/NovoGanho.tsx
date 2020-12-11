@@ -26,10 +26,20 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     const [tittleText, setTittleText] = useState('')
     const [tittleTextColor, setTittleTextColor] = useState('#fff')
     const [valueTitulo, onChangeTitulo] = useState('');
-    const [valuesArray, setValuesArray] = useState<ValuesItem[]>([])
+    const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
+        id:0,
+        description:'',
+        value:0,
+        mensal:false,
+        repeat:0
+    }])
     const [valueFrequency, setValueFrequency] = useState(0);
     const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
     const [colorMonth, setColorMonth] = useState('#fff')
+    const [secondColor, setSecondColor] = useState('#fff')
+    const [showValues, setShowValues] = useState(false)
+    const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
+
 
     const [idValues, setIdValues] = useState(0)
 
@@ -38,7 +48,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
     const [isEnabled, setIsEnabled] = useState(false);
     const [isEnabledReceived, setIsEnabledReceived] = useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    const toggleSwitch = () => {
+        setIsEnabled(previousState => !previousState)
+        updateOneValue('mensal',0, !isEnabled)
+    };
     
     const toggleSwitchReceived = () => setIsEnabledReceived(previousState => !previousState);
 
@@ -66,6 +79,22 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 }
                 else{
                     return { ...item, [subitem]: e.nativeEvent.text }
+                }
+            } else {
+                return item
+            }
+        })
+        setValuesArray(newArr)
+    }
+
+    const updateOneValue =  (subitem: any, index: any, value:any) =>{
+        let newArr = valuesArray.map((item, i) => {
+            if (index == i) {
+                if(subitem == 'mensal'){
+                    return { ...item, [subitem]: value} 
+                }
+                else{
+                    return { ...item, [subitem]: value}
                 }
             } else {
                 return item
@@ -186,16 +215,19 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             setTittleTextColor('#1A8289')
             setColorBorderAddButton('#24DBBA')
             setColorMonth('#FDDB63')
+            setSecondColor('#49B39F')
+            
         } else if (item === 'Despesas') {
             setMainColor1('#CC3728')
             setMainColor2('#F9CF3C')
             setTittleText('Nova Despesa')
             setTittleTextColor('#CC3728')
             setColorBorderAddButton('#FF4835')
+            setSecondColor('#FF4835')
         }
-
     })
 
+    
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
@@ -231,7 +263,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 Data de Recebimento
                             </Text>
                             <View style={styles.dateView}>
-                                <Text style={[styles.subTittleText, { color: tittleTextColor }]} onPress={showDatepicker}>
+                                <Text style={[styles.subTittleText, { color: secondColor}]} onPress={showDatepicker}>
                                     {date.getDate()} / {date.getUTCMonth() + 1}
                                 </Text>
                             </View>
@@ -249,7 +281,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 Periodicidade
                             </Text>
                             <View style={styles.frequencyView}>
-                                <Text>Mensal</Text>
+                                <Text style={[styles.secondColorText,{color:secondColor}]}>Mensal</Text>
                                 <Switch
                                     trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
                                     thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
@@ -260,15 +292,17 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 <Feather name='arrow-left' size={20}
                                     onPress={() => {
                                         setValueFrequency(valueFrequency - 1)
+                                        updateOneValue('repeat', 0, (valueFrequency - 1))
                                     }}
                                 />
                                 <Text>{valueFrequency}</Text>
                                 <Feather name='arrow-right' size={20}
                                     onPress={() => {
                                         setValueFrequency(valueFrequency + 1)
+                                        updateOneValue('repeat', 0, (valueFrequency + 1))
                                     }}
                                 />
-                                <Text>Vezes</Text>
+                                <Text  style={[styles.secondColorText,{color:secondColor}]}>Vezes</Text>
                             </View>
                             <View style={styles.frequencyView}>
                                 <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
@@ -283,10 +317,15 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 />
                             </View>
                             <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                Valores
+                                Valor
                             </Text>
+                            <View style={{flexDirection:'row', alignItems:'center'}}>
+                                <Text style={[styles.secondColorText,{color:secondColor, marginRight:10}]}>R$</Text>
+                                <TextInput keyboardType='numeric' placeholder='R$ 0,00' onChange={updateValues('value', 0, false)} value={valuesArray[0].value.toString()} style={styles.InputText} />
+                            </View>
                             
                             {valuesArray.map((values, index) => {
+                                if(showValues)
                                 return (
                                     <View style={styles.valuesViewItem} key={index}>
                                         <View style={styles.valuesView}>
@@ -328,11 +367,14 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                             <View style={{ alignItems: "flex-end", paddingVertical: 26 }}>
                                 <TouchableOpacity style={[styles.plusButtonModal, { borderColor: colorBorderAddButton }]}
                                     onPress={() => {
-                                        setIdValues(idValues + 1)
-                                        setValuesArray([...valuesArray, { id: idValues, description: '', value: 0 , mensal:false, repeat:0}])
-                                        console.log(idValues)
-                                        console.log(valuesArray)
-
+                                        setShowValues(true)
+                                        setContPlusButtonPressed(contPlusButtonPressed+1)
+                                        if(contPlusButtonPressed>0){
+                                            setIdValues(idValues + 1)
+                                            setValuesArray([...valuesArray, { id: idValues, description: '', value: 0 , mensal:false, repeat:0}])
+                                            console.log(idValues)
+                                            console.log(valuesArray)
+                                        }
                                     }}>
                                     <Feather name='plus' size={40} color={tittleTextColor} />
                                 </TouchableOpacity>
@@ -379,6 +421,7 @@ const styles = StyleSheet.create({
         height: 40,
         borderBottomWidth: 1,
         borderColor: '#d2d2d2',
+        color:'#136065',
     },
     frequencyView: {
         flexDirection: 'row',
@@ -394,7 +437,8 @@ const styles = StyleSheet.create({
         borderColor: '#d2d2d2',
         width: 60,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#E9E9E9',
     },
     valuesViewItem:{
         backgroundColor:'#f1f1f1',
@@ -587,6 +631,10 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'Poppins_600SemiBold',
     },
+    secondColorText:{
+        fontFamily: 'Poppins_500Medium',
+        fontSize: 12,
+    }
 
 })
 

@@ -2,7 +2,7 @@ import db from './database'
 
 db.transaction((tx) => {
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
-     tx.executeSql("DROP TABLE valuesTable;");
+     //tx.executeSql("DROP TABLE valuesTable;");
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(
@@ -45,7 +45,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM valuesTable INNER JOIN earnings ON valuesTable.ganhos_id = earnings.id WHERE dtInicio<=? and dtFim>=?;",
+          "SELECT * FROM valuesTable INNER JOIN earnings ON valuesTable.ganhos_id = earnings.id WHERE valuesTable.dtInicio<=? and valuesTable.dtFim>=?;",
           [dt,dt],
           //-----------------------
           (_, { rows }) => {
