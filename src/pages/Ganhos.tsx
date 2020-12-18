@@ -14,8 +14,13 @@ import Valores from '../services/valores';
 export default function Ganhos({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigation2 = useNavigation()
 
-    function showModal() {
+    const [selectedId, setSelectedId] = useState(0)
+    const [selectedTotalValues, setSelectedTotalValues] = useState(0)
+
+    function showModal(id: number, totalValues:number) {
         setModalVisible(true);
+        setSelectedId(id)
+        setSelectedTotalValues(totalValues)
     }
 
     interface EarningsValues {
@@ -66,20 +71,66 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     function handleNavigateNovo() {
         navigation2.navigate('NovoGanho', { item: item })
     }
+
+    function convertDtToStringMonth(dt: number) {
+        let month: number = dt % 100
+        switch (month) {
+            case 1:
+                return 'Jan'
+                break
+            case 2:
+                return 'Fev'
+                break
+            case 3:
+                return 'Mar'
+                break
+            case 4:
+                return 'Abr'
+                break
+            case 5:
+                return 'Mai'
+                break
+            case 6:
+                return 'Jun'
+                break
+            case 7:
+                return 'Jul'
+                break
+            case 8:
+                return 'Ago'
+                break
+            case 9:
+                return 'Set'
+                break
+            case 10:
+                return 'Out'
+                break
+            case 11:
+                return 'Nov'
+                break
+            case 12:
+                return 'Dez'
+                break
+            default:
+                return 'err'
+                break
+        }
+    }
+
     const setData = (date: Date) => {
-        return new Promise((resolve,reject)=>{
+        return new Promise((resolve, reject) => {
             let cont: any = []
             let cont2: any = []
-        valuesList.map(value => {
-            if (value.valor != null && value.valor != 0) cont.push(value.valor)
-            if (value.dia <= date.getDate()) cont2.push(value.valor)
-        })
-        resolve(cont)
+            valuesList.map(value => {
+                if (value.valor != null && value.valor != 0) cont.push(value.valor)
+                if (value.dia <= date.getDate()) cont2.push(value.valor)
+            })
+            resolve(cont)
         })
 
     }
     let cont: any = []
-    let cont2: any = []    
+    let cont2: any = []
 
     useEffect(() => {
         if (item === 'Ganhos') {
@@ -126,8 +177,10 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         }).catch(err => {
             console.log(err)
         })
-  
+
     }, [])
+
+
 
     return (
         <LinearGradient
@@ -147,8 +200,8 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                 </TouchableOpacity>
             </View>
             {valuesList.map(value => {
-            if (value.valor != null && value.valor != 0) cont.push(value.valor)
-            if (value.dia <= todayDate.getDate()) cont2.push(value.valor)
+                if (value.valor != null && value.valor != 0) cont.push(value.valor)
+                if (value.dia <= todayDate.getDate()) cont2.push(value.valor)
             })}
             <View style={styles.balanceView}>
                 <View style={styles.currentBalanceView}>
@@ -172,27 +225,32 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             <View style={styles.mainContainer}>
                 <ScrollView style={styles.scrollViewContainer}>
                     {earnings.map((earning, index) => {
+                        var totalValues = 0
                         return (
-                            <TouchableOpacity style={styles.earningsItemView} onPress={showModal} key={index}>
+                            <TouchableOpacity style={styles.earningsItemView} onPress={() => showModal(earning.id,totalValues)} key={index}>
                                 <Feather name="dollar-sign" size={40} color={colorText} />
-                                <View style={styles.earningTextView}>
-                                    <Text style={[styles.earningTittleText, { color: colorText }]}>
-                                        {earning.titulo}
-                                        {earnings[index].id}
-                                    </Text>
-                                    <Text style={[styles.earningDateText, { color: colorText }]}>
-                                        {earning.dia}/{earning.dtInicio}
-                                    </Text>
-                                </View>
                                 {valuesList.map(value => {
 
                                     if (earnings[index].id == value.ganhos_id) {
+                                        totalValues = totalValues + value.valor
 
-                                        return (
-                                            <Text style={[styles.earningValueText, { color: colorText }]}>R$ {value.valor}</Text>
-                                        )
                                     }
-                                })}
+                                })
+                                }
+
+                                <View style={styles.earningTextView}>
+                                    <Text style={[styles.earningTittleText, { color: colorText }]}>
+                                        {earning.titulo}
+                                    </Text>
+                                    <Text style={[styles.earningDateText, { color: colorText }]}>
+                                        {earning.dia}/{convertDtToStringMonth(earning.dtInicio)}
+                                    </Text>
+                                </View>
+
+                                <Text style={[styles.earningTittleText, { color: colorText }]}>
+                                    R$ {totalValues}
+                                </Text>
+
                             </TouchableOpacity>
                         )
                     })}
@@ -217,51 +275,49 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
             <Modal animationType="slide" visible={modalVisible} transparent>
                 <View style={styles.modalContainer}>
+
                     <View style={styles.modalContent}>
-                        <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(26, 130, 137, 0.33)', paddingBottom: 17, marginBottom: 37 }}>
-                            <View style={styles.tittleView}>
-                                <Text style={[styles.tittleText, { color: colorText }]}>Conta de Alguma Coisa</Text>
-                                <TouchableOpacity>
-                                    <Feather name="trash-2" size={20} color={colorText} />
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.tittleView}>
-                                <Text style={[styles.subTittleText, { color: colorText }]}>R$ 1.520,00</Text>
-                                <Text style={[styles.subTittleText, { color: colorText }]}>15 Jul</Text>
-                            </View>
-                        </View>
-                        <View style={styles.valuesList}>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                Ganho 1
-                            </Text>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                R$ 500,00
-                            </Text>
-                        </View>
-                        <View style={styles.valuesList}>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                Ganho 2
-                            </Text>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                R$ 300,00
-                            </Text>
-                        </View>
-                        <View style={styles.valuesList}>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                Ganho novo novissimo e importante e novo mesmo
-                            </Text>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                R$ 15.500,00
-                            </Text>
-                        </View>
-                        <View style={styles.valuesList}>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                Ganho 4
-                            </Text>
-                            <Text style={[styles.valuesListText, { color: colorText }]}>
-                                R$ 500,00
-                            </Text>
-                        </View>
+                        {earnings.map((earning, index) => {
+                            if (earning.id == selectedId) {
+                                return (
+                                    <View key={index}>
+                                        <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(26, 130, 137, 0.33)', paddingBottom: 17, marginBottom: 37 }}>
+                                            <View style={styles.tittleView}>
+                                                <Text style={[styles.tittleText, { color: colorText }]}>
+                                                    {earning.titulo}
+                                                </Text>
+                                                <TouchableOpacity>
+                                                    <Feather name="trash-2" size={20} color={colorText} />
+                                                </TouchableOpacity>
+                                            </View>
+                                            <View style={styles.tittleView}>
+                                                <Text style={[styles.subTittleText, { color: colorText }]}>
+                                                    R$ {selectedTotalValues}
+                                                </Text>
+                                                <Text style={[styles.subTittleText, { color: colorText }]}> 
+                                                    {earning.dia} {convertDtToStringMonth(earning.dtInicio)}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        {valuesList.map((value, index) => {
+                                            if(earning.id == value.ganhos_id)
+                                            return (
+                                                <View style={styles.valuesList} key={index}>
+                                                    <Text style={[styles.valuesListText, { color: colorText }]}>
+                                                        {value.descricao}
+                                                    </Text>
+                                                    <Text style={[styles.valuesListText, { color: colorText }]}>
+                                                        {value.valor}
+                                                    </Text>
+                                                </View>
+                                            )
+                                        })}
+                                    </View>
+                                )
+                            }
+                        })}
+
+
                         <View style={{ alignItems: "flex-end", padding: 26 }}>
                             <TouchableOpacity style={[styles.plusButtonModal, { borderColor: colorBorderAddButton }]}>
                                 <Feather name='plus' size={40} color={colorText} />
@@ -352,7 +408,7 @@ const styles = StyleSheet.create({
         bottom: 0,
     },
     scrollViewContainer: {
-        maxHeight: 320,
+        minHeight:250,
         marginTop: 20,
         flex: 1,
     },
