@@ -40,6 +40,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         dtFim: number,
         ganhos_id: number,
         dia: number,
+        tipo:string,
     }
 
     const [modalVisible, setModalVisible] = useState(false)
@@ -132,6 +133,18 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     let cont: any = []
     let cont2: any = []
 
+    function removeItem(id: number){
+        console.log(id)
+        GanhosBD.remove2(id).then(res=>{
+            alert('removido!')
+            setEarnings(earnings.filter(ern => ern.id !== id))
+            setValuesList(valuesList.filter(vlu => vlu.ganhos_id !== id))
+            setModalVisible(false)
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+
     useEffect(() => {
         if (item === 'Ganhos') {
             setMainColor1('#155F69')
@@ -167,7 +180,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             firstDate = CurrentYear.toString() + CurrentMonth.toString()
         }
         GanhosBD.findByDate(parseInt(firstDate)).then(res => {
-            setEarnings(res._array)
+            setEarnings(res._array.filter(earning => earning.tipo == item))
         }).catch(err => {
             console.log(err)
         })
@@ -200,8 +213,8 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                 </TouchableOpacity>
             </View>
             {valuesList.map(value => {
-                if (value.valor != null && value.valor != 0) cont.push(value.valor)
-                if (value.dia <= todayDate.getDate()) cont2.push(value.valor)
+                if (value.valor != null && value.valor != 0 && value.tipo == item) cont.push(value.valor)
+                if (value.dia <= todayDate.getDate()  && value.tipo == item) cont2.push(value.valor)
             })}
             <View style={styles.balanceView}>
                 <View style={styles.currentBalanceView}>
@@ -233,7 +246,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
                                     if (earnings[index].id == value.ganhos_id) {
                                         totalValues = totalValues + value.valor
-
+                                        console.log(totalValues)
                                     }
                                 })
                                 }
@@ -286,7 +299,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                                 <Text style={[styles.tittleText, { color: colorText }]}>
                                                     {earning.titulo}
                                                 </Text>
-                                                <TouchableOpacity>
+                                                <TouchableOpacity onPress={()=> removeItem(earning.id)}>
                                                     <Feather name="trash-2" size={20} color={colorText} />
                                                 </TouchableOpacity>
                                             </View>

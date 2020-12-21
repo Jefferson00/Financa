@@ -2,11 +2,11 @@ import db from './database'
 
 db.transaction((tx) => {
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
-     //tx.executeSql("DROP TABLE valuesTable;");
+     tx.executeSql("DROP TABLE valuesTable;");
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS valuesTable (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT, valor REAL, dtInicio INT, dtFim INT, ganhos_id INT NOT NULL, FOREIGN KEY (ganhos_id) REFERENCES earnings (id));"
+      "CREATE TABLE IF NOT EXISTS valuesTable (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT, valor REAL, dtInicio INT, dtFim INT, ganhos_id INT NOT NULL, FOREIGN KEY (ganhos_id) REFERENCES earnings (id) ON DELETE CASCADE);"
     );
   });
 
@@ -56,9 +56,26 @@ db.transaction((tx) => {
     })
   }
 
+  const remove = (id:number) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        //comando SQL modificável
+        tx.executeSql(
+          "DELETE FROM valuesTable WHERE id=?;",
+          [id],
+          //-----------------------
+          (_, { rowsAffected }) => {
+            resolve(rowsAffected);
+          }
+        )
+      })
+    })
+  }
+
   
   export default{
     create,
     all,
     findByDate,
+    remove,
 }

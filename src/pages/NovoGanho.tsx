@@ -13,6 +13,8 @@ import Valores from '../services/valores'
 
 export default function NovoGanho({ route }: { route: any }, { navigation }: { navigation: any }) {
 
+    const { item } = route.params
+
     interface ValuesItem {
         id: number,
         description: string,
@@ -150,6 +152,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             dtFim: dtFim,
             mensal: isEnabled,
             recebido: isEnabledReceived,
+            tipo:item
         }
         Ganhos.create(GanhoObj)
 
@@ -205,7 +208,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         })
     }
 
-    const { item } = route.params
+    
 
     useEffect(() => {
         if (item === 'Ganhos') {
