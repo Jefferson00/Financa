@@ -4,6 +4,9 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native';
+import NumberFormat from 'react-number-format';
+import 'intl'
+import 'intl/locale-data/jsonp/pt-BR';
 
 import Footer from './components/footer'
 
@@ -17,7 +20,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     const [selectedId, setSelectedId] = useState(0)
     const [selectedTotalValues, setSelectedTotalValues] = useState(0)
 
-    function showModal(id: number, totalValues:number) {
+    function showModal(id: number, totalValues: number) {
         setModalVisible(true);
         setSelectedId(id)
         setSelectedTotalValues(totalValues)
@@ -40,7 +43,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         dtFim: number,
         ganhos_id: number,
         dia: number,
-        tipo:string,
+        tipo: string,
     }
 
     const [modalVisible, setModalVisible] = useState(false)
@@ -133,14 +136,14 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     let cont: any = []
     let cont2: any = []
 
-    function removeItem(id: number){
+    function removeItem(id: number) {
         console.log(id)
-        GanhosBD.remove2(id).then(res=>{
+        GanhosBD.remove2(id).then(res => {
             alert('removido!')
             setEarnings(earnings.filter(ern => ern.id !== id))
             setValuesList(valuesList.filter(vlu => vlu.ganhos_id !== id))
             setModalVisible(false)
-        }).catch(err=>{
+        }).catch(err => {
             console.log(err)
         })
     }
@@ -173,26 +176,42 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         setSelectedYear(CurrentYear)
         setData(todayDate)
 
-        let firstDate
-        if (CurrentMonth < 10) {
-            firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
-        } else {
-            firstDate = CurrentYear.toString() + CurrentMonth.toString()
-        }
-        GanhosBD.findByDate(parseInt(firstDate)).then(res => {
-            setEarnings(res._array.filter(earning => earning.tipo == item))
-        }).catch(err => {
-            console.log(err)
-        })
-        Valores.findByDate(parseInt(firstDate)).then(res => {
-            setValuesList(res._array)
 
-        }).catch(err => {
-            console.log(err)
-        })
 
-    }, [])
+        const unsubscribe = navigation2.addListener('focus', () => {
+            console.log('Refreshed!');
+            let firstDate
+            if (CurrentMonth < 10) {
+                firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
+            } else {
+                firstDate = CurrentYear.toString() + CurrentMonth.toString()
+            }
+            GanhosBD.findByDate(parseInt(firstDate)).then(res => {
+                setEarnings(res._array.filter(earning => earning.tipo == item))
+            }).catch(err => {
+                console.log(err)
+            })
+            Valores.findByDate(parseInt(firstDate)).then(res => {
+                setValuesList(res._array)
 
+            }).catch(err => {
+                console.log(err)
+            })
+        });
+        return unsubscribe;
+
+    }, [navigation2])
+
+    function currencyFormatter(value:any) {
+        if (!Number(value)) return "";
+      
+        const amount = new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL"
+        }).format(value / 100);
+      
+        return `${amount}`;
+      }
 
 
     return (
@@ -214,24 +233,32 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             </View>
             {valuesList.map(value => {
                 if (value.valor != null && value.valor != 0 && value.tipo == item) cont.push(value.valor)
-                if (value.dia <= todayDate.getDate()  && value.tipo == item) cont2.push(value.valor)
+                if (value.dia <= todayDate.getDate() && value.tipo == item) cont2.push(value.valor)
             })}
             <View style={styles.balanceView}>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.currentBalanceText}>
                         {mainText1}
                     </Text>
-                    <Text style={styles.currentBalanceTextValue}>
-                        R$ {cont2.reduce((a: any, b: any) => a + b, 0)}
-                    </Text>
+                        <NumberFormat 
+                            value={cont2.reduce((a: any, b: any) => a + b, 0)}
+                            displayType={'text'}
+                            thousandSeparator={true} 
+                            format={currencyFormatter}
+                            renderText={ value=> <Text style={styles.currentBalanceTextValue}> {value} </Text>}
+                        />
                 </View>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.estimatedBalanceText}>
                         {mainText2}
                     </Text>
-                    <Text style={styles.estimatedBalanceTextValue}>
-                        R$ {cont.reduce((a: any, b: any) => a + b, 0)}
-                    </Text>
+                        <NumberFormat 
+                            value={cont.reduce((a: any, b: any) => a + b, 0)}
+                            displayType={'text'}
+                            thousandSeparator={true} 
+                            format={currencyFormatter}
+                            renderText={ value=> <Text style={styles.currentBalanceTextValue}> {value} </Text>}
+                        />
                 </View>
             </View>
 
@@ -240,7 +267,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                     {earnings.map((earning, index) => {
                         var totalValues = 0
                         return (
-                            <TouchableOpacity style={styles.earningsItemView} onPress={() => showModal(earning.id,totalValues)} key={index}>
+                            <TouchableOpacity style={styles.earningsItemView} onPress={() => showModal(earning.id, totalValues)} key={index}>
                                 <Feather name="dollar-sign" size={40} color={colorText} />
                                 {valuesList.map(value => {
 
@@ -299,7 +326,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                                 <Text style={[styles.tittleText, { color: colorText }]}>
                                                     {earning.titulo}
                                                 </Text>
-                                                <TouchableOpacity onPress={()=> removeItem(earning.id)}>
+                                                <TouchableOpacity onPress={() => removeItem(earning.id)}>
                                                     <Feather name="trash-2" size={20} color={colorText} />
                                                 </TouchableOpacity>
                                             </View>
@@ -307,23 +334,23 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                                 <Text style={[styles.subTittleText, { color: colorText }]}>
                                                     R$ {selectedTotalValues}
                                                 </Text>
-                                                <Text style={[styles.subTittleText, { color: colorText }]}> 
+                                                <Text style={[styles.subTittleText, { color: colorText }]}>
                                                     {earning.dia} {convertDtToStringMonth(earning.dtInicio)}
                                                 </Text>
                                             </View>
                                         </View>
                                         {valuesList.map((value, index) => {
-                                            if(earning.id == value.ganhos_id)
-                                            return (
-                                                <View style={styles.valuesList} key={index}>
-                                                    <Text style={[styles.valuesListText, { color: colorText }]}>
-                                                        {value.descricao}
-                                                    </Text>
-                                                    <Text style={[styles.valuesListText, { color: colorText }]}>
-                                                        {value.valor}
-                                                    </Text>
-                                                </View>
-                                            )
+                                            if (earning.id == value.ganhos_id)
+                                                return (
+                                                    <View style={styles.valuesList} key={index}>
+                                                        <Text style={[styles.valuesListText, { color: colorText }]}>
+                                                            {value.descricao}
+                                                        </Text>
+                                                        <Text style={[styles.valuesListText, { color: colorText }]}>
+                                                            {value.valor}
+                                                        </Text>
+                                                    </View>
+                                                )
                                         })}
                                     </View>
                                 )
@@ -421,7 +448,7 @@ const styles = StyleSheet.create({
         bottom: 0,
     },
     scrollViewContainer: {
-        minHeight:250,
+        minHeight: 250,
         marginTop: 20,
         flex: 1,
     },
