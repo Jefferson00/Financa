@@ -14,51 +14,64 @@ import { ScrollView, Switch } from 'react-native-gesture-handler';
 
 import Ganhos from '../services/ganhos'
 import Valores from '../services/valores'
+import Functions from '../functions/index'
 
 export default function NovoGanho({ route }: { route: any }, { navigation }: { navigation: any }) {
 
     const { item } = route.params
     const nav = useNavigation()
 
+    /*Interfaces*/
+
     interface ValuesItem {
         id: number,
         description: string,
-        value: number,
+        value: string,
         mensal: boolean,
         repeat: number,
     }
 
-    const [mainColor1, setMainColor1] = useState('')
-    const [mainColor2, setMainColor2] = useState('')
-    const [tittleText, setTittleText] = useState('')
-    const [tittleTextColor, setTittleTextColor] = useState('#fff')
-    const [valueTitulo, onChangeTitulo] = useState('');
-    const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
+    /*Estados de aparencia*/
+    /**/ const [mainColor1, setMainColor1] = useState('')
+    /**/ const [mainColor2, setMainColor2] = useState('')
+    /**/ const [tittleText, setTittleText] = useState('')
+    /**/ const [tittleTextColor, setTittleTextColor] = useState('#fff')
+    /**/ const [valueTitulo, onChangeTitulo] = useState('');
+    /**/ const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
+    /**/ const [secondColor, setSecondColor] = useState('#fff')
+    /**/ const [colorMonth, setColorMonth] = useState('#fff')
+    /**/
+    /**/
+
+    /*Estados de valores*/
+    /**/ const [idValues, setIdValues] = useState(0)
+    /**/ const [valueFrequency, setValueFrequency] = useState(0);
+    /**/ const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
         id: 0,
         description: '',
-        value: 0,
+        value: '0',
         mensal: false,
         repeat: 0
-    }])
-    const [valueFrequency, setValueFrequency] = useState(0);
-    const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
-    const [colorMonth, setColorMonth] = useState('#fff')
-    const [secondColor, setSecondColor] = useState('#fff')
-    const [showValues, setShowValues] = useState(false)
-    const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
-    const [successModal, setSuccessModal] = useState(false)
+         }])
+    /**/ const [showValues, setShowValues] = useState(false)
 
-    const [idValues, setIdValues] = useState(0)
+    
+    /*Outros Estados*/
+    /**/ const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
+    /**/ const [successModal, setSuccessModal] = useState(false)
 
-    //Switch control
+
+    //Switch control Mensal
     const [show, setShow] = useState(false);
 
     const [isEnabled, setIsEnabled] = useState(false);
-    const [isEnabledReceived, setIsEnabledReceived] = useState(false);
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState)
         updateOneValue('mensal', 0, !isEnabled)
     };
+    
+    //Switch control Recebido
+    const [isEnabledReceived, setIsEnabledReceived] = useState(false);
 
     const toggleSwitchReceived = () => setIsEnabledReceived(previousState => !previousState);
 
@@ -83,6 +96,18 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 if (subitem == 'mensal') {
                     return { ...item, [subitem]: value = !value }
                 }
+                else if (subitem == 'value'){
+                    var valor = e.nativeEvent.text
+                    valor = valor + '';
+                    valor = parseInt(valor.replace(/[\D]+/g,''));
+                    valor = valor + '';
+                    valor = valor.replace(/([0-9]{2})$/g, ",$1");
+                  
+                    if (valor.length > 6) {
+                      valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+                    }
+                    return { ...item, [subitem]: valor }
+                }
                 else {
                     return { ...item, [subitem]: e.nativeEvent.text }
                 }
@@ -93,6 +118,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         setValuesArray(newArr)
     }
 
+     /*Atualiza os valores da periodicidade */
     const updateOneValue = (subitem: any, index: any, value: any) => {
         let newArr = valuesArray.map((item, i) => {
             if (index == i) {
@@ -109,46 +135,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         setValuesArray(newArr)
     }
 
-    function setDtInicio(date: Date) {
-        let month = date.getMonth() + 1
-        let year = date.getFullYear()
-
-        let dtInicio
-        if (month < 10) {
-            dtInicio = year.toString() + '0' + month.toString()
-        } else {
-            dtInicio = year.toString() + month.toString()
-        }
-
-        return parseInt(dtInicio)
-    }
-
-    function setDtFim(mensal: Boolean, contRepeat: number, date: Date) {
-        let dtFim
-        if (mensal) {
-            dtFim = "209912"
-        } else {
-            let month = (date.getMonth() + 1)
-            let year = date.getFullYear()
-            for (var x = 0; x < contRepeat; x++) {
-                month = month + 1
-                if (month > 12) {
-                    month = 1
-                    year = year + 1
-                }
-            }
-            if (month < 10) {
-                dtFim = year.toString() + '0' + month.toString()
-            } else {
-                dtFim = year.toString() + month.toString()
-            }
-        }
-        return parseInt(dtFim)
-    }
 
     function handleCreateNew() {
-        let dtInicio = setDtInicio(date)
-        let dtFim = setDtFim(isEnabled, valueFrequency, date)
+        let dtInicio = Functions.setDtInicio(date)
+        let dtFim = Functions.setDtFim(isEnabled, valueFrequency, date)
         const GanhoObj = {
             titulo: valueTitulo,
             dia: date.getDate(),
@@ -161,13 +151,17 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         Ganhos.create(GanhoObj)
 
         Ganhos.all().then(res => {
-            console.log(res)
+            //console.log(res)
             valuesArray.map(value => {
+                var vlr = value.value
+                vlr = vlr.replace(/[.]/g, '')
+                vlr = vlr.replace(/[,]/g, '')
+                console.log(vlr)
                 const ValueObj = {
                     descricao: value.description,
-                    valor: value.value,
+                    valor: vlr,
                     dtInicio: dtInicio,
-                    dtFim: setDtFim(value.mensal, value.repeat, date),
+                    dtFim: Functions.setDtFim(value.mensal, value.repeat, date),
                     ganhos_id: res._array.slice(-1)[0].id
                 }
                 Valores.create(ValueObj)
@@ -212,8 +206,6 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         })
     }
 
-
-
     useEffect(() => {
         if (item === 'Ganhos') {
             setMainColor1('#155F69')
@@ -232,18 +224,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             setColorBorderAddButton('#FF4835')
             setSecondColor('#FF4835')
         }
-    })
+    },[item])
 
-    function currencyFormatter(value:any) {
-        if (!Number(value)) return "";
-      
-        const amount = new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency:'BRL',
-        }).format(value/100);
-        //amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-        return `${amount}`;
-      }
+    
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
@@ -337,23 +320,14 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                             </Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10 }]}>R$</Text>
-                                <NumberFormat 
-                                thousandSeparator={true} 
-                                displayType={'text'} 
-                                value={valuesArray[0].value.toString()}
-                                format={currencyFormatter}
-                                renderText={value=> (
-                                    <TextInput 
+                                <TextInput 
                                         keyboardType='numeric' 
                                         placeholder='R$ 0,00' 
                                         onChange={updateValues('value', 0, false)} 
-                                        value={value} 
+                                        value={valuesArray[0].value.toString()} 
                                         style={styles.InputText} 
-                                    />
-                                )}
                                 />
-                                
-                                
+
                             </View>
 
                             {valuesArray.map((values, index) => {
@@ -403,9 +377,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         setContPlusButtonPressed(contPlusButtonPressed + 1)
                                         if (contPlusButtonPressed > 0) {
                                             setIdValues(idValues + 1)
-                                            setValuesArray([...valuesArray, { id: idValues, description: '', value: 0, mensal: false, repeat: 0 }])
-                                            console.log(idValues)
-                                            console.log(valuesArray)
+                                            setValuesArray([...valuesArray, { id: idValues, description: '', value: '0', mensal: false, repeat: 0 }])
+                                            //console.log(idValues)
+                                            //console.log(valuesArray)
                                         }
                                     }}>
                                     <Feather name='plus' size={40} color={tittleTextColor} />

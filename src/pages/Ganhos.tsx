@@ -12,7 +12,7 @@ import Footer from './components/footer'
 
 import GanhosBD from '../services/ganhos'
 import Valores from '../services/valores';
-
+import Functions from '../functions/index'
 
 export default function Ganhos({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigation2 = useNavigation()
@@ -76,50 +76,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         navigation2.navigate('NovoGanho', { item: item })
     }
 
-    function convertDtToStringMonth(dt: number) {
-        let month: number = dt % 100
-        switch (month) {
-            case 1:
-                return 'Jan'
-                break
-            case 2:
-                return 'Fev'
-                break
-            case 3:
-                return 'Mar'
-                break
-            case 4:
-                return 'Abr'
-                break
-            case 5:
-                return 'Mai'
-                break
-            case 6:
-                return 'Jun'
-                break
-            case 7:
-                return 'Jul'
-                break
-            case 8:
-                return 'Ago'
-                break
-            case 9:
-                return 'Set'
-                break
-            case 10:
-                return 'Out'
-                break
-            case 11:
-                return 'Nov'
-                break
-            case 12:
-                return 'Dez'
-                break
-            default:
-                return 'err'
-                break
-        }
-    }
+
 
     const setData = (date: Date) => {
         return new Promise((resolve, reject) => {
@@ -202,16 +159,6 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
     }, [navigation2])
 
-    function currencyFormatter(value:any) {
-        if (!Number(value)) return "";
-      
-        const amount = new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL"
-        }).format(value / 100);
-      
-        return `${amount}`;
-      }
 
 
     return (
@@ -240,25 +187,26 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                     <Text style={styles.currentBalanceText}>
                         {mainText1}
                     </Text>
-                        <NumberFormat 
-                            value={cont2.reduce((a: any, b: any) => a + b, 0)}
-                            displayType={'text'}
-                            thousandSeparator={true} 
-                            format={currencyFormatter}
-                            renderText={ value=> <Text style={styles.currentBalanceTextValue}> {value} </Text>}
-                        />
+                    <NumberFormat
+                        value={cont2.reduce((a: any, b: any) => a + b, 0)}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        format={Functions.currencyFormatter}
+                        renderText={value => <Text style={styles.currentBalanceTextValue}> {value} </Text>}
+                    />
                 </View>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.estimatedBalanceText}>
                         {mainText2}
                     </Text>
-                        <NumberFormat 
-                            value={cont.reduce((a: any, b: any) => a + b, 0)}
-                            displayType={'text'}
-                            thousandSeparator={true} 
-                            format={currencyFormatter}
-                            renderText={ value=> <Text style={styles.currentBalanceTextValue}> {value} </Text>}
-                        />
+                    <NumberFormat
+                        value={cont.reduce((a: any, b: any) => a + b, 0)}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        format={Functions.currencyFormatter}
+                        renderText={value => <Text style={styles.currentBalanceTextValue}> {value} </Text>}
+                    />
+
                 </View>
             </View>
 
@@ -283,13 +231,17 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                         {earning.titulo}
                                     </Text>
                                     <Text style={[styles.earningDateText, { color: colorText }]}>
-                                        {earning.dia}/{convertDtToStringMonth(earning.dtInicio)}
+                                        {earning.dia}/{Functions.convertDtToStringMonth(earning.dtInicio)}
                                     </Text>
                                 </View>
 
-                                <Text style={[styles.earningTittleText, { color: colorText }]}>
-                                    R$ {totalValues}
-                                </Text>
+                                <NumberFormat
+                                    value={totalValues}
+                                    displayType={'text'}
+                                    thousandSeparator={true}
+                                    format={Functions.currencyFormatter}
+                                    renderText={value => <Text style={[styles.earningTittleText, { color: colorText }]}> {value} </Text>}
+                                />
 
                             </TouchableOpacity>
                         )
@@ -331,11 +283,16 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                                 </TouchableOpacity>
                                             </View>
                                             <View style={styles.tittleView}>
+                                                <NumberFormat
+                                                    value={selectedTotalValues}
+                                                    displayType={'text'}
+                                                    thousandSeparator={true}
+                                                    format={Functions.currencyFormatter}
+                                                    renderText={value => <Text style={[styles.subTittleText, { color: colorText }]}> {value} </Text>}
+                                                />
+
                                                 <Text style={[styles.subTittleText, { color: colorText }]}>
-                                                    R$ {selectedTotalValues}
-                                                </Text>
-                                                <Text style={[styles.subTittleText, { color: colorText }]}>
-                                                    {earning.dia} {convertDtToStringMonth(earning.dtInicio)}
+                                                    {earning.dia} {Functions.convertDtToStringMonth(earning.dtInicio)}
                                                 </Text>
                                             </View>
                                         </View>
@@ -346,9 +303,14 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                                         <Text style={[styles.valuesListText, { color: colorText }]}>
                                                             {value.descricao}
                                                         </Text>
-                                                        <Text style={[styles.valuesListText, { color: colorText }]}>
-                                                            {value.valor}
-                                                        </Text>
+        
+                                                        <NumberFormat
+                                                            value={value.valor}
+                                                            displayType={'text'}
+                                                            thousandSeparator={true}
+                                                            format={Functions.currencyFormatter}
+                                                            renderText={value => <Text style={[styles.valuesListText, { color: colorText }]}> {value} </Text>}
+                                                        />
                                                     </View>
                                                 )
                                         })}

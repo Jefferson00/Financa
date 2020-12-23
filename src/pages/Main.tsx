@@ -4,18 +4,41 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useNavigation } from '@react-navigation/native';
+import NumberFormat from 'react-number-format';
 
 
-import Ganhos from  '../services/ganhos'
+import Ganhos from '../services/ganhos'
 import Valores from '../services/valores';
+import Functions from '../functions/index'
 
 
 export default function Main() {
   const navigation = useNavigation()
 
+  interface EarningsValues {
+    id: number,
+    titulo: string,
+    dia: number,
+    dtInicio: number,
+    dtFim: number,
+    mensal: boolean,
+    recebido: boolean,
+  }
+
+  interface ValuesValues {
+    descricao: string,
+    valor: number,
+    dtInicio: number,
+    dtFim: number,
+    ganhos_id: number,
+    dia: number,
+    tipo: string,
+  }
+
   const [selectedMonth, setSelectedMonth] = useState(10)
   const [selectedYear, setSelectedYear] = useState(2020)
-  
+  const [earnings, setEarnings] = useState<EarningsValues[]>([])
+  const [valuesList, setValuesList] = useState<ValuesValues[]>([])
 
   function handleNavigateGanhos() {
     navigation.navigate('Ganhos', { item: 'Ganhos' })
@@ -33,44 +56,48 @@ export default function Main() {
 
 
   function handleNextMonth() {
-    let nextMonth = selectedMonth + 1
-    let nextYear = selectedYear
-    if (nextMonth > 12) {
-      nextMonth = 1
-      nextYear = nextYear + 1
-    }
-    let teste1
-    if (nextMonth < 10) {
-      teste1 = nextYear.toString() + '0' + nextMonth.toString()
-    } else {
-      teste1 = nextYear.toString() + nextMonth.toString()
-    }
-    Ganhos.findByDate(parseInt(teste1)).then(res => {
-      console.log(res)
+    //console.log(selectedMonth)
+    let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
+    Ganhos.findByDate(parseInt(nextDtObj.dt)).then(res => {
+      setEarnings(res._array)
     }).catch(err => {
+      setEarnings([])
       console.log(err)
     })
 
-    Valores.findByDate(parseInt(teste1)).then(res => {
+    Valores.findByDate(parseInt(nextDtObj.dt)).then(res => {
       console.log(res)
+      setValuesList(res._array)
     }).catch(err => {
+      setValuesList([])
       console.log(err)
     })
 
-    //console.log(parseInt(teste1))
-    setSelectedMonth(nextMonth)
-    setSelectedYear(nextYear)
+    //console.log(parseInt(nextDtObj))
+    setSelectedMonth(nextDtObj.nextMonth)
+    setSelectedYear(nextDtObj.nextYear)
   }
 
   function handlePrevMonth() {
-    let prevMonth = selectedMonth - 1
-    let prevYear = selectedYear
-    if (prevMonth < 1) {
-      prevMonth = 12
-      prevYear = prevYear - 1
-    }
-    setSelectedMonth(prevMonth)
-    setSelectedYear(prevYear)
+    let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
+    
+    Ganhos.findByDate(parseInt(prevDtObj.dt)).then(res => {
+      setEarnings(res._array)
+    }).catch(err => {
+      setEarnings([])
+      console.log(err)
+    })
+
+    Valores.findByDate(parseInt(prevDtObj.dt)).then(res => {
+      console.log(res)
+      setValuesList(res._array)
+    }).catch(err => {
+      setValuesList([])
+      console.log(err)
+    })
+
+    setSelectedMonth(prevDtObj.prevMonth)
+    setSelectedYear(prevDtObj.prevYear)
   }
 
   const todayDate = new Date()
@@ -82,63 +109,126 @@ export default function Main() {
     setSelectedMonth(CurrentMonth)
     setSelectedYear(CurrentYear)
 
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('Refreshed!');
+      let firstDate
+      if (CurrentMonth < 10) {
+          firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
+      } else {
+          firstDate = CurrentYear.toString() + CurrentMonth.toString()
+      }
+      Ganhos.findByDate(parseInt(firstDate)).then(res => {
+          setEarnings(res._array)
+         // console.log(res._array)
+      }).catch(err => {
+          console.log(err)
+      })
+      Valores.findByDate(parseInt(firstDate)).then(res => {
+          setValuesList(res._array)
+          //console.log(res._array)
+
+      }).catch(err => {
+          console.log(err)
+      })
+  });
+  return unsubscribe;
+
   }, [])
 
+  let contGanhos: any = []
+  let contGanhosEstimadas: any = []
+  let contDespesas: any = []
+  let contDespesasEstimadas: any = []
 
   return (
     <LinearGradient colors={['#F9CF3C', '#B26A15']} style={styles.container}>
       <StatusBar style="light" translucent />
+
+      {/*Mês e ano*/}
       <View style={styles.monthView}>
         <TouchableOpacity onPress={handlePrevMonth}>
           <Feather name="arrow-left" size={30} color="#1A8289" />
         </TouchableOpacity>
         <Text style={styles.monthText}>
-          {selectedMonth} / {selectedYear}
+          {Functions.convertDtToStringMonth(selectedMonth)} / {selectedYear}
         </Text>
         <TouchableOpacity onPress={handleNextMonth}>
           <Feather name="arrow-right" size={30} color="#1A8289" />
         </TouchableOpacity>
       </View>
 
+      {valuesList.map(value => {
+                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Ganhos') contGanhos.push(value.valor)
+                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Despesas') contDespesas.push(value.valor)
+                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Despesas') contDespesasEstimadas.push(value.valor)
+                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Ganhos') contGanhosEstimadas.push(value.valor)
+       })}
+
+      {/*Saldos*/}
       <View style={styles.balanceView}>
         <View style={styles.currentBalanceView}>
           <Text style={styles.currentBalanceText}>
             Seu Saldo Atual
             </Text>
-          <Text style={styles.currentBalanceTextValue}>
-            R$ 5.400,35
-            </Text>
+            <NumberFormat
+              value={
+                contGanhos.reduce((a: any, b: any) => a + b, 0) - contDespesas.reduce((a: any, b: any) => a + b, 0)
+              }
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+            />
         </View>
         <View style={styles.currentBalanceView}>
           <Text style={styles.estimatedBalanceText}>
             Saldo Estimado
             </Text>
-          <Text style={styles.estimatedBalanceTextValue}>
-            R$ 5.400,35
-            </Text>
+            <NumberFormat
+              value={
+                contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0) - contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)
+              }
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+            />
         </View>
       </View>
 
+      {/*Ganhos e Despesas*/}
+         
       <View style={styles.valuesView}>
         <View style={styles.currentBalanceView}>
           <Text style={styles.earningsText}>
             Ganhos
             </Text>
-          <Text style={styles.earningsTextValue}>
-            R$ 5.400,35
-            </Text>
+            <NumberFormat
+              value={contGanhos.reduce((a: any, b: any) => a + b, 0)}
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+            />       
         </View>
         <View style={styles.currentBalanceView}>
           <Text style={styles.expensesText}>
             Despesas
             </Text>
-          <Text style={styles.expensesTextValue}>
-            R$ 5.400,35
-            </Text>
+            <NumberFormat
+              value={contDespesas.reduce((a: any, b: any) => a + b, 0)}
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+            /> 
         </View>
       </View>
 
+      {/*Container Principal*/}
       <View style={styles.mainContainer}>
+        {/*Botões Ganhos*/}
+
         <View style={styles.buttonsView}>
           <LinearGradient colors={['#FFFFFF', '#24DBBA22']} start={{ x: -0.1, y: 0.1 }} style={styles.earningsButton}>
             <TouchableOpacity style={styles.earningsButton} onPress={handleNavigateGanhos}>
@@ -152,6 +242,9 @@ export default function Main() {
             </TouchableOpacity>
           </LinearGradient>
         </View>
+
+        {/*Botões Despesas*/}
+
         <View style={styles.buttonsView}>
           <LinearGradient colors={['#FFFFFF', '#CC372822']} start={{ x: -0.1, y: 0.1 }} style={styles.expensesButton}>
             <TouchableOpacity style={styles.expensesButton} onPress={handleNavigateDespesas}>
@@ -166,7 +259,7 @@ export default function Main() {
           </LinearGradient>
         </View>
 
-      {/* Nos próximos dias, aqui será mostrado os ganhos/despesas mais próximos */}
+        {/* Nos próximos dias, aqui será mostrado os ganhos/despesas mais próximos */}
 
         <View style={styles.nextDaysView}>
           <Text style={styles.nextDaysText}>Nos próximos dias...</Text>
@@ -184,6 +277,7 @@ export default function Main() {
           <Text style={[styles.nextDaysContentText, { color: '#CC3728' }]}>Cartão de Crédito</Text>
           <Text style={[styles.nextDaysContentText, { color: '#CC3728' }]}>20 Nov</Text>
         </View>
+
       </View>
     </LinearGradient>
   )
