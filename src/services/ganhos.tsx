@@ -2,7 +2,7 @@ import db from './database'
 
 db.transaction((tx) => {
     //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
-    tx.executeSql("DROP TABLE earnings;");
+    //tx.executeSql("DROP TABLE earnings;");
     //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(
@@ -56,6 +56,22 @@ db.transaction((tx) => {
     })
   }
 
+  const findById = (id:number) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        //comando SQL modificável
+        tx.executeSql(
+          "SELECT * FROM earnings WHERE id=?;",
+          [id],
+          //-----------------------
+          (_, { rows }) => {
+            if (rows.length > 0) resolve(rows);
+            else reject("Obj not found: id=" + id); // nenhum registro encontrado
+          })
+      })
+    })
+  }
+
   const remove = (id:number) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -91,4 +107,5 @@ db.transaction((tx) => {
     findByDate,
     remove,
     remove2,
+    findById,
 }

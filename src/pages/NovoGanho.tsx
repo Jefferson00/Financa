@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, Text, TouchableOpacity, View, Button, TextInput, Platform, KeyboardAvoidingView, Modal} from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Button, TextInput, Platform, KeyboardAvoidingView, Modal } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +19,7 @@ import Functions from '../functions/index'
 export default function NovoGanho({ route }: { route: any }, { navigation }: { navigation: any }) {
 
     const { item } = route.params
+    const { idUpdate } = route.params
     const nav = useNavigation()
 
     /*Interfaces*/
@@ -29,6 +30,24 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         value: string,
         mensal: boolean,
         repeat: number,
+    }
+
+    interface ValuesItemUpdate {
+        id: number,
+        descricao: string,
+        valor: string,
+        dtInicio: number,
+        dtFim: number,
+        ganhos_id: number,
+    }
+
+    interface earningValues {
+        titulo: string,
+        dia: number,
+        dtInicio: number,
+        dtFim: number,
+        mensal: boolean,
+        recebido: boolean,
     }
 
     /*Estados de aparencia*/
@@ -52,10 +71,12 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         value: '0',
         mensal: false,
         repeat: 0
-         }])
+    }])
     /**/ const [showValues, setShowValues] = useState(false)
+    const [earning, setEarning] = useState<earningValues[]>([])
+    const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
 
-    
+
     /*Outros Estados*/
     /**/ const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
     /**/ const [successModal, setSuccessModal] = useState(false)
@@ -69,7 +90,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         setIsEnabled(previousState => !previousState)
         updateOneValue('mensal', 0, !isEnabled)
     };
-    
+
     //Switch control Recebido
     const [isEnabledReceived, setIsEnabledReceived] = useState(false);
 
@@ -96,15 +117,15 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 if (subitem == 'mensal') {
                     return { ...item, [subitem]: value = !value }
                 }
-                else if (subitem == 'value'){
+                else if (subitem == 'value') {
                     var valor = e.nativeEvent.text
                     valor = valor + '';
-                    valor = parseInt(valor.replace(/[\D]+/g,''));
+                    valor = parseInt(valor.replace(/[\D]+/g, ''));
                     valor = valor + '';
                     valor = valor.replace(/([0-9]{2})$/g, ",$1");
-                  
+
                     if (valor.length > 6) {
-                      valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+                        valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
                     }
                     return { ...item, [subitem]: valor }
                 }
@@ -118,7 +139,52 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         setValuesArray(newArr)
     }
 
-     /*Atualiza os valores da periodicidade */
+    const updateValuesUpdate = (subitem: any, index: any, value: any) => (e: any) => {
+        let newArr = valuesUpdate.map((item, i) => {
+            if (index == i) {
+                if (subitem == 'mensal') {
+                    console.log(value)
+                    var fr = 0
+                    if (!value[0]) {
+                        fr = value[1]
+                        return { ...item, ['dtFim']: 209912 }
+                    }else{
+                        var dt = new Date()
+                        var dtFim = Functions.setDtFim(false, fr, dt)
+                        console.log(dtFim)
+                        return { ...item, ['dtFim']: dtFim }
+                    }
+                }
+                else if (subitem == 'repeat'){
+                    var dt = new Date()
+                    var rpt = parseInt(e.nativeEvent.text)
+                    var dtFim = Functions.setDtFim(value[0], rpt, dt)
+                    return { ...item, ['dtFim']: dtFim }
+                    
+                }
+                else if (subitem == 'value') {
+                    var valor = e.nativeEvent.text
+                    valor = valor + '';
+                    valor = parseInt(valor.replace(/[\D]+/g, ''));
+                    valor = valor + '';
+                    valor = valor.replace(/([0-9]{2})$/g, ",$1");
+
+                    if (valor.length > 6) {
+                        valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+                    }
+                    return { ...item, [subitem]: valor }
+                }
+                else {
+                    return { ...item, [subitem]: e.nativeEvent.text }
+                }
+            } else {
+                return item
+            }
+        })
+        setValuesUpdate(newArr)
+    }
+
+    /*Atualiza os valores da periodicidade */
     const updateOneValue = (subitem: any, index: any, value: any) => {
         let newArr = valuesArray.map((item, i) => {
             if (index == i) {
@@ -199,11 +265,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         }).catch(err => {
             console.log(err)
         })*/
-        Valores.all().then(res => {
-            console.log(res)
-        }).catch(err => {
-            console.log(err)
-        })
+        var dtfim = 202101
+        var dtInicio = 202012
+
+        console.log(Functions.toFrequency(dtfim, dtInicio))
     }
 
     useEffect(() => {
@@ -224,9 +289,36 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             setColorBorderAddButton('#FF4835')
             setSecondColor('#FF4835')
         }
-    },[item])
+        if (idUpdate != null) {
+            //console.log('id = '+idUpdate)
+            Valores.all().then(res => {
+                var arr: any = (res._array.filter(vlr => vlr.ganhos_id == idUpdate))
+                setValuesUpdate(arr)
+            })
+            Ganhos.findById(idUpdate).then(res => {
+                setEarning(res._array)
+                
+            }).catch(err => {
+                console.log(err)
+            })
+            
+            
+        }
+    }, [])
 
-    
+    useEffect(()=>{
+        if (earning.length > 0) {
+            onChangeTitulo(earning[0].titulo)
+            if (earning[0].mensal) {
+                setIsEnabled(true)
+            } else {
+                setValueFrequency(Functions.toFrequency(earning[0].dtFim, earning[0].dtInicio))
+            }
+            date.setDate(earning[0].dia)
+           
+        }
+    },[earning])
+
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
@@ -320,17 +412,17 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                             </Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10 }]}>R$</Text>
-                                <TextInput 
-                                        keyboardType='numeric' 
-                                        placeholder='R$ 0,00' 
-                                        onChange={updateValues('value', 0, false)} 
-                                        value={valuesArray[0].value.toString()} 
-                                        style={styles.InputText} 
+                                <TextInput
+                                    keyboardType='numeric'
+                                    placeholder='R$ 0,00'
+                                    onChange={updateValues('value', 0, false)}
+                                    value={valuesArray[0].value.toString()}
+                                    style={styles.InputText}
                                 />
 
                             </View>
 
-                            {valuesArray.map((values, index) => {
+                            {idUpdate == null && valuesArray.map((values, index) => {
                                 if (showValues)
                                     return (
                                         <View style={styles.valuesViewItem} key={index}>
@@ -370,6 +462,53 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         </View>
                                     )
                             })}
+ 
+                            {idUpdate != null && valuesUpdate.map((values, index) => {
+                                var mensal = false
+                                var frequency = Functions.toFrequency(values.dtFim,values.dtInicio)
+                                if (values.dtFim == 209912) {
+                                    mensal = true
+                                }
+                                return (
+                                    <View style={styles.valuesViewItem} key={index}>
+                                            <View style={styles.valuesView}>
+                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                                    Descrição
+                                            </Text>
+                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                                    Valor
+                                            </Text>
+                                            </View>
+                                            <View style={styles.valuesView}>
+
+                                                <TextInput onChange={updateValuesUpdate('descricao', index, false)} value={values.descricao} style={styles.InputText} />
+                                                <TextInput placeholder='R$ 0,00' onChange={updateValuesUpdate('valor', index, false)} value={values.valor.toString()} style={styles.InputText} />
+
+                                            </View>
+                                            <View style={styles.frequencyView}>
+                                                <Text>Mensal</Text>
+                                                <Switch
+                                                    trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
+                                                    thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
+                                                    ios_backgroundColor="#3e3e3e"
+                                                    onValueChange={updateValuesUpdate('mensal', index, [mensal,frequency])}
+                                                    value={mensal}
+                                                    />
+
+                                                   
+                                                <TextInput
+                                                    onChange={updateValuesUpdate('repeat', index, [mensal,frequency])}
+                                                    value={mensal ? '0' : frequency.toString()}
+                                                    style={styles.InputText}
+                                                    keyboardType='numeric'
+                                                />
+
+                                                <Text>Vezes</Text>
+                                            </View>
+                                        </View>
+                                    )
+                            })}
+
                             <View style={{ alignItems: "flex-end", paddingVertical: 26 }}>
                                 <TouchableOpacity style={[styles.plusButtonModal, { borderColor: colorBorderAddButton }]}
                                     onPress={() => {
@@ -414,7 +553,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 </Text>
                             </View>
                             <TouchableOpacity onPress={() => nav.goBack()} style={styles.modalButton}>
-                                <Text style={[styles.tittleText, {color:tittleTextColor}]}>Ok</Text>
+                                <Text style={[styles.tittleText, { color: tittleTextColor }]}>Ok</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -475,24 +614,24 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: '#fff',
-        alignItems:'center',
-        marginHorizontal:20,
+        alignItems: 'center',
+        marginHorizontal: 20,
         paddingTop: 30,
     },
-    modalButton:{
-        alignItems:'center',
-        justifyContent:'center',
-        minHeight:52,
-        borderTopWidth:1,
-        borderTopColor:'#d2d2d2',
-        width:'100%'
+    modalButton: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 52,
+        borderTopWidth: 1,
+        borderTopColor: '#d2d2d2',
+        width: '100%'
     },
-    modalTextView:{
-        minHeight:170,
-        alignItems:'center',
-        justifyContent:'center',
+    modalTextView: {
+        minHeight: 170,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    modalText:{
+    modalText: {
         color: '#136065',
         fontFamily: 'Poppins_400Regular',
         fontSize: 18,

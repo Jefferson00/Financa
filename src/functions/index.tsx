@@ -38,6 +38,31 @@ function setDtFim(mensal: Boolean, contRepeat: number, date: Date) {
     return parseInt(dtFim)
 }
 
+function toFrequency(dtfim: number, dtInicio: number){
+    var outputFim = [], outputInicio = [],
+    sDtfim = dtfim.toString(),
+    sDtInicio = dtInicio.toString()
+
+    for (var i = 0, len = sDtfim.length; i < len; i += 1) {
+        outputFim.push(+sDtfim.charAt(i));
+    }
+
+    for (var i = 0, len = sDtInicio.length; i < len; i += 1) {
+        outputInicio.push(+sDtInicio.charAt(i));
+    }
+
+    let test:string = ''
+
+    let yearFim = test.concat(outputFim[0].toString(),outputFim[1].toString(),outputFim[2].toString(),outputFim[3].toString())
+    let monthFim = test.concat(outputFim[4].toString(),outputFim[5].toString())
+    let monthInicio = test.concat(outputInicio[4].toString(),outputInicio[5].toString())
+    let yearInicio = test.concat(outputInicio[0].toString(),outputInicio[1].toString(),outputInicio[2].toString(),outputInicio[3].toString())
+ 
+    let frequencia = parseInt(monthFim)-parseInt(monthInicio) + (12* (parseInt(yearFim) - parseInt(yearInicio)))
+
+    return frequencia
+}
+
 function currencyFormatter(value:any) {
     if (!Number(value)) return "";
   
@@ -173,5 +198,6 @@ export default{
     formatNumber,
     nextMonth,
     prevMonth,
+    toFrequency,
 }
 

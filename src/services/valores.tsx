@@ -2,7 +2,7 @@ import db from './database'
 
 db.transaction((tx) => {
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
-     tx.executeSql("DROP TABLE valuesTable;");
+     //tx.executeSql("DROP TABLE valuesTable;");
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(

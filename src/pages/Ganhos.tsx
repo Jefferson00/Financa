@@ -76,6 +76,11 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         navigation2.navigate('NovoGanho', { item: item })
     }
 
+    function handleNavigateNovoUpdate(id: number) {
+        setModalVisible(false)
+        navigation2.navigate('NovoGanho', { item: item , idUpdate: id})
+    }
+
 
 
     const setData = (date: Date) => {
@@ -326,7 +331,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                             </TouchableOpacity>
                         </View>
                         <View style={styles.footerModal}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={()=> {handleNavigateNovoUpdate(selectedId)}}>
                                 <Feather name="edit-2" size={30} color={colorText} />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => { setModalVisible(!modalVisible) }}>
