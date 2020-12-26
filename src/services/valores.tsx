@@ -40,6 +40,22 @@ db.transaction((tx) => {
     })
   }
 
+  const update = (id:number, obj:any) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+        tx.executeSql(
+          "UPDATE valuesTable SET descricao=?,valor=?,dtInicio=?, dtFim=?, ganhos_id=?  Where id=?;",
+          [obj.descricao,obj.valor,obj.dtInicio,obj.dtFim,obj.ganhos_id, id],
+          //-----------------------
+          (_, { rowsAffected, insertId }) => {
+            if (rowsAffected > 0) resolve(insertId);
+            else reject("Error inserting obj: " + JSON.stringify(obj)); // insert falhou
+          },
+        );
+      });
+    });
+  };
+
   const findByDate = (dt:number) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -78,4 +94,5 @@ db.transaction((tx) => {
     all,
     findByDate,
     remove,
+    update,
 }

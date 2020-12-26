@@ -72,6 +72,22 @@ db.transaction((tx) => {
     })
   }
 
+  const update = (id: number, obj:any) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+        tx.executeSql(
+          "UPDATE earnings SET titulo=?,dia=?,dtInicio=?,dtFim=?,mensal=?,recebido=?,tipo=? Where id=?;",
+          [obj.titulo,obj.dia,obj.dtInicio,obj.dtFim,obj.mensal,obj.recebido,obj.tipo, id],
+          //-----------------------
+          (_, { rowsAffected, insertId }) => {
+            if (rowsAffected > 0) resolve(insertId);
+            else reject("Error inserting obj: " + JSON.stringify(obj)); // insert falhou
+          },
+        );
+      });
+    });
+  };
+
   const remove = (id:number) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -108,4 +124,5 @@ db.transaction((tx) => {
     remove,
     remove2,
     findById,
+    update,
 }

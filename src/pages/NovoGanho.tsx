@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, Text, TouchableOpacity, View, Button, TextInput, Platform, KeyboardAvoidingView, Modal } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Button, TextInput, Platform, KeyboardAvoidingView, Modal, Alert } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
@@ -148,19 +148,19 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                     if (!value[0]) {
                         fr = value[1]
                         return { ...item, ['dtFim']: 209912 }
-                    }else{
+                    } else {
                         var dt = new Date()
                         var dtFim = Functions.setDtFim(false, fr, dt)
                         console.log(dtFim)
                         return { ...item, ['dtFim']: dtFim }
                     }
                 }
-                else if (subitem == 'repeat'){
+                else if (subitem == 'repeat') {
                     var dt = new Date()
                     var rpt = parseInt(e.nativeEvent.text)
                     var dtFim = Functions.setDtFim(value[0], rpt, dt)
                     return { ...item, ['dtFim']: dtFim }
-                    
+
                 }
                 else if (subitem == 'value') {
                     var valor = e.nativeEvent.text
@@ -241,6 +241,40 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
     }
 
+    function handleUpdate() {
+        let dtInicio = Functions.setDtInicio(date)
+        let dtFim = Functions.setDtFim(isEnabled, valueFrequency, date)
+        const GanhoObj = {
+            titulo: valueTitulo,
+            dia: date.getDate(),
+            dtInicio: dtInicio,
+            dtFim: dtFim,
+            mensal: isEnabled,
+            recebido: isEnabledReceived,
+            tipo: item
+        }
+        Ganhos.update(idUpdate, GanhoObj).then(res => {
+            valuesUpdate.map(value => {
+                var vlr = value.valor
+                console.log(vlr)
+
+               
+                const ValueObj = {
+                    descricao: value.descricao,
+                    valor: vlr,
+                    dtInicio: value.dtInicio,
+                    dtFim: value.dtFim,
+                    ganhos_id: idUpdate
+                }
+                Valores.update(value.id, ValueObj)
+            })
+            alert('atualizado')
+            
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
     function handleResultsByMonth() {
 
         //console.log(date.toLocaleDateString('en-GB'))
@@ -297,16 +331,16 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             })
             Ganhos.findById(idUpdate).then(res => {
                 setEarning(res._array)
-                
+
             }).catch(err => {
                 console.log(err)
             })
-            
-            
+
+
         }
     }, [])
 
-    useEffect(()=>{
+    useEffect(() => {
         if (earning.length > 0) {
             onChangeTitulo(earning[0].titulo)
             if (earning[0].mensal) {
@@ -315,9 +349,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 setValueFrequency(Functions.toFrequency(earning[0].dtFim, earning[0].dtInicio))
             }
             date.setDate(earning[0].dia)
-           
+
         }
-    },[earning])
+    }, [earning])
 
 
     return (
@@ -462,51 +496,51 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         </View>
                                     )
                             })}
- 
+
                             {idUpdate != null && valuesUpdate.map((values, index) => {
                                 var mensal = false
-                                var frequency = Functions.toFrequency(values.dtFim,values.dtInicio)
+                                var frequency = Functions.toFrequency(values.dtFim, values.dtInicio)
                                 if (values.dtFim == 209912) {
                                     mensal = true
                                 }
                                 return (
                                     <View style={styles.valuesViewItem} key={index}>
-                                            <View style={styles.valuesView}>
-                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                    Descrição
+                                        <View style={styles.valuesView}>
+                                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                                Descrição
                                             </Text>
-                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                    Valor
+                                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                                Valor
                                             </Text>
-                                            </View>
-                                            <View style={styles.valuesView}>
-
-                                                <TextInput onChange={updateValuesUpdate('descricao', index, false)} value={values.descricao} style={styles.InputText} />
-                                                <TextInput placeholder='R$ 0,00' onChange={updateValuesUpdate('valor', index, false)} value={values.valor.toString()} style={styles.InputText} />
-
-                                            </View>
-                                            <View style={styles.frequencyView}>
-                                                <Text>Mensal</Text>
-                                                <Switch
-                                                    trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                                    thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
-                                                    ios_backgroundColor="#3e3e3e"
-                                                    onValueChange={updateValuesUpdate('mensal', index, [mensal,frequency])}
-                                                    value={mensal}
-                                                    />
-
-                                                   
-                                                <TextInput
-                                                    onChange={updateValuesUpdate('repeat', index, [mensal,frequency])}
-                                                    value={mensal ? '0' : frequency.toString()}
-                                                    style={styles.InputText}
-                                                    keyboardType='numeric'
-                                                />
-
-                                                <Text>Vezes</Text>
-                                            </View>
                                         </View>
-                                    )
+                                        <View style={styles.valuesView}>
+
+                                            <TextInput onChange={updateValuesUpdate('descricao', index, false)} value={values.descricao} style={styles.InputText} />
+                                            <TextInput placeholder='R$ 0,00' onChange={updateValuesUpdate('valor', index, false)} value={values.valor.toString()} style={styles.InputText} />
+
+                                        </View>
+                                        <View style={styles.frequencyView}>
+                                            <Text>Mensal</Text>
+                                            <Switch
+                                                trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
+                                                thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
+                                                ios_backgroundColor="#3e3e3e"
+                                                onValueChange={updateValuesUpdate('mensal', index, [mensal, frequency])}
+                                                value={mensal}
+                                            />
+
+
+                                            <TextInput
+                                                onChange={updateValuesUpdate('repeat', index, [mensal, frequency])}
+                                                value={mensal ? '0' : frequency.toString()}
+                                                style={styles.InputText}
+                                                keyboardType='numeric'
+                                            />
+
+                                            <Text>Vezes</Text>
+                                        </View>
+                                    </View>
+                                )
                             })}
 
                             <View style={{ alignItems: "flex-end", paddingVertical: 26 }}>
@@ -531,12 +565,20 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 colors={['#FFFFFF', colorBorderAddButton + '22']}
                                 start={{ x: -0.1, y: 0.1 }}
                                 style={[styles.addNewButton, { borderColor: colorBorderAddButton }]}>
+                                {idUpdate != null ? 
                                 <TouchableOpacity
                                     style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
-                                    onPress={handleCreateNew}
+                                    onPress={handleUpdate}
                                 >
+                                    <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>Atualizar</Text>
+                                </TouchableOpacity>
+                                : <TouchableOpacity
+                                    style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
+                                    onPress={handleCreateNew}
+                                   >
                                     <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>Adicionar</Text>
                                 </TouchableOpacity>
+                                }
                             </LinearGradient>
                         </View>
                     </ScrollView>

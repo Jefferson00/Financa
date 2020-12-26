@@ -34,9 +34,9 @@ db.transaction((tx) => {
           "UPDATE months SET month=?, year=? WHERE id=?;",
           [obj.month, obj.year, id],
           //-----------------------
-          (_, { rowsAffected }) => {
-            if (rowsAffected > 0) resolve(rowsAffected);
-            else reject("Error updating obj: id=" + id); // nenhum registro alterado
+          (_, { rowsAffected, insertId }) => {
+            if (rowsAffected > 0) resolve(insertId);
+            else reject("Error updating obj: id=" + JSON.stringify(obj)); // nenhum registro alterado
           },
         );
       });
