@@ -75,6 +75,12 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     /**/ const [showValues, setShowValues] = useState(false)
     const [earning, setEarning] = useState<earningValues[]>([])
     const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
+    /**/  const [selectedMonth, setSelectedMonth] = useState(10)
+    /**/  const [selectedYear, setSelectedYear] = useState(2020)
+
+    const todayDate = new Date()
+    const CurrentMonth = todayDate.getMonth() + 1
+    const CurrentYear = todayDate.getFullYear()
 
 
     /*Outros Estados*/
@@ -230,6 +236,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                     dtFim: Functions.setDtFim(value.mensal, value.repeat, date),
                     ganhos_id: res._array.slice(-1)[0].id
                 }
+                console.log(ValueObj.dtFim)
                 Valores.create(ValueObj)
                 setSuccessModal(true)
             })
@@ -258,7 +265,6 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 var vlr = value.valor
                 console.log(vlr)
 
-               
                 const ValueObj = {
                     descricao: value.descricao,
                     valor: vlr,
@@ -275,37 +281,23 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         })
     }
 
-    function handleResultsByMonth() {
-
-        //console.log(date.toLocaleDateString('en-GB'))
-        /*const date2 = new Date()
-        date2.setFullYear(2021)
-        const datef = date2.getFullYear().toString()+'/'+date2.getMonth().toString()
-        console.log(datef)
-        if('2021/12' < datef){
-            console.log('seila')
-        }else if('2020/11' > datef){
-            console.log('q')
-        }
-        /*const FindDate = '112021'
-        Ganhos.findByDate(FindDate).then(res=>{
-            console.log(res)
-        }).catch(err=>{
-            console.log(err)
-        })*/
-
-        /*Ganhos.findByDate(202104).then(res => {
-            console.log(res)
-        }).catch(err => {
-            console.log(err)
-        })*/
-        var dtfim = 202101
-        var dtInicio = 202012
-
-        console.log(Functions.toFrequency(dtfim, dtInicio))
+    function handleNextMonth(){
+        let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
+        setSelectedMonth(nextDtObj.nextMonth)
+        setSelectedYear(nextDtObj.nextYear)
     }
 
+    function handlePrevMonth() {
+        let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
+    
+        setSelectedMonth(prevDtObj.prevMonth)
+        setSelectedYear(prevDtObj.prevYear)
+      }
+
     useEffect(() => {
+        setSelectedMonth(CurrentMonth)
+        setSelectedYear(CurrentYear)
+
         if (item === 'Ganhos') {
             setMainColor1('#155F69')
             setMainColor2('#F9CF3C')
@@ -340,6 +332,41 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         }
     }, [])
 
+    function updateValuesList(){
+        Valores.all().then(res => {
+            var arr: any = (res._array.filter(vlr => vlr.ganhos_id == idUpdate))
+            setValuesUpdate(arr)
+        })
+        Ganhos.findById(idUpdate).then(res => {
+            setEarning(res._array)
+
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
+    function removeValue(id: number){
+        Alert.alert(
+            "Remover",
+            "Deseja mesmo remover?",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+              },
+              { text: "OK", onPress: () => 
+                Valores.remove(id).then(res => {
+                    setValuesUpdate(valuesUpdate.filter(vls => vls.id !== id))
+                }).catch(err => {
+                    console.log(err)
+                })
+            }
+            ],
+            { cancelable: false }
+          );
+    }
+
     useEffect(() => {
         if (earning.length > 0) {
             onChangeTitulo(earning[0].titulo)
@@ -358,14 +385,15 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
             <LinearGradient colors={[mainColor1, mainColor2]} start={{ x: -0.4, y: 0.1 }} style={styles.container}>
                 <StatusBar style="light" translucent />
+                 {/*Mês e ano*/}
                 <View style={styles.monthView}>
-                    <TouchableOpacity onPress={() => { }}>
+                    <TouchableOpacity onPress={handlePrevMonth}>
                         <Feather name="arrow-left" size={30} color={colorMonth} />
                     </TouchableOpacity>
                     <Text style={[styles.monthText, { color: colorMonth }]}>
-                        Nov 2020
-                </Text>
-                    <TouchableOpacity onPress={handleResultsByMonth}>
+                        {Functions.convertDtToStringMonth(selectedMonth)} / {selectedYear}
+                    </Text>
+                    <TouchableOpacity onPress={handleNextMonth}>
                         <Feather name="arrow-right" size={30} color={colorMonth} />
                     </TouchableOpacity>
                 </View>
@@ -539,6 +567,11 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
                                             <Text>Vezes</Text>
                                         </View>
+                                        <View style={{alignItems:'flex-end', margin:10}}>
+                                            <TouchableOpacity onPress={() => removeValue(values.id)}>
+                                                    <Feather name="trash-2" size={20} color={colorBorderAddButton} />
+                                            </TouchableOpacity>
+                                        </View>
                                     </View>
                                 )
                             })}
@@ -549,10 +582,25 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         setShowValues(true)
                                         setContPlusButtonPressed(contPlusButtonPressed + 1)
                                         if (contPlusButtonPressed > 0) {
-                                            setIdValues(idValues + 1)
-                                            setValuesArray([...valuesArray, { id: idValues, description: '', value: '0', mensal: false, repeat: 0 }])
+                                            
+                                                setIdValues(idValues + 1)
+                                                setValuesArray([...valuesArray, { id: idValues, description: '', value: '0', mensal: false, repeat: 0 }])
+                                            
                                             //console.log(idValues)
                                             //console.log(valuesArray)
+                                        }
+                                        if (idUpdate != null){
+                                                
+                                            const newValueObj = {
+                                                descricao: '',
+                                                valor: '0',
+                                                dtInicio: Functions.setDtInicio(todayDate),
+                                                dtFim: Functions.setDtFim(false,0,todayDate),
+                                                ganhos_id: idUpdate
+                                            }
+                                            Valores.create(newValueObj)
+                                                updateValuesList()
+
                                         }
                                     }}>
                                     <Feather name='plus' size={40} color={tittleTextColor} />

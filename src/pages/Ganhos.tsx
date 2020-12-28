@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal, Alert } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native';
 import NumberFormat from 'react-number-format';
@@ -37,6 +37,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     }
 
     interface ValuesValues {
+        id:number,
         descricao: string,
         valor: number,
         dtInicio: number,
@@ -67,6 +68,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     const [valuesList, setValuesList] = useState<ValuesValues[]>([])
 
     const todayDate = new Date()
+    const currentDate = new Date()
     const CurrentMonth = todayDate.getMonth() + 1
     const CurrentYear = todayDate.getFullYear()
 
@@ -81,6 +83,52 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         navigation2.navigate('NovoGanho', { item: item , idUpdate: id})
     }
 
+    function handleNextMonth() {
+        //console.log(selectedMonth)
+        let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
+        GanhosBD.findByDate(parseInt(nextDtObj.dt)).then(res => {
+          setEarnings(res._array.filter(earning => earning.tipo == item))
+        }).catch(err => {
+          setEarnings([])
+          console.log(err)
+        })
+    
+        Valores.findByDate(parseInt(nextDtObj.dt)).then(res => {
+          console.log(res)
+          setValuesList(res._array)
+        }).catch(err => {
+          setValuesList([])
+          console.log(err)
+        })
+    
+        //console.log(parseInt(nextDtObj))
+        setSelectedMonth(nextDtObj.nextMonth)
+        setSelectedYear(nextDtObj.nextYear)
+        
+      }
+
+      function handlePrevMonth() {
+        let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
+        
+        GanhosBD.findByDate(parseInt(prevDtObj.dt)).then(res => {
+          setEarnings(res._array.filter(earning => earning.tipo == item))
+        }).catch(err => {
+          setEarnings([])
+          console.log(err)
+        })
+    
+        Valores.findByDate(parseInt(prevDtObj.dt)).then(res => {
+          console.log(res)
+          setValuesList(res._array)
+        }).catch(err => {
+          setValuesList([])
+          console.log(err)
+        })
+    
+        setSelectedMonth(prevDtObj.prevMonth)
+        setSelectedYear(prevDtObj.prevYear)
+
+      }
 
 
     const setData = (date: Date) => {
@@ -99,15 +147,51 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     let cont2: any = []
 
     function removeItem(id: number) {
-        console.log(id)
-        GanhosBD.remove2(id).then(res => {
-            alert('removido!')
-            setEarnings(earnings.filter(ern => ern.id !== id))
-            setValuesList(valuesList.filter(vlu => vlu.ganhos_id !== id))
-            setModalVisible(false)
-        }).catch(err => {
-            console.log(err)
-        })
+        //console.log(id)
+        Alert.alert(
+            "Remover",
+            "Deseja mesmo remover?",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+              },
+              { text: "OK", onPress: () => 
+                GanhosBD.remove2(id).then(res => {
+                    alert('removido!')
+                    setEarnings(earnings.filter(ern => ern.id !== id))
+                    setValuesList(valuesList.filter(vlu => vlu.ganhos_id !== id))
+                    setModalVisible(false)
+                }).catch(err => {
+                    console.log(err)
+                })
+            }
+            ],
+            { cancelable: false }
+          );
+    }
+
+    function removeValue(id: number){
+        Alert.alert(
+            "Remover",
+            "Deseja mesmo remover?",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+              },
+              { text: "OK", onPress: () => 
+                Valores.remove(id).then(res => {
+                    setValuesList(valuesList.filter(vls => vls.id !== id))
+                }).catch(err => {
+                    console.log(err)
+                })
+            }
+            ],
+            { cancelable: false }
+          );
     }
 
     useEffect(() => {
@@ -136,6 +220,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
         setSelectedMonth(CurrentMonth)
         setSelectedYear(CurrentYear)
+
         setData(todayDate)
 
 
@@ -154,6 +239,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                 console.log(err)
             })
             Valores.findByDate(parseInt(firstDate)).then(res => {
+                //console.log(res._array)
                 setValuesList(res._array)
 
             }).catch(err => {
@@ -173,13 +259,13 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             style={styles.container}>
             <StatusBar style="light" translucent />
             <View style={styles.monthView}>
-                <TouchableOpacity onPress={() => { }}>
+                <TouchableOpacity onPress={handlePrevMonth}>
                     <Feather name="arrow-left" size={30} color={colorMonth} />
                 </TouchableOpacity>
                 <Text style={[styles.monthText, { color: colorMonth }]}>
-                    {selectedMonth} / {selectedYear}
+                    {Functions.convertDtToStringMonth(selectedMonth)} / {selectedYear}
                 </Text>
-                <TouchableOpacity onPress={() => { }}>
+                <TouchableOpacity onPress={handleNextMonth}>
                     <Feather name="arrow-right" size={30} color={colorMonth} />
                 </TouchableOpacity>
             </View>
@@ -302,20 +388,32 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                             </View>
                                         </View>
                                         {valuesList.map((value, index) => {
+                                            currentDate.setMonth(selectedMonth-1) 
+                                            currentDate.setFullYear(selectedYear)
                                             if (earning.id == value.ganhos_id)
                                                 return (
                                                     <View style={styles.valuesList} key={index}>
-                                                        <Text style={[styles.valuesListText, { color: colorText }]}>
-                                                            {value.descricao}
-                                                        </Text>
-        
-                                                        <NumberFormat
-                                                            value={value.valor}
-                                                            displayType={'text'}
-                                                            thousandSeparator={true}
-                                                            format={Functions.currencyFormatter}
-                                                            renderText={value => <Text style={[styles.valuesListText, { color: colorText }]}> {value} </Text>}
-                                                        />
+                                                        <View style={{flexDirection:'row'}}>
+                                                            <Text style={[styles.valuesListText, { color: colorText , marginRight:5}]}>
+                                                                {value.descricao}
+                                                            </Text>
+                                                            <Text style={[styles.valuesListText, { color: colorBorderAddButton }]}>
+                                                                {Functions.toFrequency(value.dtFim,value.dtInicio) < 948 ? Functions.toFrequency(value.dtFim,value.dtInicio) - Functions.toFrequency(value.dtFim,Functions.setDtInicio(currentDate)) + "/" + Functions.toFrequency(value.dtFim,value.dtInicio) : null}
+                                                            </Text>
+                                                        </View>
+                                                        <View style={{flexDirection:'row'}}>
+                                                            <NumberFormat
+                                                                value={value.valor}
+                                                                displayType={'text'}
+                                                                thousandSeparator={true}
+                                                                format={Functions.currencyFormatter}
+                                                                renderText={value => <Text style={[styles.valuesListText, { color: colorText }]}> {value} </Text>}
+                                                            />
+                                                            <TouchableOpacity onPress={() => removeValue(value.id)}>
+                                                                <Feather name="trash-2" size={20} color={colorBorderAddButton} />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        
                                                     </View>
                                                 )
                                         })}

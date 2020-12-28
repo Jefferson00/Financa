@@ -43,6 +43,8 @@ function toFrequency(dtfim: number, dtInicio: number){
     sDtfim = dtfim.toString(),
     sDtInicio = dtInicio.toString()
 
+    
+
     for (var i = 0, len = sDtfim.length; i < len; i += 1) {
         outputFim.push(+sDtfim.charAt(i));
     }
@@ -58,8 +60,9 @@ function toFrequency(dtfim: number, dtInicio: number){
     let monthInicio = test.concat(outputInicio[4].toString(),outputInicio[5].toString())
     let yearInicio = test.concat(outputInicio[0].toString(),outputInicio[1].toString(),outputInicio[2].toString(),outputInicio[3].toString())
  
+    
     let frequencia = parseInt(monthFim)-parseInt(monthInicio) + (12* (parseInt(yearFim) - parseInt(yearInicio)))
-
+    console.log(frequencia)
     return frequencia
 }
 

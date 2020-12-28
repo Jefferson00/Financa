@@ -39,6 +39,11 @@ export default function Main() {
   const [selectedYear, setSelectedYear] = useState(2020)
   const [earnings, setEarnings] = useState<EarningsValues[]>([])
   const [valuesList, setValuesList] = useState<ValuesValues[]>([])
+  const [sobra, setSobra] = useState(0)
+
+  const [primaryColor, setPrimaryColor] = useState('#F9CF3C')
+  const [secondColor, setSecondColor] = useState('#B26A15')
+  const [monthColor, setMonthColor] = useState('#1A8289')
 
   function handleNavigateGanhos() {
     navigation.navigate('Ganhos', { item: 'Ganhos' })
@@ -66,7 +71,7 @@ export default function Main() {
     })
 
     Valores.findByDate(parseInt(nextDtObj.dt)).then(res => {
-      console.log(res)
+     // console.log(res)
       setValuesList(res._array)
     }).catch(err => {
       setValuesList([])
@@ -76,6 +81,10 @@ export default function Main() {
     //console.log(parseInt(nextDtObj))
     setSelectedMonth(nextDtObj.nextMonth)
     setSelectedYear(nextDtObj.nextYear)
+
+    calcSobra()
+
+
   }
 
   function handlePrevMonth() {
@@ -89,7 +98,7 @@ export default function Main() {
     })
 
     Valores.findByDate(parseInt(prevDtObj.dt)).then(res => {
-      console.log(res)
+      //console.log(res)
       setValuesList(res._array)
     }).catch(err => {
       setValuesList([])
@@ -98,7 +107,21 @@ export default function Main() {
 
     setSelectedMonth(prevDtObj.prevMonth)
     setSelectedYear(prevDtObj.prevYear)
+
+
   }
+
+  useEffect(()=>{
+    if(selectedMonth != CurrentMonth){
+      setPrimaryColor('#892E1A')
+      setSecondColor('#F9CF3C')
+      setMonthColor('#FFFFFF')
+    }else{
+      setPrimaryColor('#F9CF3C')
+      setSecondColor('#B26A15')
+      setMonthColor('#1A8289')
+    }
+  },[selectedMonth])
 
   const todayDate = new Date()
   const CurrentMonth = todayDate.getMonth() + 1
@@ -110,7 +133,7 @@ export default function Main() {
     setSelectedYear(CurrentYear)
 
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('Refreshed!');
+     // console.log('Refreshed!');
       let firstDate
       if (CurrentMonth < 10) {
           firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
@@ -130,30 +153,54 @@ export default function Main() {
       }).catch(err => {
           console.log(err)
       })
+      calcSobra()
+
+      
   });
   return unsubscribe;
 
-  }, [])
+  
 
+  }, [])
+  
   let contGanhos: any = []
   let contGanhosEstimadas: any = []
   let contDespesas: any = []
   let contDespesasEstimadas: any = []
 
+  function calcSobra(){
+    let ganhos = 0
+    let despesas = 0
+      valuesList.map(value => {
+        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Ganhos') ganhos= ganhos + value.valor
+        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Despesas') despesas = despesas + value.valor
+        
+        //console.log(ganhos-despesas)
+        setSobra(ganhos-despesas)
+    })
+
+  }
+
+  useEffect(()=>{
+    calcSobra()
+  },[valuesList])
+
+  //calcSobra()
+  
   return (
-    <LinearGradient colors={['#F9CF3C', '#B26A15']} style={styles.container}>
+    <LinearGradient colors={[primaryColor, secondColor]} style={styles.container}>
       <StatusBar style="light" translucent />
 
       {/*Mês e ano*/}
       <View style={styles.monthView}>
         <TouchableOpacity onPress={handlePrevMonth}>
-          <Feather name="arrow-left" size={30} color="#1A8289" />
+          <Feather name="arrow-left" size={30} color={monthColor} />
         </TouchableOpacity>
-        <Text style={styles.monthText}>
+        <Text style={[styles.monthText, {color:monthColor}]}>
           {Functions.convertDtToStringMonth(selectedMonth)} / {selectedYear}
         </Text>
         <TouchableOpacity onPress={handleNextMonth}>
-          <Feather name="arrow-right" size={30} color="#1A8289" />
+          <Feather name="arrow-right" size={30} color={monthColor} />
         </TouchableOpacity>
       </View>
 
@@ -163,6 +210,7 @@ export default function Main() {
                 if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Despesas') contDespesasEstimadas.push(value.valor)
                 if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Ganhos') contGanhosEstimadas.push(value.valor)
        })}
+
 
       {/*Saldos*/}
       <View style={styles.balanceView}>
@@ -296,7 +344,6 @@ const styles = StyleSheet.create({
     marginTop: 13,
   },
   monthText: {
-    color: "#1A8289",
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 24,
     marginHorizontal: 5
