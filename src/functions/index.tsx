@@ -66,6 +66,22 @@ function toFrequency(dtfim: number, dtInicio: number){
     return frequencia
 }
 
+function toMonthAndYear(dt: number){
+    var outputDt = [],
+    sDt = dt.toString()
+
+    for (var i = 0, len = sDt.length; i < len; i += 1) {
+        outputDt.push(+sDt.charAt(i));
+    }
+
+    let test:string = ''
+
+    let year = test.concat(outputDt[0].toString(),outputDt[1].toString(),outputDt[2].toString(),outputDt[3].toString())
+    let month = test.concat(outputDt[4].toString(),outputDt[5].toString())
+
+    return {year:year,month:month}
+}
+
 function currencyFormatter(value:any) {
     if (!Number(value)) return "";
   
@@ -202,5 +218,6 @@ export default{
     nextMonth,
     prevMonth,
     toFrequency,
+    toMonthAndYear,
 }
 

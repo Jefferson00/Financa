@@ -5,11 +5,13 @@ import { Feather } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useNavigation } from '@react-navigation/native';
 import NumberFormat from 'react-number-format';
+import AsyncStorage from '@react-native-community/async-storage'
 
 
 import Ganhos from '../services/ganhos'
 import Valores from '../services/valores';
 import Functions from '../functions/index'
+import Restante from '../services/restante'
 
 
 export default function Main() {
@@ -35,11 +37,20 @@ export default function Main() {
     tipo: string,
   }
 
+  interface Saldo {
+    mes: number,
+    ano: number,
+    valor: number,
+  }
+
   const [selectedMonth, setSelectedMonth] = useState(10)
   const [selectedYear, setSelectedYear] = useState(2020)
   const [earnings, setEarnings] = useState<EarningsValues[]>([])
   const [valuesList, setValuesList] = useState<ValuesValues[]>([])
+  const [saldo, setSaldo] = useState<Saldo[]>([])
   const [sobra, setSobra] = useState(0)
+  const [balance, setBalance] = useState(0)
+  const [restante, setRestante] = useState(0)
 
   const [primaryColor, setPrimaryColor] = useState('#F9CF3C')
   const [secondColor, setSecondColor] = useState('#B26A15')
@@ -71,10 +82,24 @@ export default function Main() {
     })
 
     Valores.findByDate(parseInt(nextDtObj.dt)).then(res => {
-     // console.log(res)
+      // console.log(res)
       setValuesList(res._array)
+      let somaGanhos = 0
+      let somaDespesas = 0
+      for (var i = 0; i < res._array.length; i++) {
+        if (res._array[i].tipo == 'Ganhos') {
+          somaGanhos = somaGanhos + res._array[i].valor
+          console.log('Soma Ganhos: ' + somaGanhos)
+        } else if (res._array[i].tipo == 'Despesas') {
+          somaDespesas = somaDespesas + res._array[i].valor
+          console.log('Soma Despesas: ' + somaDespesas)
+        }
+      }
+      console.log('Saldo: ' + (somaGanhos - somaDespesas))
+      setBalance(somaGanhos - somaDespesas)
     }).catch(err => {
       setValuesList([])
+      setBalance(0)
       console.log(err)
     })
 
@@ -82,50 +107,180 @@ export default function Main() {
     setSelectedMonth(nextDtObj.nextMonth)
     setSelectedYear(nextDtObj.nextYear)
 
+    let { lastMonth, lastYear } = selectLastMonth(nextDtObj.nextMonth, nextDtObj.nextYear)
+
+    Restante.findByDate(lastMonth, lastYear).then(res => {
+      setRestante(res._array[0].value)
+      //console.log(res._array[0].value)
+    }).catch(err => {
+      //console.log(err)
+      setRestante(0)
+    })
+
     calcSobra()
+    Restante.findByDate(nextDtObj.nextMonth, nextDtObj.nextYear).then(res => {
+      //console.log(res)
+      let idRestante = res._array[0].id
+      let objUpdate = {
+        month: res._array[0].month,
+        year: res._array[0].year,
+        value: sobra,
+      }
+      Restante.update(idRestante, objUpdate).then(res => {
+        // console.log('atualizado')
+      }).catch(err => {
+        //console.log(err)
+      })
 
-
+    }).catch(err => {
+      //console.log(err)
+      let objRestante = {
+        month: nextDtObj.nextMonth,
+        year: nextDtObj.nextYear,
+        value: sobra,
+      }
+      Restante.create(objRestante).then(res => {
+        //console.log('cadastrado')
+      }).catch(err => {
+        //console.log(err)
+      })
+    })
   }
 
   function handlePrevMonth() {
     let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
-    
+
     Ganhos.findByDate(parseInt(prevDtObj.dt)).then(res => {
       setEarnings(res._array)
     }).catch(err => {
       setEarnings([])
-      console.log(err)
+      //console.log(err)
     })
 
     Valores.findByDate(parseInt(prevDtObj.dt)).then(res => {
       //console.log(res)
       setValuesList(res._array)
+      let somaGanhos = 0
+      let somaDespesas = 0
+      for (var i = 0; i < res._array.length; i++) {
+        if (res._array[i].tipo == 'Ganhos') {
+          somaGanhos = somaGanhos + res._array[i].valor
+          console.log('Soma Ganhos: ' + somaGanhos)
+        } else if (res._array[i].tipo == 'Despesas') {
+          somaDespesas = somaDespesas + res._array[i].valor
+          console.log('Soma Despesas: ' + somaDespesas)
+        }
+      }
+      console.log('Saldo: ' + (somaGanhos - somaDespesas))
+      setBalance(somaGanhos - somaDespesas)
     }).catch(err => {
       setValuesList([])
-      console.log(err)
+      setBalance(0)
+      //console.log(err)
     })
 
     setSelectedMonth(prevDtObj.prevMonth)
     setSelectedYear(prevDtObj.prevYear)
 
+    let { lastMonth, lastYear } = selectLastMonth(prevDtObj.prevMonth, prevDtObj.prevYear)
+
+    Restante.findByDate(lastMonth, lastYear).then(res => {
+      setRestante(res._array[0].value)
+      //console.log(res._array[0].value)
+    }).catch(err => {
+      //console.log(err)
+      setRestante(0)
+    })
 
   }
 
-  useEffect(()=>{
-    if(selectedMonth != CurrentMonth){
+  useEffect(() => {
+    if (selectedMonth != CurrentMonth) {
       setPrimaryColor('#892E1A')
       setSecondColor('#F9CF3C')
       setMonthColor('#FFFFFF')
-    }else{
+    } else {
       setPrimaryColor('#F9CF3C')
       setSecondColor('#B26A15')
       setMonthColor('#1A8289')
     }
-  },[selectedMonth])
+    //clearStorage()
+    //Teste()
+    //const t = selectLastMonth(selectedMonth,selectedYear)
+    // console.log(t.lastMonth,t.lastYear)
+    /*let rest
+      if (Teste2(t.lastMonth,t.lastYear) !== null){
+          rest = Teste2(t.lastMonth,t.lastYear)
+
+          rest.then(res=>{
+            if (res.sobra){
+              setRestante(res.sobra)
+            }else{
+              setRestante(0)
+            }
+          }).catch(err=>{
+            console.log(err)
+          })
+      }*/
+
+  }, [selectedMonth])
 
   const todayDate = new Date()
   const CurrentMonth = todayDate.getMonth() + 1
   const CurrentYear = todayDate.getFullYear()
+
+  async function clearStorage() {
+    try {
+      await AsyncStorage.clear()
+      //console.log('Storage successfully cleared!')
+    } catch (e) {
+      //console.log('Failed to clear the async storage.')
+    }
+  }
+
+  async function Teste() {
+    let objTeste = {
+      month: selectedMonth,
+      year: selectedYear,
+      sobra: sobra,
+    }
+    try {
+      await AsyncStorage.setItem(
+        `@Teste` + selectedMonth + selectedYear,
+        JSON.stringify(objTeste)
+      )
+      //console.log('Ok')
+    } catch (error) {
+      //console.log(error)
+    }
+  }
+
+  async function Teste2(lastMonth: number, lastYear: number) {
+    try {
+      const value = await AsyncStorage.getItem(`@Teste` + lastMonth + lastYear);
+
+      if (value !== null) {
+        const test = JSON.parse(value)
+        return test
+      }
+      else {
+        return null
+      }
+    } catch (error) {
+      // console.log(error)
+    }
+  }
+
+  function selectLastMonth(month: number, year: number) {
+    let lastMonth = month - 1
+    let lastYear = year
+    if (lastMonth == 0) {
+      lastMonth = 12
+      lastYear = year - 1
+    }
+
+    return { lastMonth: lastMonth, lastYear: lastYear }
+  }
 
   useEffect(() => {
 
@@ -133,60 +288,205 @@ export default function Main() {
     setSelectedYear(CurrentYear)
 
     const unsubscribe = navigation.addListener('focus', () => {
-     // console.log('Refreshed!');
+      // console.log('Refreshed!');
       let firstDate
+      //let lastDate
+      //let lastBalance : number = 0
+      //let last = selectLastMonth(CurrentMonth,CurrentYear)
       if (CurrentMonth < 10) {
-          firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
+        firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
       } else {
-          firstDate = CurrentYear.toString() + CurrentMonth.toString()
+        firstDate = CurrentYear.toString() + CurrentMonth.toString()
       }
-      Ganhos.findByDate(parseInt(firstDate)).then(res => {
-          setEarnings(res._array)
-         // console.log(res._array)
+
+      /*if (last.lastMonth < 10){
+          lastDate = last.lastMonth.toString()+ '0' + last.lastYear.toString()
+      }else{
+          lastDate = last.lastMonth.toString() + last.lastYear.toString()
+      }
+      console.log(lastDate)
+      Valores.findByDate(parseInt(lastDate)).then(res=>{
+        let somaGanhos = 0
+          let somaDespesas = 0 
+            for(var i=0; i < res._array.length; i++){
+              if(res._array[i].tipo == 'Ganhos'){
+                somaGanhos = somaGanhos + res._array[i].valor
+                console.log('Soma Ganhos: '+somaGanhos)
+              }else if(res._array[i].tipo == 'Despesas'){
+                somaDespesas = somaDespesas + res._array[i].valor
+                console.log('Soma Despesas: '+somaDespesas)
+              }
+            }
+            lastBalance = somaGanhos - somaDespesas
       }).catch(err => {
-          console.log(err)
-      })
-      Valores.findByDate(parseInt(firstDate)).then(res => {
-          setValuesList(res._array)
-          //console.log(res._array)
+        console.log(err)
+      })*/
+
+      Ganhos.findByDate(parseInt(firstDate)).then(res => {
+        setEarnings(res._array)
 
       }).catch(err => {
-          console.log(err)
+        console.log(err)
+      })
+      Valores.findByDate(parseInt(firstDate)).then(res => {
+        setValuesList(res._array)
+        let somaGanhos = 0
+        let somaDespesas = 0
+        for (var i = 0; i < res._array.length; i++) {
+          if (res._array[i].tipo == 'Ganhos') {
+            somaGanhos = somaGanhos + res._array[i].valor
+            //console.log('Soma Ganhos: '+somaGanhos)
+          } else if (res._array[i].tipo == 'Despesas') {
+            somaDespesas = somaDespesas + res._array[i].valor
+            //console.log('Soma Despesas: '+somaDespesas)
+          }
+        }
+        // console.log(lastBalance)
+        // setBalance(lastBalance + (somaGanhos - somaDespesas))
+
+      }).catch(err => {
+        console.log(err)
+      })
+
+
+      Valores.allOrderByDate().then(res => {
+        let dtInicio = res._array[0].dtInicio
+        let ano: number = parseInt(Functions.toMonthAndYear(dtInicio).year)
+        let mes: number = parseInt(Functions.toMonthAndYear(dtInicio).month)
+        let dateP
+        let somaSal = 0
+        let objSal : any
+        let ArrCU : any = []
+        setSaldo([])
+        //console.log(Functions.toMonthAndYear(dtInicio).year)
+        do {
+          for (var i = mes; i <= 13; i++) {
+            if (i == 13) {
+              mes = 1
+              ano = ano + 1
+            } else {
+              //console.log("Mês: " + i + " Ano: " + ano)
+              if (i < 10) {
+                dateP = ano.toString() + '0' + i.toString()
+              } else {
+                dateP = ano.toString() + i.toString()
+              }
+              //console.log(dateP)
+              Valores.findByDate(parseInt(dateP)).then(res => {
+
+                let somaGanhos = 0
+                let somaDespesas = 0
+                for (var t = 0; t < res._array.length; t++) {
+                  if (res._array[t].tipo == 'Ganhos') {
+                    somaGanhos = somaGanhos + res._array[t].valor
+                    //console.log('Soma Ganhos: '+somaGanhos)
+                  } else if (res._array[t].tipo == 'Despesas') {
+                    somaDespesas = somaDespesas + res._array[t].valor
+                    //console.log('Soma Despesas: '+somaDespesas)
+                  }
+                }
+                let sal = somaGanhos - somaDespesas
+                somaSal = somaSal + sal
+                //console.log(i)
+                
+                
+                
+                
+                //console.log('---------------------')
+              }).catch(err => {
+                console.log(err)
+              })
+              objSal = {
+                mes:i,
+                ano:ano,
+                valor:somaSal
+              }
+             // console.log(objSal)
+              ArrCU.push(objSal)
+
+                //console.log('Mes: '+i)
+                //console.log('Ano: '+ano)
+              //console.log('Saldo: '+somaSal)
+            }
+            
+          }
+        } while (ano < 2022)
+        console.log(ArrCU)
+        setSaldo(ArrCU)
       })
       calcSobra()
 
-      
-  });
-  return unsubscribe;
-
+      /*Restante.findByDate(CurrentMonth,CurrentYear).then(res=>{
+        //console.log(res)
+        let idRestante = res._array[0].id
+        let objUpdate = {
+            month: res._array[0].month,
+            year: res._array[0].year,
+            value: sobra,
+        }
+          Restante.update(idRestante,objUpdate).then(res=>{
+              //console.log('atualizado')
+          }).catch(err=>{
+            //console.log(err)
+          })
   
+    }).catch(err=>{
+      //console.log(err)
+          let objRestante = {
+              month: CurrentMonth,
+              year: CurrentYear,
+              value: sobra,
+          }
+          Restante.create(objRestante).then(res=>{
+             // console.log('cadastrado')
+          }).catch(err=>{
+              //console.log(err)
+          })
+    })*/
+
+      //let {lastMonth, lastYear} = selectLastMonth(CurrentMonth,CurrentYear)
+
+      /* Restante.findByDate(lastMonth, lastYear).then(res =>{
+           setRestante(res._array[0].value)
+           //console.log(res._array[0].value)
+       }).catch(err=>{
+          // console.log(err)
+           setRestante(0)
+       })*/
+
+
+    });
+    return unsubscribe;
+
+
 
   }, [])
-  
+
   let contGanhos: any = []
   let contGanhosEstimadas: any = []
   let contDespesas: any = []
   let contDespesasEstimadas: any = []
 
-  function calcSobra(){
+  function calcSobra() {
     let ganhos = 0
     let despesas = 0
-      valuesList.map(value => {
-        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Ganhos') ganhos= ganhos + value.valor
-        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Despesas') despesas = despesas + value.valor
-        
-        //console.log(ganhos-despesas)
-        setSobra(ganhos-despesas)
+    valuesList.map(value => {
+      if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Ganhos') ganhos = ganhos + value.valor
+      if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Despesas') despesas = despesas + value.valor
+
+      //console.log(ganhos-despesas)
+      setSobra((ganhos - despesas) + restante)
     })
 
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     calcSobra()
-  },[valuesList])
+    //console.log(sobra)
+  }, [valuesList])
 
   //calcSobra()
-  
+  //console.log(saldo)
   return (
     <LinearGradient colors={[primaryColor, secondColor]} style={styles.container}>
       <StatusBar style="light" translucent />
@@ -196,7 +496,7 @@ export default function Main() {
         <TouchableOpacity onPress={handlePrevMonth}>
           <Feather name="arrow-left" size={30} color={monthColor} />
         </TouchableOpacity>
-        <Text style={[styles.monthText, {color:monthColor}]}>
+        <Text style={[styles.monthText, { color: monthColor }]}>
           {Functions.convertDtToStringMonth(selectedMonth)} / {selectedYear}
         </Text>
         <TouchableOpacity onPress={handleNextMonth}>
@@ -205,11 +505,11 @@ export default function Main() {
       </View>
 
       {valuesList.map(value => {
-                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Ganhos') contGanhos.push(value.valor)
-                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Despesas') contDespesas.push(value.valor)
-                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Despesas') contDespesasEstimadas.push(value.valor)
-                if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Ganhos') contGanhosEstimadas.push(value.valor)
-       })}
+        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Ganhos') contGanhos.push(value.valor)
+        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Despesas') contDespesas.push(value.valor)
+        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Despesas') contDespesasEstimadas.push(value.valor)
+        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Ganhos') contGanhosEstimadas.push(value.valor)
+      })}
 
 
       {/*Saldos*/}
@@ -218,58 +518,71 @@ export default function Main() {
           <Text style={styles.currentBalanceText}>
             Seu Saldo Atual
             </Text>
-            <NumberFormat
-              value={
-                contGanhos.reduce((a: any, b: any) => a + b, 0) - contDespesas.reduce((a: any, b: any) => a + b, 0)
-              }
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-            />
+          {saldo.map((sal,index) => {
+              //console.log(sal.ano)
+              //console.log(sal.mes)
+              
+                if (sal.ano == selectedYear && sal.mes == selectedMonth){
+                  return (
+                    <View key={index}> 
+                        <NumberFormat
+                        value={
+                          sal.valor
+                        }
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        format={Functions.currencyFormatter}
+                        renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                      />
+                    </View>
+                  )
+                }
+              
+          })}
+
         </View>
         <View style={styles.currentBalanceView}>
           <Text style={styles.estimatedBalanceText}>
             Saldo Estimado
             </Text>
-            <NumberFormat
-              value={
-                contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0) - contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)
-              }
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-            />
+          <NumberFormat
+            value={
+              contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0) - contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)
+            }
+            displayType={'text'}
+            thousandSeparator={true}
+            format={Functions.currencyFormatter}
+            renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+          />
         </View>
       </View>
 
       {/*Ganhos e Despesas*/}
-         
+
       <View style={styles.valuesView}>
         <View style={styles.currentBalanceView}>
           <Text style={styles.earningsText}>
             Ganhos
             </Text>
-            <NumberFormat
-              value={contGanhos.reduce((a: any, b: any) => a + b, 0)}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-            />       
+          <NumberFormat
+            value={contGanhos.reduce((a: any, b: any) => a + b, 0)}
+            displayType={'text'}
+            thousandSeparator={true}
+            format={Functions.currencyFormatter}
+            renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+          />
         </View>
         <View style={styles.currentBalanceView}>
           <Text style={styles.expensesText}>
             Despesas
             </Text>
-            <NumberFormat
-              value={contDespesas.reduce((a: any, b: any) => a + b, 0)}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-            /> 
+          <NumberFormat
+            value={contDespesas.reduce((a: any, b: any) => a + b, 0)}
+            displayType={'text'}
+            thousandSeparator={true}
+            format={Functions.currencyFormatter}
+            renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+          />
         </View>
       </View>
 

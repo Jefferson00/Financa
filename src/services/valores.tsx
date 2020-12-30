@@ -72,6 +72,20 @@ db.transaction((tx) => {
     })
   }
 
+  const allOrderByDate = () => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        //comando SQL modificável
+        tx.executeSql(
+          "SELECT * FROM valuesTable ORDER BY dtInicio;",
+          [],
+          //-----------------------
+          (_, { rows }) => resolve(rows),
+        )
+      })
+    })
+  }
+
   const remove = (id:number) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -95,4 +109,5 @@ db.transaction((tx) => {
     findByDate,
     remove,
     update,
+    allOrderByDate,
 }
