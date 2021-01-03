@@ -51,6 +51,9 @@ export default function Main() {
   const [sobra, setSobra] = useState(0)
   const [balance, setBalance] = useState(0)
   const [restante, setRestante] = useState(0)
+  const [somaSaldo, setSomaSaldo] = useState(0)
+  let ArrCU : any = []
+  let datas: any = []
 
   const [primaryColor, setPrimaryColor] = useState('#F9CF3C')
   const [secondColor, setSecondColor] = useState('#B26A15')
@@ -89,13 +92,13 @@ export default function Main() {
       for (var i = 0; i < res._array.length; i++) {
         if (res._array[i].tipo == 'Ganhos') {
           somaGanhos = somaGanhos + res._array[i].valor
-          console.log('Soma Ganhos: ' + somaGanhos)
+          //console.log('Soma Ganhos: ' + somaGanhos)
         } else if (res._array[i].tipo == 'Despesas') {
           somaDespesas = somaDespesas + res._array[i].valor
-          console.log('Soma Despesas: ' + somaDespesas)
+          //console.log('Soma Despesas: ' + somaDespesas)
         }
       }
-      console.log('Saldo: ' + (somaGanhos - somaDespesas))
+      //console.log('Saldo: ' + (somaGanhos - somaDespesas))
       setBalance(somaGanhos - somaDespesas)
     }).catch(err => {
       setValuesList([])
@@ -103,48 +106,9 @@ export default function Main() {
       console.log(err)
     })
 
-    //console.log(parseInt(nextDtObj))
     setSelectedMonth(nextDtObj.nextMonth)
     setSelectedYear(nextDtObj.nextYear)
 
-    let { lastMonth, lastYear } = selectLastMonth(nextDtObj.nextMonth, nextDtObj.nextYear)
-
-    Restante.findByDate(lastMonth, lastYear).then(res => {
-      setRestante(res._array[0].value)
-      //console.log(res._array[0].value)
-    }).catch(err => {
-      //console.log(err)
-      setRestante(0)
-    })
-
-    calcSobra()
-    Restante.findByDate(nextDtObj.nextMonth, nextDtObj.nextYear).then(res => {
-      //console.log(res)
-      let idRestante = res._array[0].id
-      let objUpdate = {
-        month: res._array[0].month,
-        year: res._array[0].year,
-        value: sobra,
-      }
-      Restante.update(idRestante, objUpdate).then(res => {
-        // console.log('atualizado')
-      }).catch(err => {
-        //console.log(err)
-      })
-
-    }).catch(err => {
-      //console.log(err)
-      let objRestante = {
-        month: nextDtObj.nextMonth,
-        year: nextDtObj.nextYear,
-        value: sobra,
-      }
-      Restante.create(objRestante).then(res => {
-        //console.log('cadastrado')
-      }).catch(err => {
-        //console.log(err)
-      })
-    })
   }
 
   function handlePrevMonth() {
@@ -165,32 +129,19 @@ export default function Main() {
       for (var i = 0; i < res._array.length; i++) {
         if (res._array[i].tipo == 'Ganhos') {
           somaGanhos = somaGanhos + res._array[i].valor
-          console.log('Soma Ganhos: ' + somaGanhos)
+          
         } else if (res._array[i].tipo == 'Despesas') {
           somaDespesas = somaDespesas + res._array[i].valor
-          console.log('Soma Despesas: ' + somaDespesas)
+
         }
       }
-      console.log('Saldo: ' + (somaGanhos - somaDespesas))
-      setBalance(somaGanhos - somaDespesas)
     }).catch(err => {
       setValuesList([])
-      setBalance(0)
       //console.log(err)
     })
 
     setSelectedMonth(prevDtObj.prevMonth)
     setSelectedYear(prevDtObj.prevYear)
-
-    let { lastMonth, lastYear } = selectLastMonth(prevDtObj.prevMonth, prevDtObj.prevYear)
-
-    Restante.findByDate(lastMonth, lastYear).then(res => {
-      setRestante(res._array[0].value)
-      //console.log(res._array[0].value)
-    }).catch(err => {
-      //console.log(err)
-      setRestante(0)
-    })
 
   }
 
@@ -204,72 +155,11 @@ export default function Main() {
       setSecondColor('#B26A15')
       setMonthColor('#1A8289')
     }
-    //clearStorage()
-    //Teste()
-    //const t = selectLastMonth(selectedMonth,selectedYear)
-    // console.log(t.lastMonth,t.lastYear)
-    /*let rest
-      if (Teste2(t.lastMonth,t.lastYear) !== null){
-          rest = Teste2(t.lastMonth,t.lastYear)
-
-          rest.then(res=>{
-            if (res.sobra){
-              setRestante(res.sobra)
-            }else{
-              setRestante(0)
-            }
-          }).catch(err=>{
-            console.log(err)
-          })
-      }*/
-
   }, [selectedMonth])
 
   const todayDate = new Date()
   const CurrentMonth = todayDate.getMonth() + 1
   const CurrentYear = todayDate.getFullYear()
-
-  async function clearStorage() {
-    try {
-      await AsyncStorage.clear()
-      //console.log('Storage successfully cleared!')
-    } catch (e) {
-      //console.log('Failed to clear the async storage.')
-    }
-  }
-
-  async function Teste() {
-    let objTeste = {
-      month: selectedMonth,
-      year: selectedYear,
-      sobra: sobra,
-    }
-    try {
-      await AsyncStorage.setItem(
-        `@Teste` + selectedMonth + selectedYear,
-        JSON.stringify(objTeste)
-      )
-      //console.log('Ok')
-    } catch (error) {
-      //console.log(error)
-    }
-  }
-
-  async function Teste2(lastMonth: number, lastYear: number) {
-    try {
-      const value = await AsyncStorage.getItem(`@Teste` + lastMonth + lastYear);
-
-      if (value !== null) {
-        const test = JSON.parse(value)
-        return test
-      }
-      else {
-        return null
-      }
-    } catch (error) {
-      // console.log(error)
-    }
-  }
 
   function selectLastMonth(month: number, year: number) {
     let lastMonth = month - 1
@@ -287,8 +177,8 @@ export default function Main() {
     setSelectedMonth(CurrentMonth)
     setSelectedYear(CurrentYear)
 
+    
     const unsubscribe = navigation.addListener('focus', () => {
-      // console.log('Refreshed!');
       let firstDate
       //let lastDate
       //let lastBalance : number = 0
@@ -329,6 +219,7 @@ export default function Main() {
         console.log(err)
       })
       Valores.findByDate(parseInt(firstDate)).then(res => {
+        
         setValuesList(res._array)
         let somaGanhos = 0
         let somaDespesas = 0
@@ -350,14 +241,15 @@ export default function Main() {
 
 
       Valores.allOrderByDate().then(res => {
+        
         let dtInicio = res._array[0].dtInicio
         let ano: number = parseInt(Functions.toMonthAndYear(dtInicio).year)
         let mes: number = parseInt(Functions.toMonthAndYear(dtInicio).month)
         let dateP
         let somaSal = 0
         let objSal : any
-        let ArrCU : any = []
-        setSaldo([])
+        
+    
         //console.log(Functions.toMonthAndYear(dtInicio).year)
         do {
           for (var i = mes; i <= 13; i++) {
@@ -372,9 +264,40 @@ export default function Main() {
                 dateP = ano.toString() + i.toString()
               }
               //console.log(dateP)
-              Valores.findByDate(parseInt(dateP)).then(res => {
+              datas.push(dateP)
+ 
+            }
+            
+          }
+        } while (ano < 2022)
+        test().then(()=>{
+          loadBalance()
+        })
+      })
+      calcSobra()
+      datas = []
 
-                let somaGanhos = 0
+    });
+    return unsubscribe;
+
+
+
+  }, [])
+
+  async function test(){
+    await new Promise((resolve,reject)=>{
+      resolve(setSaldo([]))
+    })
+  }
+
+  async function loadBalance(){
+    let somaSald = 0
+    let arraypvfrfunciona :any = []
+    setSaldo([])
+
+      for (const [index, data] of datas.entries()){
+        const todo = await Valores.findByDate(parseInt(data)).then(res => {
+            let somaGanhos = 0
                 let somaDespesas = 0
                 for (var t = 0; t < res._array.length; t++) {
                   if (res._array[t].tipo == 'Ganhos') {
@@ -386,81 +309,41 @@ export default function Main() {
                   }
                 }
                 let sal = somaGanhos - somaDespesas
-                somaSal = somaSal + sal
-                //console.log(i)
-                
-                
-                
-                
-                //console.log('---------------------')
-              }).catch(err => {
-                console.log(err)
-              })
-              objSal = {
-                mes:i,
-                ano:ano,
-                valor:somaSal
-              }
-             // console.log(objSal)
-              ArrCU.push(objSal)
+                somaSald = somaSald + sal
+                let year = parseInt(Functions.toMonthAndYear(data).year)
+                let month = parseInt(Functions.toMonthAndYear(data).month)
+                let obj : Saldo=  {mes: month, ano : year, valor: somaSald}
+                //console.log(obj)
+                if (arraypvfrfunciona.indexOf(obj) > -1){
 
-                //console.log('Mes: '+i)
-                //console.log('Ano: '+ano)
-              //console.log('Saldo: '+somaSal)
-            }
-            
-          }
-        } while (ano < 2022)
-        console.log(ArrCU)
-        setSaldo(ArrCU)
-      })
-      calcSobra()
+                }else{
+                  arraypvfrfunciona.push(obj)
+                }
+        }).catch(err => {
+          console.log(err)
+        })
+      }
+        setSaldo(arraypvfrfunciona)
 
-      /*Restante.findByDate(CurrentMonth,CurrentYear).then(res=>{
-        //console.log(res)
-        let idRestante = res._array[0].id
-        let objUpdate = {
-            month: res._array[0].month,
-            year: res._array[0].year,
-            value: sobra,
+      arraypvfrfunciona = []
+  }
+
+  function containObject(obj:any, array:any){
+    for(var i=0; i< array.length; i++){
+      console.log('Saldo: '+array[i])
+      console.log('Objeto: '+obj)
+        if(array[i] === obj){
+          return true
         }
-          Restante.update(idRestante,objUpdate).then(res=>{
-              //console.log('atualizado')
-          }).catch(err=>{
-            //console.log(err)
-          })
-  
-    }).catch(err=>{
-      //console.log(err)
-          let objRestante = {
-              month: CurrentMonth,
-              year: CurrentYear,
-              value: sobra,
-          }
-          Restante.create(objRestante).then(res=>{
-             // console.log('cadastrado')
-          }).catch(err=>{
-              //console.log(err)
-          })
-    })*/
+        else{
+          return false
+        }
+    }
+  }
 
-      //let {lastMonth, lastYear} = selectLastMonth(CurrentMonth,CurrentYear)
-
-      /* Restante.findByDate(lastMonth, lastYear).then(res =>{
-           setRestante(res._array[0].value)
-           //console.log(res._array[0].value)
-       }).catch(err=>{
-          // console.log(err)
-           setRestante(0)
-       })*/
-
-
-    });
-    return unsubscribe;
-
-
-
-  }, [])
+  useEffect(()=>{
+    //console.log(saldo)
+  },[saldo])
 
   let contGanhos: any = []
   let contGanhosEstimadas: any = []
@@ -519,24 +402,26 @@ export default function Main() {
             Seu Saldo Atual
             </Text>
           {saldo.map((sal,index) => {
-              //console.log(sal.ano)
+              //console.log(sal)
               //console.log(sal.mes)
               
-                if (sal.ano == selectedYear && sal.mes == selectedMonth){
-                  return (
-                    <View key={index}> 
-                        <NumberFormat
-                        value={
-                          sal.valor
-                        }
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        format={Functions.currencyFormatter}
-                        renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-                      />
-                    </View>
-                  )
-                }
+                
+                  if(sal.ano == selectedYear && sal.mes == selectedMonth){
+                    return (
+                      <View key={index}> 
+                          <NumberFormat
+                          value={
+                            sal.valor
+                          }
+                          displayType={'text'}
+                          thousandSeparator={true}
+                          format={Functions.currencyFormatter}
+                          renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                        />
+                      </View>
+                    )
+                  }
+               
               
           })}
 
