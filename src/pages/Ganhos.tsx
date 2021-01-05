@@ -233,7 +233,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             } else {
                 firstDate = CurrentYear.toString() + CurrentMonth.toString()
             }
-            GanhosBD.findByDate(parseInt(firstDate)).then(res => {
+            GanhosBD.findByDateOrderByDay(parseInt(firstDate)).then(res => {
                 setEarnings(res._array.filter(earning => earning.tipo == item))
             }).catch(err => {
                 console.log(err)
@@ -302,11 +302,16 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             </View>
 
             <View style={styles.mainContainer}>
+                <View style={{ flex: 1,height:'100%'}}>
                 <ScrollView style={styles.scrollViewContainer}>
                     {earnings.map((earning, index) => {
                         var totalValues = 0
+                        var opac = 1
+                        if (earning.dia > todayDate.getDate()) {
+                            opac = 0.7
+                        }
                         return (
-                            <TouchableOpacity style={styles.earningsItemView} onPress={() => showModal(earning.id, totalValues)} key={index}>
+                            <TouchableOpacity style={[styles.earningsItemView,{opacity:opac}]} onPress={() => showModal(earning.id, totalValues)} key={index}>
                                 <Feather name="dollar-sign" size={40} color={colorText} />
                                 {valuesList.map(value => {
 
@@ -338,6 +343,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                         )
                     })}
                 </ScrollView>
+                </View>
 
                 <View style={{ justifyContent: 'flex-end', flex: 1 }}>
                     <LinearGradient
@@ -513,7 +519,7 @@ const styles = StyleSheet.create({
         bottom: 0,
     },
     scrollViewContainer: {
-        minHeight: 250,
+        minHeight:400,
         marginTop: 20,
         flex: 1,
     },

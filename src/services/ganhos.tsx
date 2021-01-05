@@ -56,6 +56,22 @@ db.transaction((tx) => {
     })
   }
 
+  const findByDateOrderByDay = (dt:number) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        //comando SQL modificável
+        tx.executeSql(
+          "SELECT * FROM earnings WHERE dtInicio<=? and dtFim>=? ORDER BY dia;",
+          [dt,dt],
+          //-----------------------
+          (_, { rows }) => {
+            if (rows.length > 0) resolve(rows);
+            else reject("Obj not found: id=" + dt); // nenhum registro encontrado
+          })
+      })
+    })
+  }
+
   const findById = (id:number) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -125,4 +141,5 @@ db.transaction((tx) => {
     remove2,
     findById,
     update,
+    findByDateOrderByDay,
 }
