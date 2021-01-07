@@ -14,6 +14,7 @@ import { ScrollView, Switch } from 'react-native-gesture-handler';
 
 import Ganhos from '../services/ganhos'
 import Valores from '../services/valores'
+import Recebidos from '../services/recebidos'
 import Functions from '../functions/index'
 
 export default function NovoGanho({ route }: { route: any }, { navigation }: { navigation: any }) {
@@ -221,6 +222,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             tipo: item
         }
         Ganhos.create(GanhoObj)
+        
 
         Ganhos.all().then(res => {
             //console.log(res)
@@ -236,10 +238,19 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                     dtFim: Functions.setDtFim(value.mensal, value.repeat, date),
                     ganhos_id: res._array.slice(-1)[0].id
                 }
-                console.log(ValueObj.dtFim)
+                //console.log(ValueObj.dtFim)
+                
                 Valores.create(ValueObj)
                 setSuccessModal(true)
             })
+            
+            const RecebidoObj = {
+                month: selectedMonth,
+                year:  selectedYear,
+                recebido: isEnabledReceived,
+                ganhos_id: res._array.slice(-1)[0].id,
+            }
+            Recebidos.create(RecebidoObj)
 
         }).catch(err => {
             console.log(err)
@@ -285,6 +296,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
         setSelectedMonth(nextDtObj.nextMonth)
         setSelectedYear(nextDtObj.nextYear)
+
+        date.setMonth(nextDtObj.nextMonth-1)
+        date.setFullYear(nextDtObj.nextYear)
     }
 
     function handlePrevMonth() {
@@ -292,6 +306,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     
         setSelectedMonth(prevDtObj.prevMonth)
         setSelectedYear(prevDtObj.prevYear)
+
+        date.setMonth(prevDtObj.prevMonth-1)
+        date.setFullYear(prevDtObj.prevYear)
       }
 
     useEffect(() => {
@@ -391,7 +408,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                         <Feather name="arrow-left" size={30} color={colorMonth} />
                     </TouchableOpacity>
                     <Text style={[styles.monthText, { color: colorMonth }]}>
-                        {Functions.convertDtToStringMonth(selectedMonth)} / {selectedYear}
+                        {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
                     </Text>
                     <TouchableOpacity onPress={handleNextMonth}>
                         <Feather name="arrow-right" size={30} color={colorMonth} />
@@ -417,7 +434,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                             </Text>
                             <View style={styles.dateView}>
                                 <Text style={[styles.subTittleText, { color: secondColor }]} onPress={showDatepicker}>
-                                    {date.getDate()} / {date.getUTCMonth() + 1}
+                                    {date.getDate()} / {Functions.convertDtToStringMonth(date.getUTCMonth() + 1)}
                                 </Text>
                             </View>
 
@@ -479,7 +496,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                     placeholder='R$ 0,00'
                                     onChange={updateValues('value', 0, false)}
                                     value={valuesArray[0].value.toString()}
-                                    style={styles.InputText}
+                                    style={styles.InputTextValue}
                                 />
 
                             </View>
@@ -491,19 +508,24 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                             <View style={styles.valuesView}>
                                                 <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                                                     Descrição
-                                            </Text>
+                                                </Text>
                                                 <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                                                     Valor
                                             </Text>
                                             </View>
                                             <View style={styles.valuesView}>
 
-                                                <TextInput onChange={updateValues('description', index, false)} value={values.description} style={styles.InputText} />
-                                                <TextInput placeholder='R$ 0,00' onChange={updateValues('value', index, false)} value={values.value.toString()} style={styles.InputText} />
+                                                <TextInput onChange={updateValues('description', index, false)} value={values.description} style={[styles.InputText, {width:150}]} />
+                                                <TextInput placeholder='R$ 0,00' onChange={updateValues('value', index, false)} value={values.value.toString()} style={styles.InputTextValue} />
 
                                             </View>
+                                            <View style={styles.valuesView}>
+                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                                    Periodicidade
+                                                </Text>
+                                            </View>
                                             <View style={styles.frequencyView}>
-                                                <Text>Mensal</Text>
+                                                <Text style={[styles.secondColorText, { color: secondColor}]}>Mensal</Text>
                                                 <Switch
                                                     trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
                                                     thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
@@ -519,7 +541,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                                     keyboardType='numeric'
                                                 />
 
-                                                <Text>Vezes</Text>
+                                                <Text style={[styles.secondColorText, { color: secondColor}]}>Vezes</Text>
                                             </View>
                                         </View>
                                     )
@@ -576,7 +598,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 )
                             })}
 
-                            <View style={{ alignItems: "flex-end", paddingVertical: 26 }}>
+                            <View style={styles.newValuesView}>
+                                <Text style={[styles.newValuesText, {color:tittleTextColor}]}>
+                                    Adcionar Novos Valores
+                                </Text>
                                 <TouchableOpacity style={[styles.plusButtonModal, { borderColor: colorBorderAddButton }]}
                                     onPress={() => {
                                         setShowValues(true)
@@ -671,10 +696,18 @@ const styles = StyleSheet.create({
         borderColor: '#d2d2d2',
         color: '#136065',
     },
+    InputTextValue:{
+        height: 40,
+        color: '#136065',
+        fontFamily: 'Poppins_500Medium',
+        fontSize: 18,
+        textAlign:'center',
+    },
     frequencyView: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop:19,
     },
     valuesView: {
         flexDirection: 'row',
@@ -682,16 +715,19 @@ const styles = StyleSheet.create({
     },
     dateView: {
         borderWidth: 1,
-        borderColor: '#d2d2d2',
+        borderColor: '#d3d3d3',
         width: 60,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#E9E9E9',
+        flexDirection:'row'
     },
     valuesViewItem: {
         backgroundColor: '#f1f1f1',
         paddingHorizontal: 15,
         paddingVertical: 5,
+        paddingBottom:10,
+        justifyContent:'center',
         marginBottom: 10,
         borderColor: '#eaeaea',
         borderWidth: 1,
@@ -901,6 +937,16 @@ const styles = StyleSheet.create({
     secondColorText: {
         fontFamily: 'Poppins_500Medium',
         fontSize: 12,
+    },
+    newValuesView:{
+        alignItems: "center", 
+        paddingVertical: 26,
+        flexDirection:'row',
+        justifyContent:'space-between'
+    },
+    newValuesText:{
+        fontSize: 18,
+        fontFamily: 'Poppins_600SemiBold',
     }
 
 })

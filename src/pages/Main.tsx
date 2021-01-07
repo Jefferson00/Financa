@@ -50,8 +50,7 @@ export default function Main() {
   const [nextEarnings2, setNextEarnings2] = useState<EarningsValues[]>([])
   const [valuesList, setValuesList] = useState<ValuesValues[]>([])
   const [saldo, setSaldo] = useState<Saldo[]>([])
-  const [restante, setRestante] = useState(0)
-
+  
   let datas: any = []
 
   const [primaryColor, setPrimaryColor] = useState('#F9CF3C')
@@ -205,22 +204,14 @@ export default function Main() {
             }
           }
         } while (ano < 2022)
-        test().then(() => {
-          loadBalance()
-        })
+        loadBalance()
       })
-      //calcSobra()
       datas = []
 
     });
     return unsubscribe;
   }, [])
 
-  async function test() {
-    await new Promise((resolve, reject) => {
-      resolve(setSaldo([]))
-    })
-  }
 
   async function loadBalance() {
     let somaSald = 0
@@ -276,7 +267,7 @@ export default function Main() {
           <Feather name="arrow-left" size={30} color={monthColor} />
         </TouchableOpacity>
         <Text style={[styles.monthText, { color: monthColor }]}>
-          {Functions.convertDtToStringMonth(selectedMonth)} / {selectedYear}
+          {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
         </Text>
         <TouchableOpacity onPress={handleNextMonth}>
           <Feather name="arrow-right" size={30} color={monthColor} />
@@ -296,7 +287,7 @@ export default function Main() {
         <View style={styles.currentBalanceView}>
           <Text style={styles.currentBalanceText}>
             Seu Saldo Atual
-            </Text>
+          </Text>
           {saldo.map((sal, index) => {
             if (sal.ano == selectedYear && sal.mes == selectedMonth) {
               return (
@@ -306,7 +297,10 @@ export default function Main() {
                     displayType={'text'}
                     thousandSeparator={true}
                     format={Functions.currencyFormatter}
-                    renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                    renderText={value => 
+                    <Text style={styles.currentBalanceTextValue}> 
+                      {value} 
+                    </Text>}
                   />
                 </View>
               )
@@ -324,7 +318,10 @@ export default function Main() {
             displayType={'text'}
             thousandSeparator={true}
             format={Functions.currencyFormatter}
-            renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+            renderText={value => 
+              <Text style={styles.estimatedBalanceTextValue}> 
+                {value} 
+              </Text>}
           />
         </View>
       </View>
@@ -364,7 +361,7 @@ export default function Main() {
             displayType={'text'}
             thousandSeparator={true}
             format={Functions.currencyFormatter}
-            renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+            renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
           />
           <NumberFormat
             value={contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)}
@@ -372,7 +369,7 @@ export default function Main() {
             thousandSeparator={true}
             format={Functions.currencyFormatter}
             renderText={value =>
-              <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>
+              <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>
                 {value}
               </Text>}
           />
