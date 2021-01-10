@@ -61,7 +61,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT valuesTable.*, earnings.dia, earnings.tipo FROM valuesTable INNER JOIN earnings ON valuesTable.ganhos_id = earnings.id WHERE valuesTable.dtInicio<=? and valuesTable.dtFim>=?;",
+          "SELECT valuesTable.*, earnings.dia, earnings.tipo, earnings.recebido FROM valuesTable INNER JOIN earnings ON valuesTable.ganhos_id = earnings.id WHERE valuesTable.dtInicio<=? and valuesTable.dtFim>=?;",
           [dt,dt],
           //-----------------------
           (_, { rows }) => {

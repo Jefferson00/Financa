@@ -104,6 +104,22 @@ db.transaction((tx) => {
     });
   };
 
+  const updateRecebidos = (recebido: boolean) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+        tx.executeSql(
+          "UPDATE earnings SET recebido=?;",
+          [recebido],
+          //-----------------------
+          (_, { rowsAffected, insertId }) => {
+            if (rowsAffected > 0) resolve(insertId);
+            else reject("Error inserting obj: " + JSON.stringify(recebido)); // insert falhou
+          },
+        );
+      });
+    });
+  };
+
   const remove = (id:number) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -142,4 +158,5 @@ db.transaction((tx) => {
     findById,
     update,
     findByDateOrderByDay,
+    updateRecebidos,
 }

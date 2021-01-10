@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View ,ScrollView} from 'react-native';
-import { Feather } from '@expo/vector-icons'
+import { StyleSheet, Text, TouchableOpacity, View ,ScrollView, Modal} from 'react-native';
+import { Feather, AntDesign  } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useNavigation } from '@react-navigation/native';
 import NumberFormat from 'react-number-format';
-import AsyncStorage from '@react-native-community/async-storage'
 
 
 import Ganhos from '../services/ganhos'
-import Valores from '../services/valores';
+import Valores from '../services/valores'
+import Dates from '../services/dates'
 import Functions from '../functions/index'
 
 
@@ -35,6 +35,7 @@ export default function Main() {
     ganhos_id: number,
     dia: number,
     tipo: string,
+    recebido: boolean,
   }
 
   interface Saldo {
@@ -50,6 +51,9 @@ export default function Main() {
   const [nextEarnings2, setNextEarnings2] = useState<EarningsValues[]>([])
   const [valuesList, setValuesList] = useState<ValuesValues[]>([])
   const [saldo, setSaldo] = useState<Saldo[]>([])
+  const [modalBalance1, setModalBalance1] = useState(false)
+  const [textModal, setTextModal] = useState('')
+
   
   let datas: any = []
 
@@ -70,7 +74,21 @@ export default function Main() {
     navigation.navigate('NovoGanho', { item: 'Despesas' })
   }
 
-
+  function showModalBalance1(idModal: number){
+    setModalBalance1(true)
+    if (idModal == 1){
+        setTextModal('Seu Saldo Atual representa o valor restante com base nos valores totais de ganhos e despesas recebidos e pagos no mês selecionado ')
+    }
+    if (idModal == 2){
+        setTextModal('Seu Saldo Estimado representa o valor restante estimado no final do mês com base nos valores totais de ganhos e despesas estimados ')
+    }
+    if (idModal == 3){
+        setTextModal('O valor superior representa todos os ganhos recebidos no mês. O valor inferior representa os ganhos estimados a serem recebidos até o final do mês ')
+    }
+    if (idModal == 4){
+        setTextModal('O valor superior representa todos as despesas pagas no mês. O valor inferior representa as despesas estimadas a serem pagas até o final do mês')
+    }
+  }
 
   function handleNextMonth() {
     let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
@@ -129,82 +147,95 @@ export default function Main() {
   const CurrentMonth = todayDate.getMonth() + 1
   const CurrentYear = todayDate.getFullYear()
 
-  function selectLastMonth(month: number, year: number) {
-    let lastMonth = month - 1
-    let lastYear = year
-    if (lastMonth == 0) {
-      lastMonth = 12
-      lastYear = year - 1
-    }
-
-    return { lastMonth: lastMonth, lastYear: lastYear }
-  }
+  
 
   useEffect(() => {
 
     setSelectedMonth(CurrentMonth)
     setSelectedYear(CurrentYear)
 
+    /*Verifica se houve mudança de mês, caso sim, atualiza todos os recebidos/pagos como falso*/ 
+    Dates.findByDate(CurrentMonth,CurrentYear).then(res => {
+      
+    }).catch(err => {
+      console.log(err)
+      const DateObj = {
+        month: CurrentMonth,
+        year: CurrentYear,
+      }
+      Dates.create(DateObj)
+      Ganhos.updateRecebidos(false).then(res=>{
+        console.log('Atualizado!'+res)
+      }).catch(err=>{
+        console.log(err)
+      })
+      console.log('Mes criado: '+CurrentMonth)
+    })
+
 
     const unsubscribe = navigation.addListener('focus', () => {
       let firstDate
+      /*Converte para a data em String e no formato que é salvo no banco de dados*/
       if (CurrentMonth < 10) {
         firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
       } else {
         firstDate = CurrentYear.toString() + CurrentMonth.toString()
       }
+      //Ex: firstDate: '202101'
 
+      //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação
       Ganhos.findByDate(parseInt(firstDate)).then(res => {
         setEarnings(res._array)
-
       }).catch(err => {
         console.log(err)
       })
+      
+      //Procura todos os valores correspondente a data atual ao abrir a aplicação
       Valores.findByDate(parseInt(firstDate)).then(res => {
-
-        console.log(res._array)
         setValuesList(res._array)
       }).catch(err => {
         console.log(err)
       })
+      
+      //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação ordenado pelo dia
       Ganhos.findByDateOrderByDay(parseInt(firstDate)).then(res => {
         setNextEarnings(res._array)
-
       }).catch(err => {
         console.log(err)
       })
 
       let nMonth = Functions.nextMonth(CurrentMonth,CurrentYear)
-
+      //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação ordenado pelo dia do Mês seguinte
       Ganhos.findByDateOrderByDay(parseInt(nMonth.dt)).then(res => {
         setNextEarnings2(res._array)
-
       }).catch(err => {
         console.log(err)
       })
 
       Valores.allOrderByDate().then(res => {
         let dtInicio = res._array[0].dtInicio
-        let ano: number = parseInt(Functions.toMonthAndYear(dtInicio).year)
-        let mes: number = parseInt(Functions.toMonthAndYear(dtInicio).month)
-        let dateP
+        if (dtInicio != undefined){
+          let ano: number = parseInt(Functions.toMonthAndYear(dtInicio).year)
+          let mes: number = parseInt(Functions.toMonthAndYear(dtInicio).month)
+          let dateP
 
-        do {
-          for (var i = mes; i <= 13; i++) {
-            if (i == 13) {
-              mes = 1
-              ano = ano + 1
-            } else {
-              if (i < 10) {
-                dateP = ano.toString() + '0' + i.toString()
+          do {
+            for (var i = mes; i <= 13; i++) {
+              if (i == 13) {
+                mes = 1
+                ano = ano + 1
               } else {
-                dateP = ano.toString() + i.toString()
+                if (i < 10) {
+                  dateP = ano.toString() + '0' + i.toString()
+                } else {
+                  dateP = ano.toString() + i.toString()
+                }
+                datas.push(dateP)
               }
-              datas.push(dateP)
             }
-          }
-        } while (ano < 2022)
-        loadBalance()
+          } while (ano < 2022)
+          loadBalance()
+        }
       })
       datas = []
 
@@ -264,19 +295,21 @@ export default function Main() {
       {/*Mês e ano*/}
       <View style={styles.monthView}>
         <TouchableOpacity onPress={handlePrevMonth}>
-          <Feather name="arrow-left" size={30} color={monthColor} />
+          <Feather name="chevron-left" size={30} color={monthColor} />
         </TouchableOpacity>
         <Text style={[styles.monthText, { color: monthColor }]}>
           {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
         </Text>
         <TouchableOpacity onPress={handleNextMonth}>
-          <Feather name="arrow-right" size={30} color={monthColor} />
+          <Feather name="chevron-right" size={30} color={monthColor} />
         </TouchableOpacity>
       </View>
 
       {valuesList.map(value => {
-        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Ganhos') contGanhos.push(value.valor)
-        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.dia <= todayDate.getDate() && value.tipo == 'Despesas') contDespesas.push(value.valor)
+        if (selectedMonth == CurrentMonth && selectedYear == CurrentYear){
+          if (value.valor != null && value.valor != NaN && value.valor != 0 && value.recebido && value.tipo == 'Ganhos') contGanhos.push(value.valor)
+          if (value.valor != null && value.valor != NaN && value.valor != 0 && value.recebido && value.tipo == 'Despesas') contDespesas.push(value.valor)
+        }
         if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Despesas') contDespesasEstimadas.push(value.valor)
         if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Ganhos') contGanhosEstimadas.push(value.valor)
       })}
@@ -285,15 +318,21 @@ export default function Main() {
       {/*Saldos*/}
       <View style={styles.balanceView}>
         <View style={styles.currentBalanceView}>
-          <Text style={styles.currentBalanceText}>
-            Seu Saldo Atual
-          </Text>
+          <View style={{flexDirection:'row',justifyContent:'center'}}>
+            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance1(1)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
+            </TouchableOpacity>
+            <Text style={styles.currentBalanceText}>
+              Seu Saldo Atual
+            </Text>
+          </View>
           {saldo.map((sal, index) => {
             if (sal.ano == selectedYear && sal.mes == selectedMonth) {
+              let saldoAtual = contGanhos.reduce((a: any, b: any) => a + b, 0) - contDespesas.reduce((a: any, b: any) => a + b, 0)
               return (
                 <View key={index}>
                   <NumberFormat
-                    value={sal.valor}
+                    value={saldoAtual}
                     displayType={'text'}
                     thousandSeparator={true}
                     format={Functions.currencyFormatter}
@@ -302,27 +341,45 @@ export default function Main() {
                       {value} 
                     </Text>}
                   />
+                  <NumberFormat
+                    value={sal.valor}
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    format={Functions.currencyFormatter}
+                    renderText={value => 
+                    <Text style={[styles.currentBalanceTextValue,{fontSize:14}]}> 
+                      {value} 
+                    </Text>}
+                  />
+                  
                 </View>
               )
             }
           })}
         </View>
         <View style={styles.currentBalanceView}>
-          <Text style={styles.estimatedBalanceText}>
-            Saldo Estimado
+          <View style={{flexDirection:'row',justifyContent:'center'}}>
+            <Text style={styles.estimatedBalanceText}>
+              Saldo Estimado
             </Text>
-          <NumberFormat
-            value={
-              contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0) - contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)
-            }
-            displayType={'text'}
-            thousandSeparator={true}
-            format={Functions.currencyFormatter}
-            renderText={value => 
-              <Text style={styles.estimatedBalanceTextValue}> 
-                {value} 
-              </Text>}
-          />
+            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance1(2)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
+            </TouchableOpacity>
+          </View>
+          <View style={{flexDirection:'row',justifyContent:'center'}}>
+            <NumberFormat
+              value={
+                contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0) - contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)
+              }
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value => 
+                <Text style={styles.estimatedBalanceTextValue}> 
+                  {value} 
+                </Text>}
+            />
+          </View>
         </View>
       </View>
 
@@ -330,32 +387,45 @@ export default function Main() {
 
       <View style={styles.valuesView}>
         <View style={styles.currentBalanceView}>
-          <Text style={styles.earningsText}>
-            Ganhos
+          <View style={{flexDirection:'row',justifyContent:'center'}}>
+            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance1(3)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
+            </TouchableOpacity>
+            <Text style={styles.earningsText}>
+              Ganhos
             </Text>
-          <NumberFormat
-            value={contGanhos.reduce((a: any, b: any) => a + b, 0)}
-            displayType={'text'}
-            thousandSeparator={true}
-            format={Functions.currencyFormatter}
-            renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-          />
-          <NumberFormat
-            value={contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0)}
-            displayType={'text'}
-            thousandSeparator={true}
-            format={Functions.currencyFormatter}
-            renderText={value =>
-              <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>
-                {value}
-              </Text>
-            }
-          />
+          </View>
+          <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <NumberFormat
+              value={contGanhos.reduce((a: any, b: any) => a + b, 0)}
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+            />
+          </View>
+          <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <NumberFormat
+              value={contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0)}
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value =>
+                <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>
+                  {value}
+                </Text>
+              }/>
+            </View>
         </View>
         <View style={styles.currentBalanceView}>
-          <Text style={styles.expensesText}>
-            Despesas
+          <View style={{flexDirection:'row',justifyContent:'center'}}>
+            <Text style={styles.expensesText}>
+              Despesas
             </Text>
+            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance1(4)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}} />
+            </TouchableOpacity>
+          </View>
           <NumberFormat
             value={contDespesas.reduce((a: any, b: any) => a + b, 0)}
             displayType={'text'}
@@ -416,7 +486,7 @@ export default function Main() {
           <Text style={styles.nextDaysText}>Nos próximos dias...</Text>
         </View>
 
-        <ScrollView>
+        <ScrollView style={{maxHeight:95,elevation:5}}>
           {nextEarnings.map((ear,index) => {
             if (ear.dia >= todayDate.getDate() && ear.dia <= (todayDate.getDate()+10)){
               let color
@@ -457,6 +527,21 @@ export default function Main() {
         </ScrollView>
 
       </View>
+
+      <Modal animationType="slide" visible={modalBalance1} transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={{flexDirection:'row', justifyContent:'center'}}>
+                <Text style={styles.monthText}>
+                    {textModal}
+                </Text>
+              <TouchableOpacity onPress={() => { setModalBalance1(!modalBalance1) }}>
+                <Feather name="x" size={30} color={'#136065'} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   )
 }
@@ -478,7 +563,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginHorizontal: 5
   },
-
+  modalContainer: {
+    flex: 1,
+    backgroundColor: ' rgba(0, 0, 0, 0.39);',
+    justifyContent: 'center'
+  },
+  modalContent: {
+        backgroundColor: '#fff',
+        height: '50%',
+        padding: 30,
+    },
   balanceView: {
     flexDirection: 'row',
     justifyContent: 'center',

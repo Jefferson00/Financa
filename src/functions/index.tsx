@@ -22,7 +22,7 @@ function setDtFim(mensal: Boolean, contRepeat: number, date: Date) {
     } else {
         let month = (date.getMonth() + 1)
         let year = date.getFullYear()
-        for (var x = 0; x < contRepeat; x++) {
+        for (var x = 1; x < contRepeat; x++) {
             month = month + 1
             if (month > 12) {
                 month = 1
@@ -63,7 +63,7 @@ function toFrequency(dtfim: number, dtInicio: number){
     
     let frequencia = parseInt(monthFim)-parseInt(monthInicio) + (12* (parseInt(yearFim) - parseInt(yearInicio)))
     console.log(frequencia)
-    return frequencia
+    return frequencia 
 }
 
 function toMonthAndYear(dt: number){
@@ -208,6 +208,17 @@ function prevMonth(selectedMonth:any, selectedYear:any) {
     return teste1
   }
 
+  function selectLastMonth(month: number, year: number) {
+    let lastMonth = month - 1
+    let lastYear = year
+    if (lastMonth == 0) {
+      lastMonth = 12
+      lastYear = year - 1
+    }
+
+    return { lastMonth: lastMonth, lastYear: lastYear }
+  }
+
 export default{
     setDtInicio,
     setDtFim,
@@ -219,5 +230,6 @@ export default{
     prevMonth,
     toFrequency,
     toMonthAndYear,
+    selectLastMonth,
 }
 

@@ -14,7 +14,6 @@ import { ScrollView, Switch } from 'react-native-gesture-handler';
 
 import Ganhos from '../services/ganhos'
 import Valores from '../services/valores'
-import Recebidos from '../services/recebidos'
 import Functions from '../functions/index'
 
 export default function NovoGanho({ route }: { route: any }, { navigation }: { navigation: any }) {
@@ -65,13 +64,13 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
     /*Estados de valores*/
     /**/ const [idValues, setIdValues] = useState(0)
-    /**/ const [valueFrequency, setValueFrequency] = useState(0);
+    /**/ const [valueFrequency, setValueFrequency] = useState(1);
     /**/ const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
         id: 0,
         description: '',
         value: '0',
         mensal: false,
-        repeat: 0
+        repeat: 1
     }])
     /**/ const [showValues, setShowValues] = useState(false)
     const [earning, setEarning] = useState<earningValues[]>([])
@@ -165,7 +164,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 else if (subitem == 'repeat') {
                     var dt = new Date()
                     var rpt = parseInt(e.nativeEvent.text)
+                    console.log('Repetir: '+rpt)
                     var dtFim = Functions.setDtFim(value[0], rpt, dt)
+                    console.log('sata fim: '+dtFim)
                     return { ...item, ['dtFim']: dtFim }
 
                 }
@@ -244,13 +245,6 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 setSuccessModal(true)
             })
             
-            const RecebidoObj = {
-                month: selectedMonth,
-                year:  selectedYear,
-                recebido: isEnabledReceived,
-                ganhos_id: res._array.slice(-1)[0].id,
-            }
-            Recebidos.create(RecebidoObj)
 
         }).catch(err => {
             console.log(err)
@@ -390,7 +384,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             if (earning[0].mensal) {
                 setIsEnabled(true)
             } else {
-                setValueFrequency(Functions.toFrequency(earning[0].dtFim, earning[0].dtInicio))
+                setValueFrequency(Functions.toFrequency(earning[0].dtFim, earning[0].dtInicio)+1)
+            }
+            if(earning[0].recebido){
+                setIsEnabledReceived(true)
             }
             date.setDate(earning[0].dia)
 
@@ -549,7 +546,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
                             {idUpdate != null && valuesUpdate.map((values, index) => {
                                 var mensal = false
-                                var frequency = Functions.toFrequency(values.dtFim, values.dtInicio)
+                                //console.log(values.dtFim)
+                                var frequency = Functions.toFrequency(values.dtFim, values.dtInicio)+1
+                                //if (Functions.toFrequency(values.dtFim, values.dtInicio) == 0) frequency = 0
+                                console.log('Frequencia: '+frequency)
                                 if (values.dtFim == 209912) {
                                     mensal = true
                                 }
@@ -581,6 +581,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
 
                                             <TextInput
+                                                onKeyPress={({nativeEvent}) =>{nativeEvent.key === 'Backspace' ? frequency=0 :null}}
                                                 onChange={updateValuesUpdate('repeat', index, [mensal, frequency])}
                                                 value={mensal ? '0' : frequency.toString()}
                                                 style={styles.InputText}
@@ -609,7 +610,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         if (contPlusButtonPressed > 0) {
                                             
                                                 setIdValues(idValues + 1)
-                                                setValuesArray([...valuesArray, { id: idValues, description: '', value: '0', mensal: false, repeat: 0 }])
+                                                setValuesArray([...valuesArray, { id: idValues, description: '', value: '0', mensal: false, repeat: 1 }])
                                             
                                             //console.log(idValues)
                                             //console.log(valuesArray)
