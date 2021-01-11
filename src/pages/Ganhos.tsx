@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal, Alert } from 'react-native'
-import { Feather } from '@expo/vector-icons'
+import { Feather, MaterialIcons,  Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native';
 import NumberFormat from 'react-number-format';
 import 'intl'
@@ -64,6 +64,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     const [mainText2, setMainText2] = useState('')
     const [TextAddButton, setTextAddButton] = useState('')
     const [textRecebido, setTextRecebido] = useState('')
+    const [textAlert, setTextAlert] = useState('')
     const [colorMonth, setColorMonth] = useState('#fff')
     const [colorText, setColorText] = useState('#fff')
     const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
@@ -243,6 +244,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             setColorBorderFooter('#1A828922')
             setTextAddButton('Adicionar Novo Ganho')
             setTextRecebido('Esse ganho já foi recebido?')
+            setTextAlert('Ganho não recebido!')
 
         } else if (item === 'Despesas') {
             setMainColor1('#CC3728')
@@ -255,6 +257,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             setColorBorderFooter('#CC372822')
             setTextAddButton('Adicionar Nova Despesa')
             setTextRecebido('Essa despesa já foi paga?')
+            setTextAlert('Despesa não paga!')
         }
 
         setSelectedMonth(CurrentMonth)
@@ -369,7 +372,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                     style={[styles.earningsItemView, { opacity: opac, borderColor:borderColor, borderWidth:1 }]}
                                     onPress={() => showModal(earning.id, totalValues)}
                                     >
-                                    <Feather name="dollar-sign" size={40} color={colorText} />
+                                    <MaterialIcons name="monetization-on" size={40} color={colorText} />
                                     {valuesList.map(value => {
                                         if (earnings[index].id == value.ganhos_id) {
                                             totalValues = totalValues + value.valor
@@ -397,7 +400,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
                                 </TouchableOpacity>
                                 {atrs? 
-                                <Feather name="alert-circle" size={40} color={colorText} style={styles.alertSign}/>
+                                <Ionicons name="alert-circle" size={40} color={colorText} style={styles.alertSign}/>
                                 :null}
                                 </View>
                             )
@@ -504,11 +507,14 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                 <>
                                     <View style={{ paddingHorizontal: 26 ,marginTop:32}}>
                                         {atrasado ? 
-                                            <Text style={[styles.tittleText, { color: colorBorderAddButton }]}>
-                                                Não Pago
-                                            </Text> 
+                                            <View style={{flexDirection:'row',alignItems:'center'}}>
+                                                <Ionicons name="alert-circle" size={40} color={colorText}/>
+                                                <Text style={[styles.tittleText, { color: colorBorderAddButton , marginLeft:5}]}>
+                                                    {textAlert}
+                                                </Text> 
+                                            </View>
                                         : null}
-                                        <Text style={[styles.subTittleText, { color: colorText }]}>
+                                        <Text style={[styles.subTittleText, { color: colorText , marginTop:15}]}>
                                             {textRecebido}
                                         </Text>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>

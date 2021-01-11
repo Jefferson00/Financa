@@ -62,7 +62,7 @@ function toFrequency(dtfim: number, dtInicio: number){
  
     
     let frequencia = parseInt(monthFim)-parseInt(monthInicio) + (12* (parseInt(yearFim) - parseInt(yearInicio)))
-    console.log(frequencia)
+    //console.log(frequencia)
     return frequencia 
 }
 
