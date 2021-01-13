@@ -7,8 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 import NumberFormat from 'react-number-format';
 
 
-import Ganhos from '../services/ganhos'
-import Valores from '../services/valores'
+import EntriesDB from '../services/entriesDB'
+import ValuesDB from '../services/valuesDB'
 import Dates from '../services/dates'
 import Functions from '../functions/index'
 
@@ -16,119 +16,176 @@ import Functions from '../functions/index'
 export default function Main() {
   const navigation = useNavigation()
 
-  interface EarningsValues {
+  // interfaces
+  interface EntriesValues {
     id: number,
-    titulo: string,
-    dia: number,
-    dtInicio: number,
-    dtFim: number,
-    mensal: boolean,
-    recebido: boolean,
-    tipo:string,
+    title: string,
+    day: number,
+    dtStart: number,
+    dtEnd: number,
+    monthly: boolean,
+    received: boolean,
+    type:string,
   }
 
   interface ValuesValues {
-    descricao: string,
-    valor: number,
-    dtInicio: number,
-    dtFim: number,
-    ganhos_id: number,
-    dia: number,
-    tipo: string,
-    recebido: boolean,
+    description: string,
+    amount: number,
+    dtStart: number,
+    dtEnd: number,
+    entries_id: number,
+    day: number,
+    type: string,
+    received: boolean,
   }
 
-  interface Saldo {
-    mes: number,
-    ano: number,
-    valor: number,
+  interface Balance{
+    month: number,
+    year: number,
+    amount: number,
   }
 
+  //
   const [selectedMonth, setSelectedMonth] = useState(10)
   const [selectedYear, setSelectedYear] = useState(2020)
-  const [earnings, setEarnings] = useState<EarningsValues[]>([])
-  const [nextEarnings, setNextEarnings] = useState<EarningsValues[]>([])
-  const [nextEarnings2, setNextEarnings2] = useState<EarningsValues[]>([])
+  const [entries, setEntries] = useState<EntriesValues[]>([])
+  const [nextEntries, setNextEntries] = useState<EntriesValues[]>([])
+  const [nextEntries2, setNextEntries2] = useState<EntriesValues[]>([])
   const [valuesList, setValuesList] = useState<ValuesValues[]>([])
-  const [saldo, setSaldo] = useState<Saldo[]>([])
-  const [modalBalance1, setModalBalance1] = useState(false)
+  const [balance, setBalance] = useState<Balance[]>([])
+  const [modalBalance, setModalBalance] = useState(false)
   const [textModal, setTextModal] = useState('')
-
-  
-  let datas: any = []
+  const [noBalance, setNoBalance] = useState(false)
 
   const [primaryColor, setPrimaryColor] = useState('#F9CF3C')
   const [secondColor, setSecondColor] = useState('#B26A15')
   const [monthColor, setMonthColor] = useState('#1A8289')
 
+  //  Define a data atual
+  const todayDate = new Date()
+  const CurrentMonth = todayDate.getMonth() + 1
+  const CurrentYear = todayDate.getFullYear()
+  
+  // Arrays
+  let datas: any = []
+  let contEarnings: Array<number> = []
+  let contEstimatedEarnings: Array<number> = []
+  let contExpenses: Array<number> = []
+  let contEstimatedExpenses: Array<number> = []
+
+  // funções de navegação
   function handleNavigateGanhos() {
-    navigation.navigate('Ganhos', { item: 'Ganhos' })
+    navigation.navigate('Entries', { item: 'Ganhos' , month: selectedMonth, year: selectedYear})
   }
   function handleNavigateDespesas() {
-    navigation.navigate('Ganhos', { item: 'Despesas' })
+    navigation.navigate('Entries', { item: 'Despesas' , month: selectedMonth, year: selectedYear})
   }
   function handleNavigateNovoGanhos() {
-    navigation.navigate('NovoGanho', { item: 'Ganhos' })
+    navigation.navigate('NewEntries', { item: 'Ganhos', month: selectedMonth, year: selectedYear })
   }
   function handleNavigateNovoDespesas() {
-    navigation.navigate('NovoGanho', { item: 'Despesas' })
+    navigation.navigate('NewEntries', { item: 'Despesas', month: selectedMonth, year: selectedYear })
   }
 
-  function showModalBalance1(idModal: number){
-    setModalBalance1(true)
+  /**Função que mostra o modal com a explicação dos resultados */
+  function showModalBalance(idModal: number){
+    setModalBalance(true)
     if (idModal == 1){
-        setTextModal('Seu Saldo Atual representa o valor restante com base nos valores totais de ganhos e despesas recebidos e pagos no mês selecionado ')
+      setTextModal('Seu Saldo Atual representa o valor restante com base nos valores totais de ganhos e despesas recebidos e pagos no mês selecionado. O valor superior indica o saldo atual do Mês, o valor inferior representa o saldo total do Mês mais o restante dos meses anteriores.')
     }
     if (idModal == 2){
-        setTextModal('Seu Saldo Estimado representa o valor restante estimado no final do mês com base nos valores totais de ganhos e despesas estimados ')
+      setTextModal('Seu Saldo Estimado representa o valor restante estimado no final do mês com base nos valores totais de ganhos e despesas estimados ')
     }
     if (idModal == 3){
-        setTextModal('O valor superior representa todos os ganhos recebidos no mês. O valor inferior representa os ganhos estimados a serem recebidos até o final do mês ')
+      setTextModal('O valor superior representa todos os ganhos recebidos no mês. O valor inferior representa os ganhos estimados a serem recebidos até o final do mês ')
     }
     if (idModal == 4){
-        setTextModal('O valor superior representa todos as despesas pagas no mês. O valor inferior representa as despesas estimadas a serem pagas até o final do mês')
+      setTextModal('O valor superior representa todos as despesas pagas no mês. O valor inferior representa as despesas estimadas a serem pagas até o final do mês')
     }
   }
+  
+  /**Função que mostra os dados do mês seguinte */
 
   function handleNextMonth() {
     let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
-    Ganhos.findByDate(parseInt(nextDtObj.dt)).then(res => {
-      setEarnings(res._array)
+    EntriesDB.findByDate(parseInt(nextDtObj.dt)).then((res:any) => {
+      setEntries(res._array)
     }).catch(err => {
-      setEarnings([])
+      setEntries([])
       console.log(err)
     })
 
-    Valores.findByDate(parseInt(nextDtObj.dt)).then(res => {
+    ValuesDB.findByDate(parseInt(nextDtObj.dt)).then((res:any) => {
       setValuesList(res._array)
+      setNoBalance(false)
     }).catch(err => {
       setValuesList([])
       console.log(err)
+      setNoBalance(true)
     })
 
     setSelectedMonth(nextDtObj.nextMonth)
     setSelectedYear(nextDtObj.nextYear)
   }
 
+  /**Função que mostra os dados do mês anterior */
   function handlePrevMonth() {
     let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
 
-    Ganhos.findByDate(parseInt(prevDtObj.dt)).then(res => {
-      setEarnings(res._array)
+    EntriesDB.findByDate(parseInt(prevDtObj.dt)).then((res:any) => {
+      setEntries(res._array)
     }).catch(err => {
-      setEarnings([])
+      setEntries([])
       console.log(err)
     })
 
-    Valores.findByDate(parseInt(prevDtObj.dt)).then(res => {
+    ValuesDB.findByDate(parseInt(prevDtObj.dt)).then((res:any) => {
       setValuesList(res._array)
+      setNoBalance(false)
     }).catch(err => {
       setValuesList([])
+      setNoBalance(true)
       console.log(err)
     })
 
     setSelectedMonth(prevDtObj.prevMonth)
     setSelectedYear(prevDtObj.prevYear)
+  }
+
+  /**Função que carrega o Saldo Total com o restante dos meses anteriores */
+  async function loadBalance() {
+    let sumBalance = 0
+    let balanceArray: Array<any> = []
+    setBalance([])
+
+    for (const [index, data] of datas.entries()) {
+       await ValuesDB.findByDate(parseInt(data)).then((res:any) => {
+        let sumEarnings = 0
+        let sumExpenses = 0
+        for (var t = 0; t < res._array.length; t++) {
+          if (res._array[t].type == 'Ganhos') {
+            sumEarnings = sumEarnings + res._array[t].amount
+          } else if (res._array[t].type == 'Despesas') {
+            sumExpenses = sumExpenses + res._array[t].amount
+          }
+        }
+        let balance = sumEarnings - sumExpenses
+        sumBalance = sumBalance + balance
+        let year = parseInt(Functions.toMonthAndYear(data).year)
+        let month = parseInt(Functions.toMonthAndYear(data).month)
+        let obj: Balance = { month: month, year: year, amount: sumBalance }
+        if (balanceArray.indexOf(obj) > -1) {
+
+        } else {
+          balanceArray.push(obj)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    }
+    setBalance(balanceArray)
+
+    balanceArray = []
   }
 
   useEffect(() => {
@@ -143,19 +200,13 @@ export default function Main() {
     }
   }, [selectedMonth])
 
-  const todayDate = new Date()
-  const CurrentMonth = todayDate.getMonth() + 1
-  const CurrentYear = todayDate.getFullYear()
-
-  
-
   useEffect(() => {
 
     setSelectedMonth(CurrentMonth)
     setSelectedYear(CurrentYear)
 
     /*Verifica se houve mudança de mês, caso sim, atualiza todos os recebidos/pagos como falso*/ 
-    Dates.findByDate(CurrentMonth,CurrentYear).then(res => {
+    Dates.findByDate(CurrentMonth,CurrentYear).then(() => {
       
     }).catch(err => {
       console.log(err)
@@ -164,7 +215,7 @@ export default function Main() {
         year: CurrentYear,
       }
       Dates.create(DateObj)
-      Ganhos.updateRecebidos(false).then(res=>{
+      EntriesDB.updateReceived(false).then(res=>{
         console.log('Atualizado!'+res)
       }).catch(err=>{
         console.log(err)
@@ -173,7 +224,9 @@ export default function Main() {
     })
 
 
-    const unsubscribe = navigation.addListener('focus', () => {
+    const reload = navigation.addListener('focus', () => {
+      setSelectedMonth(CurrentMonth)
+      setSelectedYear(CurrentYear)
       let firstDate
       /*Converte para a data em String e no formato que é salvo no banco de dados*/
       if (CurrentMonth < 10) {
@@ -184,39 +237,41 @@ export default function Main() {
       //Ex: firstDate: '202101'
 
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação
-      Ganhos.findByDate(parseInt(firstDate)).then(res => {
-        setEarnings(res._array)
+      EntriesDB.findByDate(parseInt(firstDate)).then((res:any) => {
+        setEntries(res._array)
       }).catch(err => {
         console.log(err)
       })
       
       //Procura todos os valores correspondente a data atual ao abrir a aplicação
-      Valores.findByDate(parseInt(firstDate)).then(res => {
+      ValuesDB.findByDate(parseInt(firstDate)).then((res:any) => {
         setValuesList(res._array)
+        setNoBalance(false)
       }).catch(err => {
         console.log(err)
+        setNoBalance(true)
       })
       
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação ordenado pelo dia
-      Ganhos.findByDateOrderByDay(parseInt(firstDate)).then(res => {
-        setNextEarnings(res._array)
+      EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res:any) => {
+        setNextEntries(res._array)
       }).catch(err => {
         console.log(err)
       })
 
       let nMonth = Functions.nextMonth(CurrentMonth,CurrentYear)
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação ordenado pelo dia do Mês seguinte
-      Ganhos.findByDateOrderByDay(parseInt(nMonth.dt)).then(res => {
-        setNextEarnings2(res._array)
+      EntriesDB.findByDateOrderByDay(parseInt(nMonth.dt)).then((res:any) => {
+        setNextEntries2(res._array)
       }).catch(err => {
         console.log(err)
       })
 
-      Valores.allOrderByDate().then(res => {
-        let dtInicio = res._array[0].dtInicio
-        if (dtInicio != undefined){
-          let ano: number = parseInt(Functions.toMonthAndYear(dtInicio).year)
-          let mes: number = parseInt(Functions.toMonthAndYear(dtInicio).month)
+      ValuesDB.allOrderByDate().then((res:any) => {
+        let dtStart = res._array[0].dtStart
+        if (dtStart != undefined){
+          let ano: number = parseInt(Functions.toMonthAndYear(dtStart).year)
+          let mes: number = parseInt(Functions.toMonthAndYear(dtStart).month)
           let dateP
 
           do {
@@ -233,60 +288,15 @@ export default function Main() {
                 datas.push(dateP)
               }
             }
-          } while (ano < 2022)
+          } while (ano < CurrentYear+20)
           loadBalance()
         }
       })
       datas = []
 
     });
-    return unsubscribe;
+    return reload;
   }, [])
-
-
-  async function loadBalance() {
-    let somaSald = 0
-    let arraypvfrfunciona: any = []
-    setSaldo([])
-
-    for (const [index, data] of datas.entries()) {
-      const todo = await Valores.findByDate(parseInt(data)).then(res => {
-        let somaGanhos = 0
-        let somaDespesas = 0
-        for (var t = 0; t < res._array.length; t++) {
-          if (res._array[t].tipo == 'Ganhos') {
-            somaGanhos = somaGanhos + res._array[t].valor
-            //console.log('Soma Ganhos: '+somaGanhos)
-          } else if (res._array[t].tipo == 'Despesas') {
-            somaDespesas = somaDespesas + res._array[t].valor
-            //console.log('Soma Despesas: '+somaDespesas)
-          }
-        }
-        let sal = somaGanhos - somaDespesas
-        somaSald = somaSald + sal
-        let year = parseInt(Functions.toMonthAndYear(data).year)
-        let month = parseInt(Functions.toMonthAndYear(data).month)
-        let obj: Saldo = { mes: month, ano: year, valor: somaSald }
-        //console.log(obj)
-        if (arraypvfrfunciona.indexOf(obj) > -1) {
-
-        } else {
-          arraypvfrfunciona.push(obj)
-        }
-      }).catch(err => {
-        console.log(err)
-      })
-    }
-    setSaldo(arraypvfrfunciona)
-
-    arraypvfrfunciona = []
-  }
-
-  let contGanhos: any = []
-  let contGanhosEstimadas: any = []
-  let contDespesas: any = []
-  let contDespesasEstimadas: any = []
-
 
   return (
     <LinearGradient colors={[primaryColor, secondColor]} style={styles.container}>
@@ -307,11 +317,11 @@ export default function Main() {
 
       {valuesList.map(value => {
         if (selectedMonth == CurrentMonth && selectedYear == CurrentYear){
-          if (value.valor != null && value.valor != NaN && value.valor != 0 && value.recebido && value.tipo == 'Ganhos') contGanhos.push(value.valor)
-          if (value.valor != null && value.valor != NaN && value.valor != 0 && value.recebido && value.tipo == 'Despesas') contDespesas.push(value.valor)
+          if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Ganhos') contEarnings.push(value.amount)
+          if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Despesas') contExpenses.push(value.amount)
         }
-        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Despesas') contDespesasEstimadas.push(value.valor)
-        if (value.valor != null && value.valor != NaN && value.valor != 0 && value.tipo == 'Ganhos') contGanhosEstimadas.push(value.valor)
+        if (value.amount != null && value.amount != NaN && value.amount != 0 && value.type == 'Despesas') contEstimatedExpenses.push(value.amount)
+        if (value.amount != null && value.amount != NaN && value.amount != 0 && value.type == 'Ganhos') contEstimatedEarnings.push(value.amount)
       })}
 
 
@@ -319,30 +329,35 @@ export default function Main() {
       <View style={styles.balanceView}>
         <View style={styles.currentBalanceView}>
           <View style={{flexDirection:'row',justifyContent:'center'}}>
-            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance1(1)}>
+            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance(1)}>
               <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
             </TouchableOpacity>
             <Text style={styles.currentBalanceText}>
               Seu Saldo Atual
             </Text>
           </View>
-          {saldo.map((sal, index) => {
-            if (sal.ano == selectedYear && sal.mes == selectedMonth) {
-              let saldoAtual = contGanhos.reduce((a: any, b: any) => a + b, 0) - contDespesas.reduce((a: any, b: any) => a + b, 0)
+          {noBalance?
+          <View style={{flexDirection:'row', justifyContent:'center'}}>
+              <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+          </View>
+          :
+          <NumberFormat
+            value={contEarnings.reduce((a: any, b: any) => a + b, 0) - contExpenses.reduce((a: any, b: any) => a + b, 0)}
+            displayType={'text'}
+            thousandSeparator={true}
+            format={Functions.currencyFormatter}
+            renderText={value => 
+            <Text style={styles.currentBalanceTextValue}> 
+              {value} 
+            </Text>}
+          />
+          }
+          {balance.map((bal, index) => {
+            if (bal.year == selectedYear && bal.month == selectedMonth) {
               return (
                 <View key={index}>
                   <NumberFormat
-                    value={saldoAtual}
-                    displayType={'text'}
-                    thousandSeparator={true}
-                    format={Functions.currencyFormatter}
-                    renderText={value => 
-                    <Text style={styles.currentBalanceTextValue}> 
-                      {value} 
-                    </Text>}
-                  />
-                  <NumberFormat
-                    value={sal.valor}
+                    value={bal.amount}
                     displayType={'text'}
                     thousandSeparator={true}
                     format={Functions.currencyFormatter}
@@ -351,7 +366,6 @@ export default function Main() {
                       {value} 
                     </Text>}
                   />
-                  
                 </View>
               )
             }
@@ -362,23 +376,29 @@ export default function Main() {
             <Text style={styles.estimatedBalanceText}>
               Saldo Estimado
             </Text>
-            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance1(2)}>
+            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance(2)}>
               <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
             </TouchableOpacity>
           </View>
           <View style={{flexDirection:'row',justifyContent:'center'}}>
-            <NumberFormat
-              value={
-                contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0) - contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)
-              }
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value => 
-                <Text style={styles.estimatedBalanceTextValue}> 
-                  {value} 
-                </Text>}
-            />
+            {noBalance ?
+              <View style={{flexDirection:'row', justifyContent:'center'}}>
+                <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
+              </View>
+            :
+              <NumberFormat
+                value={
+                  contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
+                }
+                displayType={'text'}
+                thousandSeparator={true}
+                format={Functions.currencyFormatter}
+                renderText={value => 
+                  <Text style={styles.estimatedBalanceTextValue}> 
+                    {value} 
+                  </Text>}
+              />
+            }
           </View>
         </View>
       </View>
@@ -388,25 +408,36 @@ export default function Main() {
       <View style={styles.valuesView}>
         <View style={styles.currentBalanceView}>
           <View style={{flexDirection:'row',justifyContent:'center'}}>
-            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance1(3)}>
+            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance(3)}>
               <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
             </TouchableOpacity>
             <Text style={styles.earningsText}>
               Ganhos
             </Text>
           </View>
+          {noBalance? 
+          <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+          </View>
+          :
           <View style={{flexDirection:'row', justifyContent:'center'}}>
             <NumberFormat
-              value={contGanhos.reduce((a: any, b: any) => a + b, 0)}
+              value={contEarnings.reduce((a: any, b: any) => a + b, 0)}
               displayType={'text'}
               thousandSeparator={true}
               format={Functions.currencyFormatter}
               renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
             />
           </View>
+          }
+          {noBalance?
+          <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
+          </View>
+          :
           <View style={{flexDirection:'row', justifyContent:'center'}}>
             <NumberFormat
-              value={contGanhosEstimadas.reduce((a: any, b: any) => a + b, 0)}
+              value={contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0)}
               displayType={'text'}
               thousandSeparator={true}
               format={Functions.currencyFormatter}
@@ -415,26 +446,40 @@ export default function Main() {
                   {value}
                 </Text>
               }/>
-            </View>
+          </View>
+          }
         </View>
+
+        
         <View style={styles.currentBalanceView}>
           <View style={{flexDirection:'row',justifyContent:'center'}}>
             <Text style={styles.expensesText}>
               Despesas
             </Text>
-            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance1(4)}>
+            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance(4)}>
               <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}} />
             </TouchableOpacity>
           </View>
+          {noBalance?
+          <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <Text style={styles.expensesTextValue}>R$ 0,00</Text>
+          </View>
+          :
           <NumberFormat
-            value={contDespesas.reduce((a: any, b: any) => a + b, 0)}
+            value={contExpenses.reduce((a: any, b: any) => a + b, 0)}
             displayType={'text'}
             thousandSeparator={true}
             format={Functions.currencyFormatter}
             renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
           />
+          }
+          {noBalance?
+          <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
+          </View>
+          :
           <NumberFormat
-            value={contDespesasEstimadas.reduce((a: any, b: any) => a + b, 0)}
+            value={contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)}
             displayType={'text'}
             thousandSeparator={true}
             format={Functions.currencyFormatter}
@@ -443,6 +488,7 @@ export default function Main() {
                 {value}
               </Text>}
           />
+          }
         </View>
       </View>
 
@@ -487,38 +533,38 @@ export default function Main() {
         </View>
 
         <ScrollView style={{maxHeight:95,elevation:5}}>
-          {nextEarnings.map((ear,index) => {
-            if (ear.dia >= todayDate.getDate() && ear.dia <= (todayDate.getDate()+10)){
+          {nextEntries.map((ear,index) => {
+            if (ear.day >= todayDate.getDate() && ear.day <= (todayDate.getDate()+10) && !ear.received){
               let color
-              if (ear.tipo == 'Ganhos'){
+              if (ear.type == 'Ganhos'){
                 color = '#1A8289'
               }else{
                 color = '#CC3728'
               }
               return (
                 <View style={styles.nextDaysContent} key={index}>
-                  <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.titulo}</Text>
+                  <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.dia+'  '+Functions.convertDtToStringMonth(todayDate.getMonth()+1)}
+                    {ear.day+'  '+Functions.convertDtToStringMonth(todayDate.getMonth()+1)}
                   </Text>
                 </View>
               )
             }
           })
           }
-          {todayDate.getDate()+5 > 30 && nextEarnings2.map((ear, index)=>{
-            if (ear.dia <= 5){
+          {todayDate.getDate()+5 > 30 && nextEntries2.map((ear, index)=>{
+            if (ear.day <= 5){
               let color
-              if (ear.tipo == 'Ganhos'){
+              if (ear.type == 'Ganhos'){
                 color = '#1A8289'
               }else{
                 color = '#CC3728'
               }
               return (
                 <View style={styles.nextDaysContent} key={index}>
-                  <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.titulo}</Text>
+                  <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.dia+'  '+Functions.convertDtToStringMonth(todayDate.getMonth()+2)}
+                    {ear.day+'  '+Functions.convertDtToStringMonth(todayDate.getMonth()+2)}
                   </Text>
                 </View>
               )
@@ -528,14 +574,14 @@ export default function Main() {
 
       </View>
 
-      <Modal animationType="slide" visible={modalBalance1} transparent>
+      <Modal animationType="slide" visible={modalBalance} transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={{flexDirection:'row', justifyContent:'center'}}>
                 <Text style={styles.monthText}>
                     {textModal}
                 </Text>
-              <TouchableOpacity onPress={() => { setModalBalance1(!modalBalance1) }}>
+              <TouchableOpacity onPress={() => { setModalBalance(!modalBalance) }}>
                 <Feather name="x" size={30} color={'#136065'} />
               </TouchableOpacity>
             </View>

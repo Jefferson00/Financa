@@ -10,51 +10,48 @@ import 'intl/locale-data/jsonp/pt-BR';
 
 import Footer from './components/footer'
 
-import GanhosBD from '../services/ganhos'
-import Valores from '../services/valores';
+import EntriesDB from '../services/entriesDB'
+import ValuesDB from '../services/valuesDB';
 import Functions from '../functions/index'
 
 
-export default function Ganhos({ route }: { route: any }, { navigation }: { navigation: any }) {
-    const navigation2 = useNavigation()
+export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
+    const navigationScreen = useNavigation()
 
-    const [selectedId, setSelectedId] = useState(0)
+    const [selectedId, setSelectedId] = useState(0) 
     const [selectedTotalValues, setSelectedTotalValues] = useState(0)
 
-    function showModal(id: number, totalValues: number) {
-        setModalVisible(true);
-        setSelectedId(id)
-        setSelectedTotalValues(totalValues)
-    }
+    const { item , month, year} = route.params
 
     interface EarningsValues {
         id: number,
-        titulo: string,
-        dia: number,
-        dtInicio: number,
-        dtFim: number,
-        mensal: boolean,
-        recebido: boolean,
+        title: string,
+        day: number,
+        dtStart: number,
+        dtEnd: number,
+        monthly: boolean,
+        received: boolean,
+        type:string,
     }
 
     interface EarningsRecebidos {
-        ganhos_id: number,
+        entries_id: number,
         id: number,
         month: number,
-        recebido: number,
+        received: number,
         year: number,
     }
 
     interface ValuesValues {
         id: number,
-        descricao: string,
-        valor: number,
-        dtInicio: number,
-        dtFim: number,
-        ganhos_id: number,
-        dia: number,
-        tipo: string,
-        recebido:boolean,
+        description: string,
+        amount: number,
+        dtStart: number,
+        dtEnd: number,
+        entries_id: number,
+        day: number,
+        type: string,
+        received:boolean,
     }
 
     const [modalVisible, setModalVisible] = useState(false)
@@ -63,7 +60,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     const [mainText1, setMainText1] = useState('')
     const [mainText2, setMainText2] = useState('')
     const [TextAddButton, setTextAddButton] = useState('')
-    const [textRecebido, setTextRecebido] = useState('')
+    const [textReceived, setTextReceived] = useState('')
     const [textAlert, setTextAlert] = useState('')
     const [colorMonth, setColorMonth] = useState('#fff')
     const [colorText, setColorText] = useState('#fff')
@@ -72,9 +69,6 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
     const [selectedMonth, setSelectedMonth] = useState(10)
     const [selectedYear, setSelectedYear] = useState(2020)
-
-    const [totalCurrentValues, setTotalCurrentValues] = useState(0)
-    const [totalEstimatedValues, setTotalEstimatedValues] = useState(0)
 
     const [earnings, setEarnings] = useState<EarningsValues[]>([])
     const [valuesList, setValuesList] = useState<ValuesValues[]>([])
@@ -87,53 +81,54 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
     let rec
     let atrasado = false
 
-    const { item } = route.params
+    
+
+    function showModal(id: number, totalValues: number) {
+        setModalVisible(true);
+        setSelectedId(id)
+        setSelectedTotalValues(totalValues)
+    }
 
     function handleNavigateNovo() {
-        navigation2.navigate('NovoGanho', { item: item })
+        navigationScreen.navigate('NewEntries', { item: item , month: selectedMonth, year: selectedYear})
     }
 
     function handleNavigateNovoUpdate(id: number) {
         setModalVisible(false)
-        navigation2.navigate('NovoGanho', { item: item, idUpdate: id })
+        navigationScreen.navigate('NewEntries', { item: item, idUpdate: id })
     }
 
     function handleNextMonth() {
-        //console.log(selectedMonth)
         let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
-        GanhosBD.findByDate(parseInt(nextDtObj.dt)).then(res => {
-            setEarnings(res._array.filter(earning => earning.tipo == item))
+        EntriesDB.findByDateOrderByDay(parseInt(nextDtObj.dt)).then((res:any) => {
+            setEarnings(res._array.filter((earning :EarningsValues)=> earning.type == item))
         }).catch(err => {
             setEarnings([])
             console.log(err)
         })
 
-        Valores.findByDate(parseInt(nextDtObj.dt)).then(res => {
-            //console.log(res)
+        ValuesDB.findByDate(parseInt(nextDtObj.dt)).then((res:any) => {
             setValuesList(res._array)
         }).catch(err => {
             setValuesList([])
             console.log(err)
         })
 
-        //console.log(parseInt(nextDtObj))
         setSelectedMonth(nextDtObj.nextMonth)
         setSelectedYear(nextDtObj.nextYear)
-
     }
 
     function handlePrevMonth() {
         let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
 
-        GanhosBD.findByDate(parseInt(prevDtObj.dt)).then(res => {
-            setEarnings(res._array.filter(earning => earning.tipo == item))
+        EntriesDB.findByDateOrderByDay(parseInt(prevDtObj.dt)).then((res:any) => {
+            setEarnings(res._array.filter((earning:EarningsValues) => earning.type == item))
         }).catch(err => {
             setEarnings([])
             console.log(err)
         })
 
-        Valores.findByDate(parseInt(prevDtObj.dt)).then(res => {
-            //console.log(res)
+        ValuesDB.findByDate(parseInt(prevDtObj.dt)).then((res:any) => {
             setValuesList(res._array)
         }).catch(err => {
             setValuesList([])
@@ -142,7 +137,6 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
         setSelectedMonth(prevDtObj.prevMonth)
         setSelectedYear(prevDtObj.prevYear)
-
     }
 
 
@@ -151,8 +145,8 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             let cont: any = []
             let cont2: any = []
             valuesList.map(value => {
-                if (value.valor != null && value.valor != 0) cont.push(value.valor)
-                if (value.dia <= date.getDate()) cont2.push(value.valor)
+                if (value.amount != null && value.amount != 0) cont.push(value.amount)
+                if (value.day <= date.getDate()) cont2.push(value.amount)
             })
             resolve(cont)
         })
@@ -174,10 +168,10 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                 },
                 {
                     text: "OK", onPress: () =>
-                        GanhosBD.remove2(id).then(res => {
+                        EntriesDB.remove2(id).then(() => {
                             alert('removido!')
                             setEarnings(earnings.filter(ern => ern.id !== id))
-                            setValuesList(valuesList.filter(vlu => vlu.ganhos_id !== id))
+                            setValuesList(valuesList.filter(vlu => vlu.entries_id !== id))
                             setModalVisible(false)
                         }).catch(err => {
                             console.log(err)
@@ -200,7 +194,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                 },
                 {
                     text: "OK", onPress: () =>
-                        Valores.remove(id).then(res => {
+                        ValuesDB.remove(id).then(res => {
                             setValuesList(valuesList.filter(vls => vls.id !== id))
                         }).catch(err => {
                             console.log(err)
@@ -211,25 +205,47 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
         );
     }
 
-    function updateRecebido(selectedId:number){
-        GanhosBD.findById(selectedId).then(res=>{
+    function updateReceived(selectedId:number){
+        EntriesDB.findById(selectedId).then((res:any)=>{
             let obj = {
-                titulo: res._array[0].titulo,
-                dia: res._array[0].dia,
-                dtInicio:res._array[0].dtInicio,
-                dtFim:res._array[0].dtFim,
-                mensal:res._array[0].mensal,
-                recebido:true,
-                tipo:res._array[0].tipo,
+                title: res._array[0].title,
+                day: res._array[0].day,
+                dtStart:res._array[0].dtStart,
+                dtEnd:res._array[0].dtEnd,
+                monthly:res._array[0].monthly,
+                received:true,
+                type:res._array[0].type,
             }
-            GanhosBD.update(selectedId, obj).then(res=>{
+            EntriesDB.update(selectedId, obj).then(res=>{
                 alert("Pago!")
                 setModalVisible(false)
+                loadResults()
             }).catch(err=>{
                 console.log(err)
             })
-            //console.log('Obj: '+obj.titulo)
+            //console.log('Obj: '+obj.title)
         })
+    }
+
+    function loadResults(){
+        let firstDate
+            if (CurrentMonth < 10) {
+                firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
+            } else {
+                firstDate = CurrentYear.toString() + CurrentMonth.toString()
+            }
+            EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res:any) => {
+                setEarnings(res._array.filter((earning:EarningsValues) => earning.type == item))
+            }).catch(err => {
+                console.log(err)
+            })
+            ValuesDB.findByDate(parseInt(firstDate)).then((res:any) => {
+                console.log(res)
+                setValuesList(res._array)
+
+            }).catch(err => {
+                console.log(err)
+            })
     }
 
     useEffect(() => {
@@ -243,7 +259,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             setColorBorderAddButton('#24DBBA')
             setColorBorderFooter('#1A828922')
             setTextAddButton('Adicionar Novo Ganho')
-            setTextRecebido('Esse ganho já foi recebido?')
+            setTextReceived('Esse ganho já foi recebido?')
             setTextAlert('Ganho não recebido!')
 
         } else if (item === 'Despesas') {
@@ -256,42 +272,25 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             setColorBorderAddButton('#FF4835')
             setColorBorderFooter('#CC372822')
             setTextAddButton('Adicionar Nova Despesa')
-            setTextRecebido('Essa despesa já foi paga?')
+            setTextReceived('Essa despesa já foi paga?')
             setTextAlert('Despesa não paga!')
         }
 
-        setSelectedMonth(CurrentMonth)
-        setSelectedYear(CurrentYear)
+        setSelectedMonth(month)
+        setSelectedYear(year)
 
         setData(todayDate)
 
 
 
-        const unsubscribe = navigation2.addListener('focus', () => {
+        const unsubscribe = navigationScreen.addListener('focus', () => {
             console.log('Refreshed!');
-            let firstDate
-            if (CurrentMonth < 10) {
-                firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
-            } else {
-                firstDate = CurrentYear.toString() + CurrentMonth.toString()
-            }
-            GanhosBD.findByDateOrderByDay(parseInt(firstDate)).then(res => {
-                setEarnings(res._array.filter(earning => earning.tipo == item))
-            }).catch(err => {
-                console.log(err)
-            })
-            Valores.findByDate(parseInt(firstDate)).then(res => {
-                //console.log(res._array)
-                setValuesList(res._array)
-
-            }).catch(err => {
-                console.log(err)
-            })
+            loadResults()
 
         });
         return unsubscribe;
 
-    }, [navigation2])
+    }, [navigationScreen])
 
     
 
@@ -314,9 +313,9 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
             </View>
             {valuesList.map(value => {
                 if (selectedMonth == CurrentMonth && selectedYear == CurrentYear){
-                    if (value.recebido && value.tipo == item) cont2.push(value.valor)
+                    if (value.received && value.type == item) cont2.push(value.amount)
                 }
-                if (value.valor != null && value.valor != 0 && value.tipo == item) cont.push(value.valor)
+                if (value.amount != null && value.amount != 0 && value.type == item) cont.push(value.amount)
             })}
             <View style={styles.balanceView}>
                 <View style={styles.currentBalanceView}>
@@ -358,12 +357,16 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                             console.log(CurrentYear)
                             console.log(CurrentMonth)
                             console.log(selectedMonth)*/
-                            if (!earning.recebido || selectedMonth != CurrentMonth || selectedYear != CurrentYear) {
+                            if (!earning.received || selectedMonth != CurrentMonth || selectedYear != CurrentYear) {
                                 opac = 0.7
                             }
-                            if (!earning.recebido && earning.dia <= todayDate.getDate()) {
+                            if (!earning.received && earning.day <= todayDate.getDate()) {
                                 atrs = true
                                 borderColor = colorText
+                            }
+                            if(selectedMonth != CurrentMonth || selectedYear != CurrentYear){
+                                atrs = false
+                                borderColor = '#ffffff'
                             }
                             return (
                                 <View key={index}>
@@ -374,8 +377,8 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                     >
                                     <MaterialIcons name="monetization-on" size={40} color={colorText} />
                                     {valuesList.map(value => {
-                                        if (earnings[index].id == value.ganhos_id) {
-                                            totalValues = totalValues + value.valor
+                                        if (earnings[index].id == value.entries_id) {
+                                            totalValues = totalValues + value.amount
                                             //console.log(totalValues)
                                         }
                                     })}
@@ -383,10 +386,10 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                     
                                     <View style={styles.earningTextView}>
                                         <Text style={[styles.earningTittleText, { color: colorText }]}>
-                                            {earning.titulo}
+                                            {earning.title}
                                         </Text>
                                         <Text style={[styles.earningDateText, { color: colorText }]}>
-                                            {earning.dia}/{Functions.convertDtToStringMonth(selectedMonth)}
+                                            {earning.day}/{Functions.convertDtToStringMonth(selectedMonth)}
                                         </Text>
                                     </View>
 
@@ -432,10 +435,13 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                     <View style={styles.modalContent}>
                         {earnings.map((earning, index) => {
                             if (earning.id == selectedId){
-                                rec = earning.recebido
+                                rec = earning.received
                                 //console.log('Recebido: '+rec)
-                            if (earning.dia <= todayDate.getDate() && !earning.recebido){
+                            if (earning.day <= todayDate.getDate() && !earning.received){
                                 atrasado = true
+                            }
+                            if (selectedMonth != CurrentMonth || selectedYear != CurrentYear){
+                                atrasado = false
                             }
                             }
                             if (earning.id == selectedId) {
@@ -444,7 +450,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                         <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(26, 130, 137, 0.33)', paddingBottom: 17, marginBottom: 37 }}>
                                             <View style={styles.tittleView}>
                                                 <Text style={[styles.tittleText, { color: colorText }]}>
-                                                    {earning.titulo}
+                                                    {earning.title}
                                                 </Text>
                                                 <TouchableOpacity onPress={() => removeItem(earning.id)}>
                                                     <Feather name="trash-2" size={20} color={colorText} />
@@ -460,29 +466,35 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                                 />
 
                                                 <Text style={[styles.subTittleText, { color: colorText }]}>
-                                                    {earning.dia} {Functions.convertDtToStringMonth(earning.dtInicio)}
+                                                    {earning.day} {Functions.convertDtToStringMonth(selectedMonth)}
                                                 </Text>
                                             </View>
                                         </View>
                                         {valuesList.map((value, index) => {
                                             currentDate.setMonth(selectedMonth - 1)
                                             currentDate.setFullYear(selectedYear)
-                                            if (earning.id == value.ganhos_id)
+                                            if (earning.id == value.entries_id)
                                                 return (
                                                     <View style={styles.valuesList} key={index}>
                                                         <View style={{ flexDirection: 'row' }}>
+                                                            {value.description==''?
                                                             <Text style={[styles.valuesListText, { color: colorText, marginRight: 5 }]}>
-                                                                {value.descricao}
+                                                                {earning.title}
                                                             </Text>
+                                                            :
+                                                            <Text style={[styles.valuesListText, { color: colorText, marginRight: 5 }]}>
+                                                                {value.description}
+                                                            </Text>
+                                                            }
                                                             <Text style={[styles.valuesListText, { color: colorBorderAddButton }]}>
-                                                                {Functions.toFrequency(value.dtFim, value.dtInicio) < 948 ? 
-                                                                Functions.toFrequency(value.dtFim, value.dtInicio) - Functions.toFrequency(value.dtFim, Functions.setDtInicio(currentDate)) + 1 + "/" + (Functions.toFrequency(value.dtFim, value.dtInicio)+1)
+                                                                {Functions.toFrequency(value.dtEnd, value.dtStart)+1 < 948 ? 
+                                                                Functions.toFrequency(value.dtEnd, value.dtStart) - Functions.toFrequency(value.dtEnd, Functions.setDtStart(currentDate)) + 1 + "/" + (Functions.toFrequency(value.dtEnd, value.dtStart)+1)
                                                                 : null}
                                                             </Text>
                                                         </View>
                                                         <View style={{ flexDirection: 'row' }}>
                                                             <NumberFormat
-                                                                value={value.valor}
+                                                                value={value.amount}
                                                                 displayType={'text'}
                                                                 thousandSeparator={true}
                                                                 format={Functions.currencyFormatter}
@@ -503,7 +515,7 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
 
 
                         <View>
-                            {rec == 0 ?
+                            {rec == 0 && selectedMonth == CurrentMonth && selectedYear == CurrentYear ?
                                 <>
                                     <View style={{ paddingHorizontal: 26 ,marginTop:32}}>
                                         {atrasado ? 
@@ -515,10 +527,10 @@ export default function Ganhos({ route }: { route: any }, { navigation }: { navi
                                             </View>
                                         : null}
                                         <Text style={[styles.subTittleText, { color: colorText , marginTop:15}]}>
-                                            {textRecebido}
+                                            {textReceived}
                                         </Text>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                            <TouchableOpacity onPress={() => updateRecebido(selectedId)}>
+                                            <TouchableOpacity onPress={() => updateReceived(selectedId)}>
                                                 <Text style={[styles.tittleText, { color: colorBorderAddButton }]}>
                                                     SIM
                                                 </Text>

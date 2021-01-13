@@ -2,11 +2,11 @@ import db from './database'
 
 db.transaction((tx) => {
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
-     //tx.executeSql("DROP TABLE valuesTable;");
+     //tx.executeSql("DROP TABLE tableValues;");
      //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS valuesTable (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT, valor REAL, dtInicio INT, dtFim INT, ganhos_id INT NOT NULL, FOREIGN KEY (ganhos_id) REFERENCES earnings (id) ON DELETE CASCADE);"
+      "CREATE TABLE IF NOT EXISTS tableValues (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, amount REAL, dtStart INT, dtEnd INT, entries_id INT NOT NULL, FOREIGN KEY (entries_id) REFERENCES entries (id) ON DELETE CASCADE);"
     );
   });
 
@@ -14,8 +14,8 @@ db.transaction((tx) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
         tx.executeSql(
-          "INSERT INTO valuesTable (descricao,valor,dtInicio, dtFim, ganhos_id) values (?,?,?,?,?);",
-          [obj.descricao,obj.valor,obj.dtInicio,obj.dtFim,obj.ganhos_id],
+          "INSERT INTO tableValues (description,amount,dtStart, dtEnd, entries_id) values (?,?,?,?,?);",
+          [obj.description,obj.amount,obj.dtStart,obj.dtEnd,obj.entries_id],
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);
@@ -31,7 +31,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM valuesTable;",
+          "SELECT * FROM tableValues;",
           [],
           //-----------------------
           (_, { rows }) => resolve(rows),
@@ -44,8 +44,8 @@ db.transaction((tx) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
         tx.executeSql(
-          "UPDATE valuesTable SET descricao=?,valor=?,dtInicio=?, dtFim=?, ganhos_id=?  Where id=?;",
-          [obj.descricao,obj.valor,obj.dtInicio,obj.dtFim,obj.ganhos_id, id],
+          "UPDATE tableValues SET description=?,amount=?,dtStart=?, dtEnd=?, entries_id=?  Where id=?;",
+          [obj.description,obj.amount,obj.dtStart,obj.dtEnd,obj.entries_id, id],
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);
@@ -61,7 +61,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT valuesTable.*, earnings.dia, earnings.tipo, earnings.recebido FROM valuesTable INNER JOIN earnings ON valuesTable.ganhos_id = earnings.id WHERE valuesTable.dtInicio<=? and valuesTable.dtFim>=?;",
+          "SELECT tableValues.*, entries.day, entries.type, entries.received FROM tableValues INNER JOIN entries ON tableValues.entries_id = entries.id WHERE tableValues.dtStart<=? and tableValues.dtEnd>=?;",
           [dt,dt],
           //-----------------------
           (_, { rows }) => {
@@ -77,7 +77,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM valuesTable ORDER BY dtInicio;",
+          "SELECT * FROM tableValues ORDER BY dtStart;",
           [],
           //-----------------------
           (_, { rows }) => resolve(rows),
@@ -91,7 +91,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "DELETE FROM valuesTable WHERE id=?;",
+          "DELETE FROM tableValues WHERE id=?;",
           [id],
           //-----------------------
           (_, { rowsAffected }) => {

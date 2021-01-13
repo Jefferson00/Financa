@@ -1,24 +1,24 @@
 
 /*Define a data de inicio */
-function setDtInicio(date: Date) {
+function setDtStart(date: Date) {
     let month = date.getMonth() + 1
     let year = date.getFullYear()
 
-    let dtInicio
+    let dtStart
     if (month < 10) {
-        dtInicio = year.toString() + '0' + month.toString()
+        dtStart = year.toString() + '0' + month.toString()
     } else {
-        dtInicio = year.toString() + month.toString()
+        dtStart = year.toString() + month.toString()
     }
 
-    return parseInt(dtInicio)
+    return parseInt(dtStart)
 }
 
 /*Define a data fim */
-function setDtFim(mensal: Boolean, contRepeat: number, date: Date) {
-    let dtFim
+function setDtEnd(mensal: Boolean, contRepeat: number, date: Date) {
+    let dtEnd
     if (mensal) {
-        dtFim = "209912"
+        dtEnd = "209912"
     } else {
         let month = (date.getMonth() + 1)
         let year = date.getFullYear()
@@ -30,23 +30,23 @@ function setDtFim(mensal: Boolean, contRepeat: number, date: Date) {
             }
         }
         if (month < 10) {
-            dtFim = year.toString() + '0' + month.toString()
+            dtEnd = year.toString() + '0' + month.toString()
         } else {
-            dtFim = year.toString() + month.toString()
+            dtEnd = year.toString() + month.toString()
         }
     }
-    return parseInt(dtFim)
+    return parseInt(dtEnd)
 }
 
-function toFrequency(dtfim: number, dtInicio: number){
-    var outputFim = [], outputInicio = [],
-    sDtfim = dtfim.toString(),
+function toFrequency(dtEnd: number, dtInicio: number){
+    var outputEnd = [], outputInicio = [],
+    sDtEnd = dtEnd.toString(),
     sDtInicio = dtInicio.toString()
 
     
 
-    for (var i = 0, len = sDtfim.length; i < len; i += 1) {
-        outputFim.push(+sDtfim.charAt(i));
+    for (var i = 0, len = sDtEnd.length; i < len; i += 1) {
+        outputEnd.push(+sDtEnd.charAt(i));
     }
 
     for (var i = 0, len = sDtInicio.length; i < len; i += 1) {
@@ -55,13 +55,13 @@ function toFrequency(dtfim: number, dtInicio: number){
 
     let test:string = ''
 
-    let yearFim = test.concat(outputFim[0].toString(),outputFim[1].toString(),outputFim[2].toString(),outputFim[3].toString())
-    let monthFim = test.concat(outputFim[4].toString(),outputFim[5].toString())
+    let yearEnd = test.concat(outputEnd[0].toString(),outputEnd[1].toString(),outputEnd[2].toString(),outputEnd[3].toString())
+    let monthEnd = test.concat(outputEnd[4].toString(),outputEnd[5].toString())
     let monthInicio = test.concat(outputInicio[4].toString(),outputInicio[5].toString())
     let yearInicio = test.concat(outputInicio[0].toString(),outputInicio[1].toString(),outputInicio[2].toString(),outputInicio[3].toString())
  
     
-    let frequencia = parseInt(monthFim)-parseInt(monthInicio) + (12* (parseInt(yearFim) - parseInt(yearInicio)))
+    let frequencia = parseInt(monthEnd)-parseInt(monthInicio) + (12* (parseInt(yearEnd) - parseInt(yearInicio)))
     //console.log(frequencia)
     return frequencia 
 }
@@ -131,6 +131,9 @@ function currencyFormatter(value:any) {
             break
         case 12:
             return 'Dez'
+            break
+        case 13:
+            return 'Jan'
             break
         default:
             return 'err'
@@ -219,9 +222,22 @@ function prevMonth(selectedMonth:any, selectedYear:any) {
     return { lastMonth: lastMonth, lastYear: lastYear }
   }
 
+  function formatCurrency(value:any){
+    //console.log('VALOR 1: '+valor)
+    value = value + '';
+    value = parseInt(value.replace(/[\D]+/g, ''));
+    value = value + '';
+    value = value.replace(/([0-9]{2})$/g, ",$1");
+
+    if (value.length > 6) {
+        value = value.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
+    }
+    return value
+  }
+
 export default{
-    setDtInicio,
-    setDtFim,
+    setDtStart,
+    setDtEnd,
     currencyFormatter,
     convertDtToStringMonth,
     sumValues,
@@ -231,5 +247,6 @@ export default{
     toFrequency,
     toMonthAndYear,
     selectLastMonth,
+    formatCurrency,
 }
 

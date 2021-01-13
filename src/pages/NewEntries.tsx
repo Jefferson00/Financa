@@ -5,20 +5,19 @@ import { StyleSheet, Text, TouchableOpacity, View, Button, TextInput, Platform, 
 import { Feather } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import NumberFormat from 'react-number-format';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
 
 import Footer from './components/footer'
 import { ScrollView, Switch } from 'react-native-gesture-handler';
 
-import Ganhos from '../services/ganhos'
-import Valores from '../services/valores'
+import EntriesDB from '../services/entriesDB'
+import ValuesDB from '../services/valuesDB'
 import Functions from '../functions/index'
 
-export default function NovoGanho({ route }: { route: any }, { navigation }: { navigation: any }) {
+export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
 
-    const { item } = route.params
+    const { item , month, year} = route.params
     const { idUpdate } = route.params
     const nav = useNavigation()
 
@@ -27,27 +26,27 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     interface ValuesItem {
         id: number,
         description: string,
-        value: string,
-        mensal: boolean,
+        amount: string,
+        monthly: boolean,
         repeat: number,
     }
 
     interface ValuesItemUpdate {
         id: number,
-        descricao: string,
-        valor: string,
-        dtInicio: number,
-        dtFim: number,
-        ganhos_id: number,
+        description: string,
+        amount: string,
+        dtStart: number,
+        dtEnd: number,
+        entries_id: number,
     }
 
     interface earningValues {
-        titulo: string,
-        dia: number,
-        dtInicio: number,
-        dtFim: number,
-        mensal: boolean,
-        recebido: boolean,
+        title: string,
+        day: number,
+        dtStart: number,
+        dtEnd: number,
+        monthly: boolean,
+        received: boolean,
     }
 
     /*Estados de aparencia*/
@@ -55,7 +54,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     /**/ const [mainColor2, setMainColor2] = useState('')
     /**/ const [tittleText, setTittleText] = useState('')
     /**/ const [tittleTextColor, setTittleTextColor] = useState('#fff')
-    /**/ const [valueTitulo, onChangeTitulo] = useState('');
+    /**/ const [valueTitle, onChangeTitle] = useState('');
+    /**/ const [receivedTextDate, setReceivedTextDate] = useState('');
+    /**/ const [receivedText, setReceivedText] = useState('');
     /**/ const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
     /**/ const [secondColor, setSecondColor] = useState('#fff')
     /**/ const [colorMonth, setColorMonth] = useState('#fff')
@@ -68,8 +69,8 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     /**/ const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
         id: 0,
         description: '',
-        value: '0',
-        mensal: false,
+        amount: '0',
+        monthly: false,
         repeat: 1
     }])
     /**/ const [showValues, setShowValues] = useState(false)
@@ -89,13 +90,13 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     /**/ const [successModal, setSuccessModal] = useState(false)
 
 
-    //Switch control Mensal
+    //Switch control monthly
     const [show, setShow] = useState(false);
 
     const [isEnabled, setIsEnabled] = useState(false);
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState)
-        updateOneValue('mensal', 0, !isEnabled)
+        updateOneValue('monthly', 0, !isEnabled)
     };
 
     //Switch control Recebido
@@ -121,10 +122,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     const updateValues = (subitem: any, index: any, value: any) => (e: any) => {
         let newArr = valuesArray.map((item, i) => {
             if (index == i) {
-                if (subitem == 'mensal') {
+                if (subitem == 'monthly') {
                     return { ...item, [subitem]: value = !value }
                 }
-                else if (subitem == 'value') {
+                else if (subitem == 'amount') {
                     var valor = e.nativeEvent.text
                     valor = valor + '';
                     valor = parseInt(valor.replace(/[\D]+/g, ''));
@@ -149,30 +150,27 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     const updateValuesUpdate = (subitem: any, index: any, value: any) => (e: any) => {
         let newArr = valuesUpdate.map((item, i) => {
             if (index == i) {
-                if (subitem == 'mensal') {
+                if (subitem == 'monthly') {
                     //console.log(value)
                     var fr = 0
                     if (!value[0]) {
                         fr = value[1]
-                        return { ...item, ['dtFim']: 209912 }
+                        return { ...item, ['dtEnd']: 209912 }
                     } else {
                         var dt = new Date()
-                        var dtFim = Functions.setDtFim(false, fr, dt)
-                        //console.log(dtFim)
-                        return { ...item, ['dtFim']: dtFim }
+                        var dtEnd = Functions.setDtEnd(false, fr, dt)
+                        //console.log(dtEnd)
+                        return { ...item, ['dtEnd']: dtEnd }
                     }
                 }
                 else if (subitem == 'repeat') {
                     var dt = new Date()
-                    console.log('valor: ' + value[1])
                     var rpt = value[1]
-                    console.log('Repetir: ' + rpt)
-                    var dtFim = Functions.setDtFim(value[0], rpt, dt)
-                    console.log('sata fim: ' + dtFim)
-                    return { ...item, ['dtFim']: dtFim }
+                    var dtEnd = Functions.setDtEnd(value[0], rpt, dt)
+                    return { ...item, ['dtEnd']: dtEnd }
 
                 }
-                else if (subitem == 'value') {
+                else if (subitem == 'amount') {
                     var valor = e.nativeEvent.text
                     valor = valor + '';
                     valor = parseInt(valor.replace(/[\D]+/g, ''));
@@ -202,9 +200,9 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                     console.log('valor: ' + value[1])
                     var rpt = value[1]
                     console.log('Repetir: ' + rpt)
-                    var dtFim = Functions.setDtFim(value[0], rpt, dt)
-                    console.log('sata fim: ' + dtFim)
-                    return { ...item, ['dtFim']: dtFim }
+                    var dtEnd = Functions.setDtEnd(value[0], rpt, dt)
+                    console.log('sata fim: ' + dtEnd)
+                    return { ...item, ['dtEnd']: dtEnd }
 
                 }
                 
@@ -219,7 +217,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     const updateOneValue = (subitem: any, index: any, value: any) => {
         let newArr = valuesArray.map((item, i) => {
             if (index == i) {
-                if (subitem == 'mensal') {
+                if (subitem == 'monthly') {
                     return { ...item, [subitem]: value }
                 }
                 else {
@@ -234,37 +232,45 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
 
     function handleCreateNew() {
-        let dtInicio = Functions.setDtInicio(date)
-        let dtFim = Functions.setDtFim(isEnabled, valueFrequency, date)
+        let dtStart = Functions.setDtStart(date)
+        let dtEnd = Functions.setDtEnd(isEnabled, valueFrequency, date)
         const GanhoObj = {
-            titulo: valueTitulo,
-            dia: date.getDate(),
-            dtInicio: dtInicio,
-            dtFim: dtFim,
-            mensal: isEnabled,
-            recebido: isEnabledReceived,
-            tipo: item
+            title: valueTitle,
+            day: date.getDate(),
+            dtStart: dtStart,
+            dtEnd: dtEnd,
+            monthly: isEnabled,
+            received: isEnabledReceived,
+            type: item
         }
-        Ganhos.create(GanhoObj)
+        EntriesDB.create(GanhoObj)
 
 
-        Ganhos.all().then(res => {
+        EntriesDB.all().then((res:any) => {
             //console.log(res)
             valuesArray.map(value => {
-                var vlr = value.value
+                var vlr = value.amount
                 vlr = vlr.replace(/[.]/g, '')
                 vlr = vlr.replace(/[,]/g, '')
-                //console.log(vlr)
+                console.log(vlr)
                 const ValueObj = {
-                    descricao: value.description,
-                    valor: vlr,
-                    dtInicio: dtInicio,
-                    dtFim: Functions.setDtFim(value.mensal, value.repeat, date),
-                    ganhos_id: res._array.slice(-1)[0].id
+                    description: value.description,
+                    amount: vlr,
+                    dtStart: dtStart,
+                    dtEnd: Functions.setDtEnd(value.monthly, value.repeat, date),
+                    entries_id: res._array.slice(-1)[0].id
                 }
-                //console.log(ValueObj.dtFim)
+                console.log('Descricao: '+ValueObj.description)
+                console.log('valor: '+ValueObj.amount)
+                console.log('dtStart: '+ValueObj.dtStart)
+                console.log('dtEnd: '+ValueObj.dtEnd)
+                console.log('id: '+ValueObj.entries_id)
 
-                Valores.create(ValueObj)
+                ValuesDB.create(ValueObj).then(()=>{
+
+                }).catch(err =>{
+                    console.log(err)
+                })
                 setSuccessModal(true)
             })
 
@@ -277,32 +283,36 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     }
 
     function handleUpdate() {
-        let dtInicio = Functions.setDtInicio(date)
-        let dtFim = Functions.setDtFim(isEnabled, valueFrequency, date)
+        let dtStart = Functions.setDtStart(date)
+        let dtEnd = Functions.setDtEnd(isEnabled, valueFrequency, date)
         const GanhoObj = {
-            titulo: valueTitulo,
-            dia: date.getDate(),
-            dtInicio: dtInicio,
-            dtFim: dtFim,
-            mensal: isEnabled,
-            recebido: isEnabledReceived,
-            tipo: item
+            title: valueTitle,
+            day: date.getDate(),
+            dtStart: dtStart,
+            dtEnd: dtEnd,
+            monthly: isEnabled,
+            received: isEnabledReceived,
+            type: item
         }
-        Ganhos.update(idUpdate, GanhoObj).then(res => {
+        EntriesDB.update(idUpdate, GanhoObj).then(res => {
             valuesUpdate.map(value => {
-                var vlr = value.valor
-                //console.log(vlr)
+                var vlr = value.amount
+                console.log('vlr'+vlr)
+                if(typeof(vlr) == 'string'){
+                    vlr = vlr.replace(/[.]/g, '')
+                    vlr = vlr.replace(/[,]/g, '')
+                }
 
                 const ValueObj = {
-                    descricao: value.descricao,
-                    valor: vlr,
-                    dtInicio: value.dtInicio,
-                    dtFim: value.dtFim,
-                    ganhos_id: idUpdate
+                    description: value.description,
+                    amount: vlr,
+                    dtStart: value.dtStart,
+                    dtEnd: value.dtEnd,
+                    entries_id: idUpdate
                 }
-                Valores.update(value.id, ValueObj)
+                ValuesDB.update(value.id, ValueObj)
             })
-            alert('atualizado')
+            setSuccessModal(true)
 
         }).catch(err => {
             console.log(err)
@@ -329,8 +339,15 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     }
 
     useEffect(() => {
-        setSelectedMonth(CurrentMonth)
-        setSelectedYear(CurrentYear)
+        if (month != null && year != null){
+            setSelectedMonth(month)
+            setSelectedYear(year)
+            date.setMonth(month- 1)
+            date.setFullYear(year)
+        }else{
+            setSelectedMonth(CurrentMonth)
+            setSelectedYear(CurrentYear)
+        }
 
         if (item === 'Ganhos') {
             setMainColor1('#155F69')
@@ -340,6 +357,8 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             setColorBorderAddButton('#24DBBA')
             setColorMonth('#FDDB63')
             setSecondColor('#49B39F')
+            setReceivedText('Recebido')
+            setReceivedTextDate('Data de Recebimento')
 
         } else if (item === 'Despesas') {
             setMainColor1('#CC3728')
@@ -348,17 +367,15 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
             setTittleTextColor('#CC3728')
             setColorBorderAddButton('#FF4835')
             setSecondColor('#FF4835')
+            setReceivedText('Pago')
+            setReceivedTextDate('Data de Pagamento')
         }
         if (idUpdate != null) {
-            //console.log('id = '+idUpdate)
-            Valores.all().then(res => {
-                var arr: any = (res._array.filter(vlr => vlr.ganhos_id == idUpdate))
-                //console.log("Array: "+arr[0].dtFim)
-                
-                
+            ValuesDB.all().then((res:any) => {
+                var arr: any = (res._array.filter((vlr:ValuesItemUpdate) => vlr.entries_id == idUpdate))
                 setValuesUpdate(arr)
             })
-            Ganhos.findById(idUpdate).then(res => {
+            EntriesDB.findById(idUpdate).then((res:any) => {
                 setEarning(res._array)
 
             }).catch(err => {
@@ -370,11 +387,11 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
     }, [])
 
     function updateValuesList() {
-        Valores.all().then(res => {
-            var arr: any = (res._array.filter(vlr => vlr.ganhos_id == idUpdate))
+        ValuesDB.all().then((res:any) => {
+            var arr: any = (res._array.filter((vlr:ValuesItemUpdate) => vlr.entries_id == idUpdate))
             setValuesUpdate(arr)
         })
-        Ganhos.findById(idUpdate).then(res => {
+        EntriesDB.findById(idUpdate).then((res:any) => {
             setEarning(res._array)
 
         }).catch(err => {
@@ -394,7 +411,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                 },
                 {
                     text: "OK", onPress: () =>
-                        Valores.remove(id).then(res => {
+                    ValuesDB.remove(id).then(res => {
                             setValuesUpdate(valuesUpdate.filter(vls => vls.id !== id))
                         }).catch(err => {
                             console.log(err)
@@ -407,16 +424,16 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
 
     useEffect(() => {
         if (earning.length > 0) {
-            onChangeTitulo(earning[0].titulo)
-            if (earning[0].mensal) {
+            onChangeTitle(earning[0].title)
+            if (earning[0].monthly) {
                 setIsEnabled(true)
             } else {
-                setValueFrequency(Functions.toFrequency(earning[0].dtFim, earning[0].dtInicio) + 1)
+                setValueFrequency(Functions.toFrequency(earning[0].dtEnd, earning[0].dtStart) + 1)
             }
-            if (earning[0].recebido) {
+            if (earning[0].received) {
                 setIsEnabledReceived(true)
             }
-            date.setDate(earning[0].dia)
+            date.setDate(earning[0].day)
             
         }
     }, [earning])
@@ -425,7 +442,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
         setFrequencys([])
         let arrFrequency :any = []
             valuesUpdate.map(value =>{
-                arrFrequency.push(Functions.toFrequency(value.dtFim,value.dtInicio)+1)
+                arrFrequency.push(Functions.toFrequency(value.dtEnd,value.dtStart)+1)
             })
         //console.log(arrFrequency)
         setFrequencys(arrFrequency)
@@ -461,15 +478,31 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                             <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                                 Título
                             </Text>
-                            <TextInput onChangeText={text => onChangeTitulo(text)} value={valueTitulo} style={styles.InputText} />
-                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                Data de Recebimento
-                            </Text>
-                            <View style={styles.dateView}>
-                                <Text style={[styles.subTittleText, { color: secondColor }]} onPress={showDatepicker}>
-                                    {date.getDate()} / {Functions.convertDtToStringMonth(date.getUTCMonth() + 1)}
+                            <TextInput onChangeText={text => onChangeTitle(text)} value={valueTitle} style={styles.InputText} />
+                        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                            <View>
+                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                    {receivedTextDate}
                                 </Text>
+                                <View style={styles.dateView}>
+                                    <Text style={[styles.subTittleText, { color: secondColor }]} onPress={showDatepicker}>
+                                        {date.getDate()} / {Functions.convertDtToStringMonth(date.getUTCMonth() + 1)}
+                                    </Text>
+                                </View>
                             </View>
+                            <View>
+                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                    {receivedText}
+                                </Text>
+                                <Switch
+                                    trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
+                                    thumbColor={isEnabledReceived ? 'd2d2d2' : tittleTextColor}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={toggleSwitchReceived}
+                                    value={isEnabledReceived}
+                                />
+                            </View>
+                        </View>    
 
                             {show && (
                                 <DateTimePicker
@@ -508,31 +541,28 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                 <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
                             </View>
                             <View style={styles.frequencyView}>
-                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                    Recebido
-                                </Text>
-                                <Switch
-                                    trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                    thumbColor={isEnabledReceived ? 'd2d2d2' : tittleTextColor}
-                                    ios_backgroundColor="#3e3e3e"
-                                    onValueChange={toggleSwitchReceived}
-                                    value={isEnabledReceived}
-                                />
+                               
                             </View>
+                            {idUpdate==null?
+                            <>
                             <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                                 Valor
                             </Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10 }]}>R$</Text>
+                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize:18 }]}>
+                                    R$
+                                </Text>
                                 <TextInput
                                     keyboardType='numeric'
                                     placeholder='R$ 0,00'
-                                    onChange={updateValues('value', 0, false)}
-                                    value={valuesArray[0].value.toString()}
+                                    onChange={updateValues('amount', 0, false)}
+                                    value={valuesArray[0].amount.toString()}
                                     style={styles.InputTextValue}
                                 />
-
                             </View>
+                            </>
+                            :null
+                            }
 
                             {idUpdate == null && valuesArray.map((values, index) => {
                                 if (showValues)
@@ -544,12 +574,27 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                                 </Text>
                                                 <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                                                     Valor
-                                            </Text>
+                                                </Text>
                                             </View>
                                             <View style={styles.valuesView}>
 
-                                                <TextInput onChange={updateValues('description', index, false)} value={values.description} style={[styles.InputText, { width: 150 }]} />
-                                                <TextInput placeholder='R$ 0,00' onChange={updateValues('value', index, false)} value={values.value.toString()} style={styles.InputTextValue} />
+                                                <TextInput 
+                                                    onChange={updateValues('description', index, false)} 
+                                                    value={values.description} 
+                                                    style={[styles.InputText, { width: 150 }]} 
+                                                />
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize:18}]}>
+                                                    R$
+                                                </Text>
+                                                <TextInput 
+                                                    keyboardType='numeric'
+                                                    placeholder='R$ 0,00' 
+                                                    onChange={updateValues('amount', index, false)} 
+                                                    value={values.amount.toString()} 
+                                                    style={styles.InputTextValue} 
+                                                />
+                                                </View>
 
                                             </View>
                                             <View style={styles.valuesView}>
@@ -563,8 +608,8 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                                     trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
                                                     thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
                                                     ios_backgroundColor="#3e3e3e"
-                                                    onValueChange={updateValues('mensal', index, values.mensal)}
-                                                    value={values.mensal}
+                                                    onValueChange={updateValues('monthly', index, values.monthly)}
+                                                    value={values.monthly}
                                                 />
 
                                                 <TextInput
@@ -581,10 +626,10 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                             })}
 
                             {idUpdate != null && valuesUpdate.map((values, index) => {
-                                var mensal = false
+                                var monthly = false
  
-                                if (values.dtFim == 209912) {
-                                    mensal = true
+                                if (values.dtEnd == 209912) {
+                                    monthly = true
                                 }
                                 return (
                                     <View style={styles.valuesViewItem} key={index}>
@@ -598,18 +643,32 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         </View>
                                         <View style={styles.valuesView}>
 
-                                            <TextInput onChange={updateValuesUpdate('descricao', index, false)} value={values.descricao} style={styles.InputText} />
-                                            <TextInput placeholder='R$ 0,00' onChange={updateValuesUpdate('valor', index, false)} value={values.valor.toString()} style={styles.InputText} />
+                                            <TextInput 
+                                            onChange={updateValuesUpdate('description', index, false)} 
+                                            value={values.description} 
+                                            style={[styles.InputText, { width: 150 }]} />
+
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize:18}]}>
+                                                    R$
+                                                </Text>
+                                                <TextInput 
+                                                keyboardType='numeric'
+                                                placeholder='R$ 0,00' 
+                                                onChange={updateValuesUpdate('amount', index, false)} 
+                                                value={Functions.formatCurrency(values.amount)} 
+                                                style={styles.InputTextValue} />
+                                            </View>
 
                                         </View>
                                         <View style={styles.frequencyView}>
-                                            <Text>Mensal</Text>
+                                            <Text style={[styles.secondColorText, { color: secondColor }]}>Mensal</Text>
                                             <Switch
                                                 trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
                                                 thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
                                                 ios_backgroundColor="#3e3e3e"
-                                                onValueChange={updateValuesUpdate('mensal', index, [mensal, frequencys[index]])}
-                                                value={mensal}
+                                                onValueChange={updateValuesUpdate('monthly', index, [monthly, frequencys[index]])}
+                                                value={monthly}
                                             />
                                             <Feather name='arrow-left' size={20}
                                                 onPress={() => {
@@ -621,12 +680,14 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                                         }
                                                     })
                                                     setFrequencys(newArr)
-                                                    updateFrequencyValuesUpdate('repeat', index, [mensal, frequencys[index]-1])
-                                                    //updateValuesUpdate('repeat', index, [mensal, frequencys[index]])
+                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index]-1])
+                                                    //updateValuesUpdate('repeat', index, [monthly, frequencys[index]])
                                                 }}
                                             />
-                                            <Text>{frequencys[index]}</Text>
-                                            <Feather name='arrow-right' size={20}
+                                            {monthly?
+                                            <Text>1</Text>:
+                                            <Text>{frequencys[index]}</Text>}
+                                            <Feather name='arrow-right' size={20} 
                                                 onPress={() => {
                                                     let newArr : any = frequencys.map((item, i) => {
                                                         if (index == i) {
@@ -637,11 +698,11 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                                     })
                                                     setFrequencys(newArr)
                                                     console.log(frequencys[index])
-                                                    updateFrequencyValuesUpdate('repeat', index, [mensal, frequencys[index]+1])
+                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index]+1])
                                                 }}
                                             />
 
-                                            <Text>Vezes</Text>
+                                            <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
                                         </View>
                                         <View style={{ alignItems: 'flex-end', margin: 10 }}>
                                             <TouchableOpacity onPress={() => removeValue(values.id)}>
@@ -663,7 +724,7 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         if (contPlusButtonPressed > 0) {
 
                                             setIdValues(idValues + 1)
-                                            setValuesArray([...valuesArray, { id: idValues, description: '', value: '0', mensal: false, repeat: 1 }])
+                                            setValuesArray([...valuesArray, { id: idValues, description: '', amount: '0', monthly: false, repeat: 1 }])
 
                                             //console.log(idValues)
                                             //console.log(valuesArray)
@@ -671,13 +732,13 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                                         if (idUpdate != null) {
 
                                             const newValueObj = {
-                                                descricao: '',
-                                                valor: '0',
-                                                dtInicio: Functions.setDtInicio(todayDate),
-                                                dtFim: Functions.setDtFim(false, 0, todayDate),
-                                                ganhos_id: idUpdate
+                                                description: '',
+                                                amount: '0',
+                                                dtStart: Functions.setDtStart(todayDate),
+                                                dtEnd: Functions.setDtEnd(false, 0, todayDate),
+                                                entries_id: idUpdate
                                             }
-                                            Valores.create(newValueObj)
+                                            ValuesDB.create(newValueObj)
                                             updateValuesList()
 
                                         }
@@ -717,9 +778,15 @@ export default function NovoGanho({ route }: { route: any }, { navigation }: { n
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
                             <View style={styles.modalTextView}>
+                                {idUpdate==null?
                                 <Text style={styles.modalText}>
-                                    Cadastro realizado com sucesso!
+                                    Cadastro realizado com sucesso! 
                                 </Text>
+                                :
+                                <Text style={styles.modalText}>
+                                    Atualizado com sucesso! 
+                                </Text>
+                                }
                             </View>
                             <TouchableOpacity onPress={() => nav.goBack()} style={styles.modalButton}>
                                 <Text style={[styles.tittleText, { color: tittleTextColor }]}>Ok</Text>

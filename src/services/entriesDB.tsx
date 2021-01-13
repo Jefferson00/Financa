@@ -3,10 +3,11 @@ import db from './database'
 db.transaction((tx) => {
     //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
     //tx.executeSql("DROP TABLE earnings;");
+    //tx.executeSql("DROP TABLE entries;");
     //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS earnings (id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, dia INT, dtInicio INT, dtFim INT, mensal BOOLEAN, recebido BOOLEAN, tipo TEXT);"
+      "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, day INT, dtStart INT, dtEnd INT, monthly BOOLEAN, received BOOLEAN, type TEXT);"
     );
   });
 
@@ -14,8 +15,8 @@ db.transaction((tx) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
         tx.executeSql(
-          "INSERT INTO earnings (titulo,dia,dtInicio,dtFim,mensal,recebido,tipo) values (?,?,?,?,?,?,?);",
-          [obj.titulo,obj.dia,obj.dtInicio,obj.dtFim,obj.mensal,obj.recebido,obj.tipo],
+          "INSERT INTO entries (title,day,dtStart,dtEnd,monthly,received,type) values (?,?,?,?,?,?,?);",
+          [obj.title,obj.day,obj.dtStart,obj.dtEnd,obj.monthly,obj.received,obj.type],
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);
@@ -31,7 +32,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM earnings;",
+          "SELECT * FROM entries;",
           [],
           //-----------------------
           (_, { rows }) => resolve(rows),
@@ -45,7 +46,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM earnings WHERE dtInicio<=? and dtFim>=?;",
+          "SELECT * FROM entries WHERE dtStart<=? and dtEnd>=?;",
           [dt,dt],
           //-----------------------
           (_, { rows }) => {
@@ -61,7 +62,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM earnings WHERE dtInicio<=? and dtFim>=? ORDER BY dia;",
+          "SELECT * FROM entries WHERE dtStart<=? and dtEnd>=? ORDER BY day;",
           [dt,dt],
           //-----------------------
           (_, { rows }) => {
@@ -77,7 +78,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM earnings WHERE id=?;",
+          "SELECT * FROM entries WHERE id=?;",
           [id],
           //-----------------------
           (_, { rows }) => {
@@ -92,8 +93,8 @@ db.transaction((tx) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
         tx.executeSql(
-          "UPDATE earnings SET titulo=?,dia=?,dtInicio=?,dtFim=?,mensal=?,recebido=?,tipo=? Where id=?;",
-          [obj.titulo,obj.dia,obj.dtInicio,obj.dtFim,obj.mensal,obj.recebido,obj.tipo, id],
+          "UPDATE entries SET title=?,day=?,dtStart=?,dtEnd=?,monthly=?,received=?,type=? Where id=?;",
+          [obj.title,obj.day,obj.dtStart,obj.dtEnd,obj.monthly,obj.received,obj.type, id],
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);
@@ -104,16 +105,16 @@ db.transaction((tx) => {
     });
   };
 
-  const updateRecebidos = (recebido: boolean) => {
+  const updateReceived = (received: boolean) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
         tx.executeSql(
-          "UPDATE earnings SET recebido=?;",
-          [recebido],
+          "UPDATE entries SET received=?;",
+          [received],
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);
-            else reject("Error inserting obj: " + JSON.stringify(recebido)); // insert falhou
+            else reject("Error inserting obj: " + JSON.stringify(received)); // insert falhou
           },
         );
       });
@@ -125,7 +126,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          `DELETE FROM earnings WHERE id=?;`,
+          `DELETE FROM entries WHERE id=?;`,
           [id]
         )
       })
@@ -137,13 +138,12 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "DELETE FROM earnings WHERE id=?;",
+          "DELETE FROM entries WHERE id=?;",
           [id],
           //-----------------------
           (_, { rowsAffected }) => {
             resolve(rowsAffected);
-          },
-          (_, error) => reject(error) // erro interno em tx.executeSql
+          }
         );
       });
     });
@@ -158,5 +158,5 @@ db.transaction((tx) => {
     findById,
     update,
     findByDateOrderByDay,
-    updateRecebidos,
+    updateReceived,
 }

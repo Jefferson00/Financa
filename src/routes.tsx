@@ -6,16 +6,16 @@ import {createStackNavigator} from '@react-navigation/stack'
 const {Navigator, Screen} = createStackNavigator();
 
 import Main from './pages/Main'
-import Ganhos from './pages/Ganhos'
-import NovoGanho from './pages/NovoGanho'
+import Entries from './pages/Entries'
+import NewEntries from './pages/NewEntries'
 
 export default function Routes(){
     return(
         <NavigationContainer>
             <Navigator screenOptions={{headerShown:false}}>
                 <Screen name="Main" component={Main}/>
-                <Screen name="Ganhos" component={Ganhos}/>
-                <Screen name="NovoGanho" component={NovoGanho}/>
+                <Screen name="Entries" component={Entries}/>
+                <Screen name="NewEntries" component={NewEntries}/>
             </Navigator>
         </NavigationContainer>
     )
