@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View ,ScrollView, Modal} from 'react-native';
-import { Feather, AntDesign  } from '@expo/vector-icons'
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal } from 'react-native';
+import { Feather, AntDesign, Foundation } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useNavigation } from '@react-navigation/native';
 import NumberFormat from 'react-number-format';
@@ -25,7 +25,7 @@ export default function Main() {
     dtEnd: number,
     monthly: boolean,
     received: boolean,
-    type:string,
+    type: string,
   }
 
   interface ValuesValues {
@@ -39,7 +39,7 @@ export default function Main() {
     received: boolean,
   }
 
-  interface Balance{
+  interface Balance {
     month: number,
     year: number,
     amount: number,
@@ -65,7 +65,7 @@ export default function Main() {
   const todayDate = new Date()
   const CurrentMonth = todayDate.getMonth() + 1
   const CurrentYear = todayDate.getFullYear()
-  
+
   // Arrays
   let datas: any = []
   let contEarnings: Array<number> = []
@@ -75,10 +75,10 @@ export default function Main() {
 
   // funções de navegação
   function handleNavigateGanhos() {
-    navigation.navigate('Entries', { item: 'Ganhos' , month: selectedMonth, year: selectedYear})
+    navigation.navigate('Entries', { item: 'Ganhos', month: selectedMonth, year: selectedYear })
   }
   function handleNavigateDespesas() {
-    navigation.navigate('Entries', { item: 'Despesas' , month: selectedMonth, year: selectedYear})
+    navigation.navigate('Entries', { item: 'Despesas', month: selectedMonth, year: selectedYear })
   }
   function handleNavigateNovoGanhos() {
     navigation.navigate('NewEntries', { item: 'Ganhos', month: selectedMonth, year: selectedYear })
@@ -88,34 +88,36 @@ export default function Main() {
   }
 
   /**Função que mostra o modal com a explicação dos resultados */
-  function showModalBalance(idModal: number){
+  function showModalBalance(idModal: number) {
     setModalBalance(true)
-    if (idModal == 1){
-      setTextModal('Seu Saldo Atual representa o valor restante com base nos valores totais de ganhos e despesas recebidos e pagos no mês selecionado. O valor superior indica o saldo atual do Mês, o valor inferior representa o saldo total do Mês mais o restante dos meses anteriores.')
+    if (idModal == 1) {
+      setTextModal(`Em seu Saldo atual, o primeiro valor representa o saldo com base nos ganhos recebidos e despesas pagas no mês.
+      O segundo valor, representa o valor restante dos meses anteriores.
+      `)
     }
-    if (idModal == 2){
+    if (idModal == 2) {
       setTextModal('Seu Saldo Estimado representa o valor restante estimado no final do mês com base nos valores totais de ganhos e despesas estimados ')
     }
-    if (idModal == 3){
+    if (idModal == 3) {
       setTextModal('O valor superior representa todos os ganhos recebidos no mês. O valor inferior representa os ganhos estimados a serem recebidos até o final do mês ')
     }
-    if (idModal == 4){
+    if (idModal == 4) {
       setTextModal('O valor superior representa todos as despesas pagas no mês. O valor inferior representa as despesas estimadas a serem pagas até o final do mês')
     }
   }
-  
+
   /**Função que mostra os dados do mês seguinte */
 
   function handleNextMonth() {
     let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
-    EntriesDB.findByDate(parseInt(nextDtObj.dt)).then((res:any) => {
+    EntriesDB.findByDate(parseInt(nextDtObj.dt)).then((res: any) => {
       setEntries(res._array)
     }).catch(err => {
       setEntries([])
       console.log(err)
     })
 
-    ValuesDB.findByDate(parseInt(nextDtObj.dt)).then((res:any) => {
+    ValuesDB.findByDate(parseInt(nextDtObj.dt)).then((res: any) => {
       setValuesList(res._array)
       setNoBalance(false)
     }).catch(err => {
@@ -132,14 +134,14 @@ export default function Main() {
   function handlePrevMonth() {
     let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
 
-    EntriesDB.findByDate(parseInt(prevDtObj.dt)).then((res:any) => {
+    EntriesDB.findByDate(parseInt(prevDtObj.dt)).then((res: any) => {
       setEntries(res._array)
     }).catch(err => {
       setEntries([])
       console.log(err)
     })
 
-    ValuesDB.findByDate(parseInt(prevDtObj.dt)).then((res:any) => {
+    ValuesDB.findByDate(parseInt(prevDtObj.dt)).then((res: any) => {
       setValuesList(res._array)
       setNoBalance(false)
     }).catch(err => {
@@ -159,7 +161,7 @@ export default function Main() {
     setBalance([])
 
     for (const [index, data] of datas.entries()) {
-       await ValuesDB.findByDate(parseInt(data)).then((res:any) => {
+      await ValuesDB.findByDate(parseInt(data)).then((res: any) => {
         let sumEarnings = 0
         let sumExpenses = 0
         for (var t = 0; t < res._array.length; t++) {
@@ -190,7 +192,7 @@ export default function Main() {
 
   useEffect(() => {
     if (selectedMonth != CurrentMonth) {
-      setPrimaryColor('#892E1A')
+      setPrimaryColor('#1B5AA4')
       setSecondColor('#F9CF3C')
       setMonthColor('#FFFFFF')
     } else {
@@ -205,9 +207,9 @@ export default function Main() {
     setSelectedMonth(CurrentMonth)
     setSelectedYear(CurrentYear)
 
-    /*Verifica se houve mudança de mês, caso sim, atualiza todos os recebidos/pagos como falso*/ 
-    Dates.findByDate(CurrentMonth,CurrentYear).then(() => {
-      
+    /*Verifica se houve mudança de mês, caso sim, atualiza todos os recebidos/pagos como falso*/
+    Dates.findByDate(CurrentMonth, CurrentYear).then(() => {
+
     }).catch(err => {
       console.log(err)
       const DateObj = {
@@ -215,12 +217,12 @@ export default function Main() {
         year: CurrentYear,
       }
       Dates.create(DateObj)
-      EntriesDB.updateReceived(false).then(res=>{
-        console.log('Atualizado!'+res)
-      }).catch(err=>{
+      EntriesDB.updateReceived(false).then(res => {
+        console.log('Atualizado!' + res)
+      }).catch(err => {
         console.log(err)
       })
-      console.log('Mes criado: '+CurrentMonth)
+      console.log('Mes criado: ' + CurrentMonth)
     })
 
 
@@ -237,39 +239,39 @@ export default function Main() {
       //Ex: firstDate: '202101'
 
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação
-      EntriesDB.findByDate(parseInt(firstDate)).then((res:any) => {
+      EntriesDB.findByDate(parseInt(firstDate)).then((res: any) => {
         setEntries(res._array)
       }).catch(err => {
         console.log(err)
       })
-      
+
       //Procura todos os valores correspondente a data atual ao abrir a aplicação
-      ValuesDB.findByDate(parseInt(firstDate)).then((res:any) => {
+      ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
         setValuesList(res._array)
         setNoBalance(false)
       }).catch(err => {
         console.log(err)
         setNoBalance(true)
       })
-      
+
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação ordenado pelo dia
-      EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res:any) => {
+      EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res: any) => {
         setNextEntries(res._array)
       }).catch(err => {
         console.log(err)
       })
 
-      let nMonth = Functions.nextMonth(CurrentMonth,CurrentYear)
+      let nMonth = Functions.nextMonth(CurrentMonth, CurrentYear)
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação ordenado pelo dia do Mês seguinte
-      EntriesDB.findByDateOrderByDay(parseInt(nMonth.dt)).then((res:any) => {
+      EntriesDB.findByDateOrderByDay(parseInt(nMonth.dt)).then((res: any) => {
         setNextEntries2(res._array)
       }).catch(err => {
         console.log(err)
       })
 
-      ValuesDB.allOrderByDate().then((res:any) => {
+      ValuesDB.allOrderByDate().then((res: any) => {
         let dtStart = res._array[0].dtStart
-        if (dtStart != undefined){
+        if (dtStart != undefined) {
           let ano: number = parseInt(Functions.toMonthAndYear(dtStart).year)
           let mes: number = parseInt(Functions.toMonthAndYear(dtStart).month)
           let dateP
@@ -288,7 +290,7 @@ export default function Main() {
                 datas.push(dateP)
               }
             }
-          } while (ano < CurrentYear+20)
+          } while (ano < CurrentYear + 20)
           loadBalance()
         }
       })
@@ -299,93 +301,95 @@ export default function Main() {
   }, [])
 
   return (
-    <LinearGradient colors={[primaryColor, secondColor]} style={styles.container}>
+    <LinearGradient colors={[primaryColor, secondColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
       {/*Mês e ano*/}
       <View style={styles.monthView}>
         <TouchableOpacity onPress={handlePrevMonth}>
-          <Feather name="chevron-left" size={30} color={monthColor} />
+          <Feather name="chevron-left" size={40} color={monthColor} />
         </TouchableOpacity>
         <Text style={[styles.monthText, { color: monthColor }]}>
           {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
         </Text>
         <TouchableOpacity onPress={handleNextMonth}>
-          <Feather name="chevron-right" size={30} color={monthColor} />
+          <Feather name="chevron-right" size={40} color={monthColor} />
         </TouchableOpacity>
       </View>
 
       {valuesList.map(value => {
-        if (selectedMonth == CurrentMonth && selectedYear == CurrentYear){
+        if (selectedMonth == CurrentMonth && selectedYear == CurrentYear) {
           if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Ganhos') contEarnings.push(value.amount)
           if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Despesas') contExpenses.push(value.amount)
         }
         if (value.amount != null && value.amount != NaN && value.amount != 0 && value.type == 'Despesas') contEstimatedExpenses.push(value.amount)
         if (value.amount != null && value.amount != NaN && value.amount != 0 && value.type == 'Ganhos') contEstimatedEarnings.push(value.amount)
+        
       })}
 
 
       {/*Saldos*/}
       <View style={styles.balanceView}>
         <View style={styles.currentBalanceView}>
-          <View style={{flexDirection:'row',justifyContent:'center'}}>
-            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance(1)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => showModalBalance(1)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
             </TouchableOpacity>
             <Text style={styles.currentBalanceText}>
               Seu Saldo Atual
             </Text>
           </View>
-          {noBalance?
-          <View style={{flexDirection:'row', justifyContent:'center'}}>
+          {noBalance || selectedMonth != CurrentMonth || selectedYear != CurrentYear?
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
               <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
-          </View>
-          :
-          <NumberFormat
-            value={contEarnings.reduce((a: any, b: any) => a + b, 0) - contExpenses.reduce((a: any, b: any) => a + b, 0)}
-            displayType={'text'}
-            thousandSeparator={true}
-            format={Functions.currencyFormatter}
-            renderText={value => 
-            <Text style={styles.currentBalanceTextValue}> 
-              {value} 
-            </Text>}
-          />
+            </View>
+            :
+            <NumberFormat
+              value={contEarnings.reduce((a: any, b: any) => a + b, 0) - contExpenses.reduce((a: any, b: any) => a + b, 0)}
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value =>
+                <Text style={styles.currentBalanceTextValue}>
+                  {value}
+                </Text>}
+            />
           }
           {balance.map((bal, index) => {
-            if (bal.year == selectedYear && bal.month == selectedMonth) {
-              return (
-                <View key={index}>
-                  <NumberFormat
-                    value={bal.amount}
-                    displayType={'text'}
-                    thousandSeparator={true}
-                    format={Functions.currencyFormatter}
-                    renderText={value => 
-                    <Text style={[styles.currentBalanceTextValue,{fontSize:14}]}> 
-                      {value} 
-                    </Text>}
-                  />
-                </View>
-              )
-            }
-          })}
+              if (bal.year == selectedYear && bal.month == selectedMonth) {
+                let remainingValues = bal.amount - (contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0))
+                return (
+                  <View key={index}>
+                    <NumberFormat
+                      value={remainingValues}
+                      displayType={'text'}
+                      thousandSeparator={true}
+                      format={Functions.currencyFormatter}
+                      renderText={value =>
+                        <Text style={[styles.currentBalanceTextValue, { fontSize: 14 }]}>
+                          {value}
+                        </Text>}
+                    />
+                  </View>
+                )
+              }
+            })}
         </View>
         <View style={styles.currentBalanceView}>
-          <View style={{flexDirection:'row',justifyContent:'center'}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Text style={styles.estimatedBalanceText}>
               Saldo Estimado
             </Text>
-            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance(2)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => showModalBalance(2)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
             </TouchableOpacity>
           </View>
-          <View style={{flexDirection:'row',justifyContent:'center'}}>
+
             {noBalance ?
-              <View style={{flexDirection:'row', justifyContent:'center'}}>
+              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                 <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
               </View>
-            :
+              :
               <NumberFormat
                 value={
                   contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
@@ -393,13 +397,30 @@ export default function Main() {
                 displayType={'text'}
                 thousandSeparator={true}
                 format={Functions.currencyFormatter}
-                renderText={value => 
-                  <Text style={styles.estimatedBalanceTextValue}> 
-                    {value} 
+                renderText={value =>
+                  <Text style={styles.estimatedBalanceTextValue}>
+                    {value}
                   </Text>}
               />
             }
-          </View>
+            {balance.map((bal, index) => {
+              if (bal.year == selectedYear && bal.month == selectedMonth) {
+                return (
+                  <View key={index}>
+                    <NumberFormat
+                      value={bal.amount}
+                      displayType={'text'}
+                      thousandSeparator={true}
+                      format={Functions.currencyFormatter}
+                      renderText={value =>
+                        <Text style={[styles.estimatedBalanceTextValue, { fontSize: 14 }]}>
+                          {value}
+                        </Text>}
+                    />
+                  </View>
+                )
+              }
+            })}
         </View>
       </View>
 
@@ -407,87 +428,87 @@ export default function Main() {
 
       <View style={styles.valuesView}>
         <View style={styles.currentBalanceView}>
-          <View style={{flexDirection:'row',justifyContent:'center'}}>
-            <TouchableOpacity style={{marginRight:5}} onPress={() => showModalBalance(3)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}}/>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => showModalBalance(3)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
             </TouchableOpacity>
             <Text style={styles.earningsText}>
               Ganhos
             </Text>
           </View>
-          {noBalance? 
-          <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+          {noBalance || selectedMonth != CurrentMonth || selectedYear != CurrentYear?
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+            </View>
+            :
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <NumberFormat
+                value={contEarnings.reduce((a: any, b: any) => a + b, 0)}
+                displayType={'text'}
+                thousandSeparator={true}
+                format={Functions.currencyFormatter}
+                renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+              />
+            </View>
+          }
+          {noBalance ?
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
+            </View>
+            :
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <NumberFormat
+                value={contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0)}
+                displayType={'text'}
+                thousandSeparator={true}
+                format={Functions.currencyFormatter}
+                renderText={value =>
+                  <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>
+                    {value}
+                  </Text>
+                } />
+            </View>
+          }
+        </View>
+
+
+        <View style={styles.currentBalanceView}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <Text style={styles.expensesText}>
+              Despesas
+            </Text>
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => showModalBalance(4)}>
+              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
+            </TouchableOpacity>
           </View>
-          :
-          <View style={{flexDirection:'row', justifyContent:'center'}}>
+          {noBalance || selectedMonth != CurrentMonth || selectedYear != CurrentYear?
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <Text style={styles.expensesTextValue}>R$ 0,00</Text>
+            </View>
+            :
             <NumberFormat
-              value={contEarnings.reduce((a: any, b: any) => a + b, 0)}
+              value={contExpenses.reduce((a: any, b: any) => a + b, 0)}
               displayType={'text'}
               thousandSeparator={true}
               format={Functions.currencyFormatter}
-              renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+              renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
             />
-          </View>
           }
-          {noBalance?
-          <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
-          </View>
-          :
-          <View style={{flexDirection:'row', justifyContent:'center'}}>
+          {noBalance ?
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
+            </View>
+            :
             <NumberFormat
-              value={contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0)}
+              value={contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)}
               displayType={'text'}
               thousandSeparator={true}
               format={Functions.currencyFormatter}
               renderText={value =>
-                <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>
+                <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>
                   {value}
-                </Text>
-              }/>
-          </View>
-          }
-        </View>
-
-        
-        <View style={styles.currentBalanceView}>
-          <View style={{flexDirection:'row',justifyContent:'center'}}>
-            <Text style={styles.expensesText}>
-              Despesas
-            </Text>
-            <TouchableOpacity style={{marginLeft:5}} onPress={() => showModalBalance(4)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{opacity:0.5}} />
-            </TouchableOpacity>
-          </View>
-          {noBalance?
-          <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <Text style={styles.expensesTextValue}>R$ 0,00</Text>
-          </View>
-          :
-          <NumberFormat
-            value={contExpenses.reduce((a: any, b: any) => a + b, 0)}
-            displayType={'text'}
-            thousandSeparator={true}
-            format={Functions.currencyFormatter}
-            renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
-          />
-          }
-          {noBalance?
-          <View style={{flexDirection:'row', justifyContent:'center'}}>
-            <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
-          </View>
-          :
-          <NumberFormat
-            value={contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)}
-            displayType={'text'}
-            thousandSeparator={true}
-            format={Functions.currencyFormatter}
-            renderText={value =>
-              <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>
-                {value}
-              </Text>}
-          />
+                </Text>}
+            />
           }
         </View>
       </View>
@@ -499,8 +520,10 @@ export default function Main() {
         <View style={styles.buttonsView}>
           <LinearGradient colors={['#FFFFFF', '#24DBBA22']} start={{ x: -0.1, y: 0.1 }} style={styles.earningsButton}>
             <TouchableOpacity style={styles.earningsButton} onPress={handleNavigateGanhos}>
-              <Feather name="dollar-sign" size={40} color="#1A8289" />
-              <Text style={styles.earningsTextButton}>Ganhos</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Foundation name="dollar" size={50} color="#1A8289" style={{ marginRight: 15, marginBottom: 5 }} />
+                <Text style={styles.earningsTextButton}>Ganhos</Text>
+              </View>
             </TouchableOpacity>
           </LinearGradient>
           <LinearGradient colors={['#24DBBA', '#2AC4A8']} start={{ x: -0.1, y: 0.1 }} style={styles.plusButton}>
@@ -515,7 +538,7 @@ export default function Main() {
         <View style={styles.buttonsView}>
           <LinearGradient colors={['#FFFFFF', '#CC372822']} start={{ x: -0.1, y: 0.1 }} style={styles.expensesButton}>
             <TouchableOpacity style={styles.expensesButton} onPress={handleNavigateDespesas}>
-              <Feather name="dollar-sign" size={40} color="#CC3728" />
+              <Foundation name="dollar" size={50} color="#CC3728" style={{ marginRight: 15, marginBottom: 5 }} />
               <Text style={styles.expensesTextButton}>Despesas</Text>
             </TouchableOpacity>
           </LinearGradient>
@@ -532,39 +555,39 @@ export default function Main() {
           <Text style={styles.nextDaysText}>Nos próximos dias...</Text>
         </View>
 
-        <ScrollView style={{maxHeight:95,elevation:5}}>
-          {nextEntries.map((ear,index) => {
-            if (ear.day >= todayDate.getDate() && ear.day <= (todayDate.getDate()+10) && !ear.received){
+        <ScrollView style={{ maxHeight: 95, elevation: 5 }}>
+          {nextEntries.map((ear, index) => {
+            if (ear.day >= todayDate.getDate() && ear.day <= (todayDate.getDate() + 10) && !ear.received) {
               let color
-              if (ear.type == 'Ganhos'){
+              if (ear.type == 'Ganhos') {
                 color = '#1A8289'
-              }else{
+              } else {
                 color = '#CC3728'
               }
               return (
                 <View style={styles.nextDaysContent} key={index}>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.day+'  '+Functions.convertDtToStringMonth(todayDate.getMonth()+1)}
+                    {ear.day + '  ' + Functions.convertDtToStringMonth(todayDate.getMonth() + 1)}
                   </Text>
                 </View>
               )
             }
           })
           }
-          {todayDate.getDate()+5 > 30 && nextEntries2.map((ear, index)=>{
-            if (ear.day <= 5){
+          {todayDate.getDate() + 5 > 30 && nextEntries2.map((ear, index) => {
+            if (ear.day <= 5) {
               let color
-              if (ear.type == 'Ganhos'){
+              if (ear.type == 'Ganhos') {
                 color = '#1A8289'
-              }else{
+              } else {
                 color = '#CC3728'
               }
               return (
                 <View style={styles.nextDaysContent} key={index}>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.day+'  '+Functions.convertDtToStringMonth(todayDate.getMonth()+2)}
+                    {ear.day + '  ' + Functions.convertDtToStringMonth(todayDate.getMonth() + 2)}
                   </Text>
                 </View>
               )
@@ -577,9 +600,9 @@ export default function Main() {
       <Modal animationType="slide" visible={modalBalance} transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <View style={{flexDirection:'row', justifyContent:'center'}}>
-                <Text style={styles.monthText}>
-                    {textModal}
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <Text style={styles.questionsModalText}>
+                  {textModal}
                 </Text>
               <TouchableOpacity onPress={() => { setModalBalance(!modalBalance) }}>
                 <Feather name="x" size={30} color={'#136065'} />
@@ -609,16 +632,24 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginHorizontal: 5
   },
+  questionsModalText:{
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 22,
+    marginHorizontal: 5,
+    color: '#1A8289'
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: ' rgba(0, 0, 0, 0.39);',
     justifyContent: 'center'
   },
   modalContent: {
-        backgroundColor: '#fff',
-        height: '50%',
-        padding: 30,
-    },
+    backgroundColor: '#fff',
+    height: '50%',
+    padding: 30,
+    alignItems:'center',
+    justifyContent:'center'
+  },
   balanceView: {
     flexDirection: 'row',
     justifyContent: 'center',

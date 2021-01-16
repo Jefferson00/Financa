@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "financa",
+    "name": "Finanças App",
     "slug": "financa",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#136065"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -17,16 +17,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier":"com.jeffersoncsilva.financaapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      },
+      "package":"com.jeffersoncsilva.financaapp"
     }
   }
 }

@@ -455,13 +455,13 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 {/*Mês e ano*/}
                 <View style={styles.monthView}>
                     <TouchableOpacity onPress={handlePrevMonth}>
-                        <Feather name="arrow-left" size={30} color={colorMonth} />
+                        <Feather name="chevron-left" size={40} color={colorMonth} />
                     </TouchableOpacity>
                     <Text style={[styles.monthText, { color: colorMonth }]}>
                         {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
                     </Text>
                     <TouchableOpacity onPress={handleNextMonth}>
-                        <Feather name="arrow-right" size={30} color={colorMonth} />
+                        <Feather name="chevron-right" size={40} color={colorMonth} />
                     </TouchableOpacity>
                 </View>
 
@@ -517,7 +517,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                 Periodicidade
                             </Text>
                             <View style={styles.frequencyView}>
-                                <Text style={[styles.secondColorText, { color: secondColor }]}>Mensal</Text>
+                                <Text style={[styles.secondColorText, { color: secondColor }]}>
+                                    Mensal
+                                </Text>
                                 <Switch
                                     trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
                                     thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
@@ -525,19 +527,48 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                     onValueChange={toggleSwitch}
                                     value={isEnabled}
                                 />
-                                <Feather name='arrow-left' size={20}
+                                {isEnabled?
+                                <>
+                                    <Feather name='chevron-left' size={30}/>
+                                        <Text style={{fontSize:18}}>-</Text>
+                                    <Feather name='chevron-right' size={30}/>
+                                </>
+                                :
+                                <>
+                                    <Feather name='chevron-left' size={30}
                                     onPress={() => {
+                                        if (valueFrequency > 1){
                                         setValueFrequency(valueFrequency - 1)
                                         updateOneValue('repeat', 0, (valueFrequency - 1))
+                                        let newArr : any = frequencys.map((item, i) => {
+                                            if (i == 0 && item == valueFrequency) {
+                                                return item - 1
+                                            } else {
+                                                return item
+                                            }
+                                        })
+                                        setFrequencys(newArr)
+                                        }
                                     }}
-                                />
-                                <Text>{valueFrequency}</Text>
-                                <Feather name='arrow-right' size={20}
-                                    onPress={() => {
-                                        setValueFrequency(valueFrequency + 1)
-                                        updateOneValue('repeat', 0, (valueFrequency + 1))
-                                    }}
-                                />
+                                    />
+                                    <Text  style={{fontSize:18}}>{valueFrequency}</Text>
+                                    <Feather name='chevron-right' size={30}
+                                        onPress={() => {
+                                            setValueFrequency(valueFrequency + 1)
+                                            updateOneValue('repeat', 0, (valueFrequency + 1))
+                                            let newArr : any = frequencys.map((item, i) => {
+                                                if (i == 0 && item == valueFrequency) {
+                                                    return item + 1
+                                                } else {
+                                                    return item
+                                                }
+                                            })
+                                            setFrequencys(newArr)
+                                        }}
+                                    />
+                                </>
+                                }
+                                
                                 <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
                             </View>
                             <View style={styles.frequencyView}>
@@ -670,7 +701,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                                 onValueChange={updateValuesUpdate('monthly', index, [monthly, frequencys[index]])}
                                                 value={monthly}
                                             />
-                                            <Feather name='arrow-left' size={20}
+                                            <Feather name='chevron-left' size={30}
                                                 onPress={() => {
                                                     let newArr : any = frequencys.map((item, i) => {
                                                         if (index == i) {
@@ -686,8 +717,8 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                             />
                                             {monthly?
                                             <Text>1</Text>:
-                                            <Text>{frequencys[index]}</Text>}
-                                            <Feather name='arrow-right' size={20} 
+                                            <Text  style={{fontSize:18}}>{frequencys[index]}</Text>}
+                                            <Feather name='chevron-right' size={30} 
                                                 onPress={() => {
                                                     let newArr : any = frequencys.map((item, i) => {
                                                         if (index == i) {

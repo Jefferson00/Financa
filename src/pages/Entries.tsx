@@ -229,11 +229,13 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     function loadResults(){
         let firstDate
-            if (CurrentMonth < 10) {
-                firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
+            if (month < 10) {
+                firstDate = year.toString() + '0' + month.toString()
             } else {
-                firstDate = CurrentYear.toString() + CurrentMonth.toString()
+                firstDate = year.toString() + month.toString()
             }
+            console.log("mes :"+month)
+            console.log("ano :"+year)
             EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res:any) => {
                 setEarnings(res._array.filter((earning:EarningsValues) => earning.type == item))
             }).catch(err => {
@@ -302,13 +304,13 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             <StatusBar style="light" translucent />
             <View style={styles.monthView}>
                 <TouchableOpacity onPress={handlePrevMonth}>
-                    <Feather name="arrow-left" size={30} color={colorMonth} />
+                    <Feather name="chevron-left" size={40} color={colorMonth} />
                 </TouchableOpacity>
                 <Text style={[styles.monthText, { color: colorMonth }]}>
                     {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
                 </Text>
                 <TouchableOpacity onPress={handleNextMonth}>
-                    <Feather name="arrow-right" size={30} color={colorMonth} />
+                    <Feather name="chevron-right" size={40} color={colorMonth} />
                 </TouchableOpacity>
             </View>
             {valuesList.map(value => {
@@ -322,13 +324,17 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                     <Text style={styles.currentBalanceText}>
                         {mainText1}
                     </Text>
-                    <NumberFormat
+                    {selectedMonth == CurrentMonth && selectedYear == CurrentYear?
+                        <NumberFormat
                         value={cont2.reduce((a: any, b: any) => a + b, 0)}
                         displayType={'text'}
                         thousandSeparator={true}
                         format={Functions.currencyFormatter}
                         renderText={value => <Text style={styles.currentBalanceTextValue}> {value} </Text>}
-                    />
+                        />
+                        :
+                        <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+                    }
                 </View>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.estimatedBalanceText}>
@@ -350,15 +356,11 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                         { }
                         {earnings.map((earning, index) => {
                             var totalValues = 0
-                            var opac = 1
+                            var opac = false
                             var atrs = false
                             var borderColor = '#ffffff'
-                            /*console.log(selectedYear)
-                            console.log(CurrentYear)
-                            console.log(CurrentMonth)
-                            console.log(selectedMonth)*/
                             if (!earning.received || selectedMonth != CurrentMonth || selectedYear != CurrentYear) {
-                                opac = 0.7
+                                opac = true
                             }
                             if (!earning.received && earning.day <= todayDate.getDate()) {
                                 atrs = true
@@ -371,8 +373,39 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                             return (
                                 <View key={index}>
                                 
+                                {opac?
+                                    <TouchableOpacity
+                                    style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
+                                    onPress={() => showModal(earning.id, totalValues)}
+                                    >
+                                    <MaterialIcons name="monetization-on" size={40} color={colorText+'AA'} />
+                                    {valuesList.map(value => {
+                                        if (earnings[index].id == value.entries_id) {
+                                            totalValues = totalValues + value.amount
+                                        }
+                                    })}
+
+                                    <View style={styles.earningTextView}>
+                                        <Text style={[styles.earningTittleText, { color: colorText+'AA' }]}>
+                                            {earning.title}
+                                        </Text>
+                                        <Text style={[styles.earningDateText, { color: colorText+'AA' }]}>
+                                            {earning.day}/{Functions.convertDtToStringMonth(selectedMonth)}
+                                        </Text>
+                                    </View>
+
+                                    <NumberFormat
+                                        value={totalValues}
+                                        displayType={'text'}
+                                        thousandSeparator={true}
+                                        format={Functions.currencyFormatter}
+                                        renderText={value => <Text style={[styles.earningTittleText, { color: colorText+'AA' }]}> {value} </Text>}
+                                    />
+
+                                </TouchableOpacity>
+                                :
                                 <TouchableOpacity
-                                    style={[styles.earningsItemView, { opacity: opac, borderColor:borderColor, borderWidth:1 }]}
+                                    style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1 }]}
                                     onPress={() => showModal(earning.id, totalValues)}
                                     >
                                     <MaterialIcons name="monetization-on" size={40} color={colorText} />
@@ -402,6 +435,8 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                                     />
 
                                 </TouchableOpacity>
+                                }
+                                
                                 {atrs? 
                                 <Ionicons name="alert-circle" size={40} color={colorText} style={styles.alertSign}/>
                                 :null}
@@ -470,12 +505,16 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                                                 </Text>
                                             </View>
                                         </View>
+                                        <ScrollView style={{
+                                            maxHeight:200,
+                                        }}>
                                         {valuesList.map((value, index) => {
                                             currentDate.setMonth(selectedMonth - 1)
                                             currentDate.setFullYear(selectedYear)
                                             if (earning.id == value.entries_id)
                                                 return (
-                                                    <View style={styles.valuesList} key={index}>
+                                                    
+                                                        <View style={styles.valuesList} key={index}>
                                                         <View style={{ flexDirection: 'row' }}>
                                                             {value.description==''?
                                                             <Text style={[styles.valuesListText, { color: colorText, marginRight: 5 }]}>
@@ -504,10 +543,11 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                                                                 <Feather name="trash-2" size={20} color={colorBorderAddButton} />
                                                             </TouchableOpacity>
                                                         </View>
-
-                                                    </View>
+                                                        </View>
+                                                    
                                                 )
                                         })}
+                                        </ScrollView>
                                     </View>
                                 )
                             }
@@ -535,7 +575,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                                                     SIM
                                                 </Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity>
+                                            <TouchableOpacity onPress={() => { setModalVisible(!modalVisible) }}>
                                                 <Text style={[styles.tittleText, { color: colorBorderAddButton }]}>
                                                     Ainda não
                                                 </Text>
