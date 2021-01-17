@@ -20,10 +20,10 @@
 
 ## 🚀 Tecnologias
 
-- [TypeScript]
-- [React Native]
-- [Expo]
-- [SQLite]
+- TypeScript
+- React Native
+- Expo
+- SQLite
 
 ## 🔖 Layout
 
