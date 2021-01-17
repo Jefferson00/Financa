@@ -11,6 +11,10 @@
   </a>
 </p>
 
+<p align="center">
+  <img src="assets/readme-1.png">
+</p>
+
 ## 💻 Projeto
 
 ## 🚀 Tecnologias
