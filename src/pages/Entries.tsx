@@ -95,7 +95,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     function handleNavigateNovoUpdate(id: number) {
         setModalVisible(false)
-        navigationScreen.navigate('NewEntries', { item: item, idUpdate: id })
+        navigationScreen.navigate('NewEntries', { item: item, idUpdate: id, month: selectedMonth, year: selectedYear })
     }
 
     function handleNextMonth() {
@@ -228,7 +228,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
 
     function loadResults(){
-        let firstDate
+            let firstDate
             if (month < 10) {
                 firstDate = year.toString() + '0' + month.toString()
             } else {
@@ -526,7 +526,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                                                             </Text>
                                                             }
                                                             <Text style={[styles.valuesListText, { color: colorBorderAddButton }]}>
-                                                                {Functions.toFrequency(value.dtEnd, value.dtStart)+1 < 948 ? 
+                                                                {value.dtEnd != 209912 ? 
                                                                 Functions.toFrequency(value.dtEnd, value.dtStart) - Functions.toFrequency(value.dtEnd, Functions.setDtStart(currentDate)) + 1 + "/" + (Functions.toFrequency(value.dtEnd, value.dtStart)+1)
                                                                 : null}
                                                             </Text>

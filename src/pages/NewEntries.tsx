@@ -17,7 +17,7 @@ import Functions from '../functions/index'
 
 export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
 
-    const { item , month, year} = route.params
+    const { item, month, year } = route.params
     const { idUpdate } = route.params
     const nav = useNavigation()
 
@@ -76,11 +76,13 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     /**/ const [showValues, setShowValues] = useState(false)
     const [earning, setEarning] = useState<earningValues[]>([])
     const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
-    const [frequencys, setFrequencys] =useState([])
+    const [valuesBeforeUpdate, setValuesBeforeUpdate] = useState<ValuesItemUpdate[]>([])
+    const [frequencys, setFrequencys] = useState([])
     /**/  const [selectedMonth, setSelectedMonth] = useState(10)
     /**/  const [selectedYear, setSelectedYear] = useState(2020)
 
     const todayDate = new Date()
+    const selectedDate = todayDate
     const CurrentMonth = todayDate.getMonth() + 1
     const CurrentYear = todayDate.getFullYear()
 
@@ -97,6 +99,16 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     const toggleSwitch = () => {
         setIsEnabled(previousState => !previousState)
         updateOneValue('monthly', 0, !isEnabled)
+        if (!isEnabled) {
+            let newArr = valuesUpdate.map((item, i) => {
+                if (i == 0) {
+                    return { ...item, ['dtEnd']: 209912 }
+                } else {
+                    return item
+                }
+            })
+            setValuesUpdate(newArr)
+        }
     };
 
     //Switch control Recebido
@@ -116,6 +128,18 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     const showDatepicker = () => {
         setShow(true);
     };
+
+     // funções de navegação
+    function handleNavigateEntries() {
+        console.log(selectedMonth)
+        console.log(selectedYear)
+        clearParams()
+        nav.navigate('Entries', { item: item, month: selectedMonth, year: selectedYear })
+    }
+
+    function clearParams(){
+        nav.setParams({month:selectedMonth,year:selectedYear})
+    }
 
     /*Atualiza os valores dos inputs 'valores' */
 
@@ -193,19 +217,27 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     }
 
     const updateFrequencyValuesUpdate = (subitem: any, index: any, value: any) => {
-        let newArr :any = valuesUpdate.map((item, i) => {
+        let newArr: any = valuesUpdate.map((item, i) => {
             if (index == i) {
-                 if (subitem == 'repeat') {
+                if (subitem == 'repeat') {
                     var dt = new Date()
-                    console.log('valor: ' + value[1])
+                    /*var dat = Functions.toMonthAndYear(item.dtStart)
+                    console.log('mes: ' + dat.month)
+                    console.log('ano: ' + dat.year)
+                    dt.setMonth(parseInt(dat.month))
+                    dt.setFullYear(parseInt(dat.year))*/
+
+                    dt.setMonth(parseInt(Functions.toMonthAndYear(item.dtStart).month) - 1)
+                    dt.setFullYear(parseInt(Functions.toMonthAndYear(item.dtStart).year))
                     var rpt = value[1]
-                    console.log('Repetir: ' + rpt)
+                    //console.log('Repetir: ' + rpt)
+                    //console.log('Data: ' + dt)
                     var dtEnd = Functions.setDtEnd(value[0], rpt, dt)
-                    console.log('sata fim: ' + dtEnd)
+                    //console.log('sata fim: ' + dtEnd)
                     return { ...item, ['dtEnd']: dtEnd }
 
                 }
-                
+
             } else {
                 return item
             }
@@ -246,13 +278,13 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         EntriesDB.create(GanhoObj)
 
 
-        EntriesDB.all().then((res:any) => {
+        EntriesDB.all().then((res: any) => {
             //console.log(res)
             valuesArray.map(value => {
                 var vlr = value.amount
                 vlr = vlr.replace(/[.]/g, '')
                 vlr = vlr.replace(/[,]/g, '')
-                console.log(vlr)
+                //console.log(vlr)
                 const ValueObj = {
                     description: value.description,
                     amount: vlr,
@@ -260,15 +292,15 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     dtEnd: Functions.setDtEnd(value.monthly, value.repeat, date),
                     entries_id: res._array.slice(-1)[0].id
                 }
-                console.log('Descricao: '+ValueObj.description)
-                console.log('valor: '+ValueObj.amount)
-                console.log('dtStart: '+ValueObj.dtStart)
-                console.log('dtEnd: '+ValueObj.dtEnd)
-                console.log('id: '+ValueObj.entries_id)
+               /* console.log('Descricao: ' + ValueObj.description)
+                console.log('valor: ' + ValueObj.amount)
+                console.log('dtStart: ' + ValueObj.dtStart)
+                console.log('dtEnd: ' + ValueObj.dtEnd)
+                console.log('id: ' + ValueObj.entries_id)*/
 
-                ValuesDB.create(ValueObj).then(()=>{
+                ValuesDB.create(ValueObj).then(() => {
 
-                }).catch(err =>{
+                }).catch(err => {
                     console.log(err)
                 })
                 setSuccessModal(true)
@@ -295,28 +327,90 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             type: item
         }
         EntriesDB.update(idUpdate, GanhoObj).then(res => {
-            valuesUpdate.map(value => {
+            valuesUpdate.map((value,index) => {
                 var vlr = value.amount
-                console.log('vlr'+vlr)
-                if(typeof(vlr) == 'string'){
+                //console.log('vlr' + vlr)
+                if (typeof (vlr) == 'string') {
                     vlr = vlr.replace(/[.]/g, '')
                     vlr = vlr.replace(/[,]/g, '')
                 }
 
-                const ValueObj = {
-                    description: value.description,
-                    amount: vlr,
-                    dtStart: value.dtStart,
-                    dtEnd: value.dtEnd,
-                    entries_id: idUpdate
+                if (value.dtEnd == 209912) {
+                    console.log('Valor antes: '+valuesBeforeUpdate[index].amount)
+                    const newDtStart = new Date()
+                    console.log("dtStart: "+valuesBeforeUpdate[index].dtStart)
+                    newDtStart.setMonth(parseInt(Functions.toMonthAndYear(valuesBeforeUpdate[index].dtStart).month)-1)
+                    newDtStart.setFullYear(parseInt(Functions.toMonthAndYear(valuesBeforeUpdate[index].dtStart).year))
+                    selectedDate.setMonth(month-1)
+                    selectedDate.setFullYear(year)
+                    let newDtEnd
+                    if ((selectedDate.getMonth() + 1) < 10) {
+                        newDtEnd = selectedDate.getFullYear().toString() + '0' + (selectedDate.getMonth() + 1).toString()
+                    } else {
+                        newDtEnd = selectedDate.getFullYear().toString() + (selectedDate.getMonth() + 1).toString()
+                    }
+                    let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
+                    if (contRep > 0){
+                        console.log("dtEnd: "+newDtEnd)
+                        console.log("contRep: "+contRep)
+                        console.log("newdtStart: "+newDtStart)
+                        const ValueObjMonthly = {
+                            description: value.description,
+                            amount: valuesBeforeUpdate[index].amount,
+                            dtStart: valuesBeforeUpdate[index].dtStart,
+                            dtEnd: Functions.setDtEnd(false,contRep,newDtStart),
+                            entries_id: idUpdate
+                        }
+                        ValuesDB.update(value.id, ValueObjMonthly)
+                        const newValueObjMonthly = {
+                            description: value.description,
+                            amount: vlr,
+                            dtStart: Functions.setDtStart(selectedDate),
+                            dtEnd: Functions.setDtEnd(true,0,newDtStart),
+                            entries_id: idUpdate 
+                        }
+                        ValuesDB.create(newValueObjMonthly)
+                    }else{
+                        updateNormally(value)
+                    }
+                }else{
+                    updateNormally(value)
                 }
-                ValuesDB.update(value.id, ValueObj)
+
             })
             setSuccessModal(true)
+
+            let newDate
+            if ((selectedDate.getMonth() + 1) < 10) {
+                newDate = selectedDate.getFullYear().toString() + '0' + (selectedDate.getMonth() + 1).toString()
+            } else {
+                newDate = selectedDate.getFullYear().toString() + (selectedDate.getMonth() + 1).toString()
+            }
+            ValuesDB.findByDate(parseInt(newDate)).then((res: any) => {
+                var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
+                setValuesUpdate(arr)
+            })
 
         }).catch(err => {
             console.log(err)
         })
+    }
+
+    function updateNormally(value: ValuesItemUpdate){
+        var vlr = value.amount
+                //console.log('vlr' + vlr)
+                if (typeof (vlr) == 'string') {
+                    vlr = vlr.replace(/[.]/g, '')
+                    vlr = vlr.replace(/[,]/g, '')
+                }
+        const ValueObj = {
+            description: value.description,
+            amount: vlr,
+            dtStart: value.dtStart,
+            dtEnd: value.dtEnd,
+            entries_id: idUpdate
+        }
+        ValuesDB.update(value.id, ValueObj)
     }
 
     function handleNextMonth() {
@@ -324,8 +418,19 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         setSelectedMonth(nextDtObj.nextMonth)
         setSelectedYear(nextDtObj.nextYear)
 
-        date.setMonth(nextDtObj.nextMonth - 1)
-        date.setFullYear(nextDtObj.nextYear)
+        selectedDate.setMonth(nextDtObj.nextMonth - 1)
+        selectedDate.setFullYear(nextDtObj.nextYear)
+        //console.log(selectedDate)
+
+        if (idUpdate == null) {
+            date.setMonth(nextDtObj.nextMonth - 1)
+            date.setFullYear(nextDtObj.nextYear)
+        } else {
+            ValuesDB.findByDate(parseInt(nextDtObj.dt)).then((res: any) => {
+                var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
+                setValuesUpdate(arr)
+            })
+        }
     }
 
     function handlePrevMonth() {
@@ -334,17 +439,34 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         setSelectedMonth(prevDtObj.prevMonth)
         setSelectedYear(prevDtObj.prevYear)
 
-        date.setMonth(prevDtObj.prevMonth - 1)
-        date.setFullYear(prevDtObj.prevYear)
+        selectedDate.setMonth(prevDtObj.prevMonth - 1)
+        selectedDate.setFullYear(prevDtObj.prevYear)
+        //console.log(selectedDate)
+
+        if (idUpdate == null) {
+            date.setMonth(prevDtObj.prevMonth - 1)
+            date.setFullYear(prevDtObj.prevYear)
+        } else {
+            ValuesDB.findByDate(parseInt(prevDtObj.dt)).then((res: any) => {
+                var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
+                setValuesUpdate(arr)
+            })
+        }
     }
 
     useEffect(() => {
-        if (month != null && year != null){
+        if (month != null && year != null) {
             setSelectedMonth(month)
             setSelectedYear(year)
-            date.setMonth(month- 1)
-            date.setFullYear(year)
-        }else{
+            selectedDate.setMonth(month - 1)
+            selectedDate.setFullYear(year)
+            console.log('Mes: '+month)
+            console.log('Ano: '+year)
+            if (idUpdate == null) {
+                date.setMonth(month - 1)
+                date.setFullYear(year)
+            }
+        } else {
             setSelectedMonth(CurrentMonth)
             setSelectedYear(CurrentYear)
         }
@@ -371,11 +493,18 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             setReceivedTextDate('Data de Pagamento')
         }
         if (idUpdate != null) {
-            ValuesDB.all().then((res:any) => {
-                var arr: any = (res._array.filter((vlr:ValuesItemUpdate) => vlr.entries_id == idUpdate))
+            let firstDate
+            if (month < 10) {
+                firstDate = year.toString() + '0' + month.toString()
+            } else {
+                firstDate = year.toString() + month.toString()
+            }
+            ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
+                var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
                 setValuesUpdate(arr)
+                setValuesBeforeUpdate(arr)
             })
-            EntriesDB.findById(idUpdate).then((res:any) => {
+            EntriesDB.findById(idUpdate).then((res: any) => {
                 setEarning(res._array)
 
             }).catch(err => {
@@ -387,11 +516,17 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     }, [])
 
     function updateValuesList() {
-        ValuesDB.all().then((res:any) => {
-            var arr: any = (res._array.filter((vlr:ValuesItemUpdate) => vlr.entries_id == idUpdate))
+        let firstDate
+        if (month < 10) {
+            firstDate = year.toString() + '0' + month.toString()
+        } else {
+            firstDate = year.toString() + month.toString()
+        }
+        ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
+            var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
             setValuesUpdate(arr)
         })
-        EntriesDB.findById(idUpdate).then((res:any) => {
+        EntriesDB.findById(idUpdate).then((res: any) => {
             setEarning(res._array)
 
         }).catch(err => {
@@ -411,7 +546,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 },
                 {
                     text: "OK", onPress: () =>
-                    ValuesDB.remove(id).then(res => {
+                        ValuesDB.remove(id).then(res => {
                             setValuesUpdate(valuesUpdate.filter(vls => vls.id !== id))
                         }).catch(err => {
                             console.log(err)
@@ -434,19 +569,20 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 setIsEnabledReceived(true)
             }
             date.setDate(earning[0].day)
-            
+
         }
     }, [earning])
 
-    useEffect(()=>{
+    useEffect(() => {
         setFrequencys([])
-        let arrFrequency :any = []
-            valuesUpdate.map(value =>{
-                arrFrequency.push(Functions.toFrequency(value.dtEnd,value.dtStart)+1)
-            })
+        let arrFrequency: any = []
+        valuesUpdate.map(value => {
+            arrFrequency.push(Functions.toFrequency(value.dtEnd, value.dtStart) + 1)
+            //console.log("Frr: " + arrFrequency)
+        })
         //console.log(arrFrequency)
         setFrequencys(arrFrequency)
-    },[valuesUpdate])
+    }, [valuesUpdate])
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
@@ -479,30 +615,30 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                 Título
                             </Text>
                             <TextInput onChangeText={text => onChangeTitle(text)} value={valueTitle} style={styles.InputText} />
-                        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                            <View>
-                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                    {receivedTextDate}
-                                </Text>
-                                <View style={styles.dateView}>
-                                    <Text style={[styles.subTittleText, { color: secondColor }]} onPress={showDatepicker}>
-                                        {date.getDate()} / {Functions.convertDtToStringMonth(date.getUTCMonth() + 1)}
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View>
+                                    <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                        {receivedTextDate}
                                     </Text>
+                                    <View style={styles.dateView}>
+                                        <Text style={[styles.subTittleText, { color: secondColor }]} onPress={showDatepicker}>
+                                            {date.getDate()} / {Functions.convertDtToStringMonth(date.getUTCMonth() + 1)}
+                                        </Text>
+                                    </View>
+                                </View>
+                                <View>
+                                    <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                        {receivedText}
+                                    </Text>
+                                    <Switch
+                                        trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
+                                        thumbColor={isEnabledReceived ? 'd2d2d2' : tittleTextColor}
+                                        ios_backgroundColor="#3e3e3e"
+                                        onValueChange={toggleSwitchReceived}
+                                        value={isEnabledReceived}
+                                    />
                                 </View>
                             </View>
-                            <View>
-                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                    {receivedText}
-                                </Text>
-                                <Switch
-                                    trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                    thumbColor={isEnabledReceived ? 'd2d2d2' : tittleTextColor}
-                                    ios_backgroundColor="#3e3e3e"
-                                    onValueChange={toggleSwitchReceived}
-                                    value={isEnabledReceived}
-                                />
-                            </View>
-                        </View>    
 
                             {show && (
                                 <DateTimePicker
@@ -527,72 +663,72 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                     onValueChange={toggleSwitch}
                                     value={isEnabled}
                                 />
-                                {isEnabled?
-                                <>
-                                    <Feather name='chevron-left' size={30}/>
-                                        <Text style={{fontSize:18}}>-</Text>
-                                    <Feather name='chevron-right' size={30}/>
-                                </>
-                                :
-                                <>
-                                    <Feather name='chevron-left' size={30}
-                                    onPress={() => {
-                                        if (valueFrequency > 1){
-                                        setValueFrequency(valueFrequency - 1)
-                                        updateOneValue('repeat', 0, (valueFrequency - 1))
-                                        let newArr : any = frequencys.map((item, i) => {
-                                            if (i == 0 && item == valueFrequency) {
-                                                return item - 1
-                                            } else {
-                                                return item
-                                            }
-                                        })
-                                        setFrequencys(newArr)
-                                        }
-                                    }}
-                                    />
-                                    <Text  style={{fontSize:18}}>{valueFrequency}</Text>
-                                    <Feather name='chevron-right' size={30}
-                                        onPress={() => {
-                                            setValueFrequency(valueFrequency + 1)
-                                            updateOneValue('repeat', 0, (valueFrequency + 1))
-                                            let newArr : any = frequencys.map((item, i) => {
-                                                if (i == 0 && item == valueFrequency) {
-                                                    return item + 1
-                                                } else {
-                                                    return item
+                                {isEnabled ?
+                                    <>
+                                        <Feather name='chevron-left' size={30} />
+                                        <Text style={{ fontSize: 18 }}>-</Text>
+                                        <Feather name='chevron-right' size={30} />
+                                    </>
+                                    :
+                                    <>
+                                        <Feather name='chevron-left' size={30}
+                                            onPress={() => {
+                                                if (valueFrequency > 1) {
+                                                    setValueFrequency(valueFrequency - 1)
+                                                    updateOneValue('repeat', 0, (valueFrequency - 1))
+                                                    let newArr: any = frequencys.map((item, i) => {
+                                                        if (i == 0 && item == valueFrequency) {
+                                                            return item - 1
+                                                        } else {
+                                                            return item
+                                                        }
+                                                    })
+                                                    setFrequencys(newArr)
                                                 }
-                                            })
-                                            setFrequencys(newArr)
-                                        }}
-                                    />
-                                </>
+                                            }}
+                                        />
+                                        <Text style={{ fontSize: 18 }}>{valueFrequency}</Text>
+                                        <Feather name='chevron-right' size={30}
+                                            onPress={() => {
+                                                setValueFrequency(valueFrequency + 1)
+                                                updateOneValue('repeat', 0, (valueFrequency + 1))
+                                                let newArr: any = frequencys.map((item, i) => {
+                                                    if (i == 0 && item == valueFrequency) {
+                                                        return item + 1
+                                                    } else {
+                                                        return item
+                                                    }
+                                                })
+                                                setFrequencys(newArr)
+                                            }}
+                                        />
+                                    </>
                                 }
-                                
+
                                 <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
                             </View>
                             <View style={styles.frequencyView}>
-                               
+
                             </View>
-                            {idUpdate==null?
-                            <>
-                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                Valor
+                            {idUpdate == null ?
+                                <>
+                                    <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                                        Valor
                             </Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize:18 }]}>
-                                    R$
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
+                                            R$
                                 </Text>
-                                <TextInput
-                                    keyboardType='numeric'
-                                    placeholder='R$ 0,00'
-                                    onChange={updateValues('amount', 0, false)}
-                                    value={valuesArray[0].amount.toString()}
-                                    style={styles.InputTextValue}
-                                />
-                            </View>
-                            </>
-                            :null
+                                        <TextInput
+                                            keyboardType='numeric'
+                                            placeholder='R$ 0,00'
+                                            onChange={updateValues('amount', 0, false)}
+                                            value={valuesArray[0].amount.toString()}
+                                            style={styles.InputTextValue}
+                                        />
+                                    </View>
+                                </>
+                                : null
                             }
 
                             {idUpdate == null && valuesArray.map((values, index) => {
@@ -609,22 +745,22 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                             </View>
                                             <View style={styles.valuesView}>
 
-                                                <TextInput 
-                                                    onChange={updateValues('description', index, false)} 
-                                                    value={values.description} 
-                                                    style={[styles.InputText, { width: 150 }]} 
+                                                <TextInput
+                                                    onChange={updateValues('description', index, false)}
+                                                    value={values.description}
+                                                    style={[styles.InputText, { width: 150 }]}
                                                 />
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize:18}]}>
-                                                    R$
+                                                    <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
+                                                        R$
                                                 </Text>
-                                                <TextInput 
-                                                    keyboardType='numeric'
-                                                    placeholder='R$ 0,00' 
-                                                    onChange={updateValues('amount', index, false)} 
-                                                    value={values.amount.toString()} 
-                                                    style={styles.InputTextValue} 
-                                                />
+                                                    <TextInput
+                                                        keyboardType='numeric'
+                                                        placeholder='R$ 0,00'
+                                                        onChange={updateValues('amount', index, false)}
+                                                        value={values.amount.toString()}
+                                                        style={styles.InputTextValue}
+                                                    />
                                                 </View>
 
                                             </View>
@@ -658,7 +794,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
                             {idUpdate != null && valuesUpdate.map((values, index) => {
                                 var monthly = false
- 
+
                                 if (values.dtEnd == 209912) {
                                     monthly = true
                                 }
@@ -674,21 +810,21 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                         </View>
                                         <View style={styles.valuesView}>
 
-                                            <TextInput 
-                                            onChange={updateValuesUpdate('description', index, false)} 
-                                            value={values.description} 
-                                            style={[styles.InputText, { width: 150 }]} />
+                                            <TextInput
+                                                onChange={updateValuesUpdate('description', index, false)}
+                                                value={values.description}
+                                                style={[styles.InputText, { width: 150 }]} />
 
                                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize:18}]}>
+                                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
                                                     R$
                                                 </Text>
-                                                <TextInput 
-                                                keyboardType='numeric'
-                                                placeholder='R$ 0,00' 
-                                                onChange={updateValuesUpdate('amount', index, false)} 
-                                                value={Functions.formatCurrency(values.amount)} 
-                                                style={styles.InputTextValue} />
+                                                <TextInput
+                                                    keyboardType='numeric'
+                                                    placeholder='R$ 0,00'
+                                                    onChange={updateValuesUpdate('amount', index, false)}
+                                                    value={Functions.formatCurrency(values.amount)}
+                                                    style={styles.InputTextValue} />
                                             </View>
 
                                         </View>
@@ -703,7 +839,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                             />
                                             <Feather name='chevron-left' size={30}
                                                 onPress={() => {
-                                                    let newArr : any = frequencys.map((item, i) => {
+                                                    let newArr: any = frequencys.map((item, i) => {
                                                         if (index == i) {
                                                             return item - 1
                                                         } else {
@@ -711,16 +847,17 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                                         }
                                                     })
                                                     setFrequencys(newArr)
-                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index]-1])
-                                                    //updateValuesUpdate('repeat', index, [monthly, frequencys[index]])
+                                                    //console.log('NewArr: ' + newArr)
+                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index] - 1])
+                                                    //console.log('freq: ' + frequencys[index])
                                                 }}
                                             />
-                                            {monthly?
-                                            <Text>1</Text>:
-                                            <Text  style={{fontSize:18}}>{frequencys[index]}</Text>}
-                                            <Feather name='chevron-right' size={30} 
+                                            {monthly ?
+                                                <Text>1</Text> :
+                                                <Text style={{ fontSize: 18 }}>{frequencys[index]}</Text>}
+                                            <Feather name='chevron-right' size={30}
                                                 onPress={() => {
-                                                    let newArr : any = frequencys.map((item, i) => {
+                                                    let newArr: any = frequencys.map((item, i) => {
                                                         if (index == i) {
                                                             return item + 1
                                                         } else {
@@ -728,8 +865,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                                         }
                                                     })
                                                     setFrequencys(newArr)
-                                                    console.log(frequencys[index])
-                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index]+1])
+                                                    //console.log(frequencys[index])
+                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index] + 1])
+                                                    //console.log('freq: ' + frequencys[index])
                                                 }}
                                             />
 
@@ -761,14 +899,20 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                             //console.log(valuesArray)
                                         }
                                         if (idUpdate != null) {
-
+                                            selectedDate.setMonth(selectedMonth - 1)
+                                            selectedDate.setFullYear(selectedYear)
                                             const newValueObj = {
                                                 description: '',
                                                 amount: '0',
-                                                dtStart: Functions.setDtStart(todayDate),
-                                                dtEnd: Functions.setDtEnd(false, 0, todayDate),
+                                                dtStart: Functions.setDtStart(selectedDate),
+                                                dtEnd: Functions.setDtEnd(false, 0, selectedDate),
                                                 entries_id: idUpdate
                                             }
+
+                                            //console.log('selectedDate: ' + selectedDate)
+                                            //console.log('dtStart: '+newValueObj.dtStart)
+                                            //console.log('dtStart: ' + newValueObj.dtStart)
+                                            //console.log('dtEnd: ' + newValueObj.dtEnd)
                                             ValuesDB.create(newValueObj)
                                             updateValuesList()
 
@@ -809,17 +953,17 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
                             <View style={styles.modalTextView}>
-                                {idUpdate==null?
-                                <Text style={styles.modalText}>
-                                    Cadastro realizado com sucesso! 
+                                {idUpdate == null ?
+                                    <Text style={styles.modalText}>
+                                        Cadastro realizado com sucesso!
                                 </Text>
-                                :
-                                <Text style={styles.modalText}>
-                                    Atualizado com sucesso! 
+                                    :
+                                    <Text style={styles.modalText}>
+                                        Atualizado com sucesso!
                                 </Text>
                                 }
                             </View>
-                            <TouchableOpacity onPress={() => nav.goBack()} style={styles.modalButton}>
+                            <TouchableOpacity onPress={handleNavigateEntries} style={styles.modalButton}>
                                 <Text style={[styles.tittleText, { color: tittleTextColor }]}>Ok</Text>
                             </TouchableOpacity>
                         </View>
