@@ -4,62 +4,40 @@ import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal } from 'rea
 import { Feather, AntDesign, Foundation } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useNavigation } from '@react-navigation/native';
-import NumberFormat from 'react-number-format';
-
 
 import EntriesDB from '../services/entriesDB'
 import ValuesDB from '../services/valuesDB'
 import Dates from '../services/dates'
 import Functions from '../functions/index'
 
+import Header from "./components/header"
+import BalanceValues from "./components/balanceValues"
+
+import {useSelectedMonthAndYear} from '../contexts/selectMonthAndYear'
+import {useStylesStates} from '../contexts/stylesStates'
+import {useResultsDB} from "../contexts/resultsDBStates"
 
 export default function Main() {
   const navigation = useNavigation()
 
-  // interfaces
-  interface EntriesValues {
-    id: number,
-    title: string,
-    day: number,
-    dtStart: number,
-    dtEnd: number,
-    monthly: boolean,
-    received: boolean,
-    type: string,
-  }
+  const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, noBalance, setNoBalance} = useSelectedMonthAndYear();
+  const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor} = useStylesStates();
+  const {
+    entries,
+    setEntries,
+    balance,
+    setBalance,
+    nextEntries,
+    setNextEntries,
+    nextEntries2,
+    setNextEntries2,
+    valuesList,
+    setValuesList,
+  }  = useResultsDB();
 
-  interface ValuesValues {
-    description: string,
-    amount: number,
-    dtStart: number,
-    dtEnd: number,
-    entries_id: number,
-    day: number,
-    type: string,
-    received: boolean,
-  }
-
-  interface Balance {
-    month: number,
-    year: number,
-    amount: number,
-  }
-
-  //
-  const [selectedMonth, setSelectedMonth] = useState(10)
-  const [selectedYear, setSelectedYear] = useState(2020)
-  const [entries, setEntries] = useState<EntriesValues[]>([])
-  const [nextEntries, setNextEntries] = useState<EntriesValues[]>([])
-  const [nextEntries2, setNextEntries2] = useState<EntriesValues[]>([])
-  const [valuesList, setValuesList] = useState<ValuesValues[]>([])
-  const [balance, setBalance] = useState<Balance[]>([])
   const [modalBalance, setModalBalance] = useState(false)
   const [textModal, setTextModal] = useState('')
-  const [noBalance, setNoBalance] = useState(false)
 
-  const [primaryColor, setPrimaryColor] = useState('#F9CF3C')
-  const [secondColor, setSecondColor] = useState('#B26A15')
-  const [monthColor, setMonthColor] = useState('#1A8289')
 
   //  Define a data atual
   const todayDate = new Date()
@@ -68,10 +46,6 @@ export default function Main() {
 
   // Arrays
   let datas: any = []
-  let contEarnings: Array<number> = []
-  let contEstimatedEarnings: Array<number> = []
-  let contExpenses: Array<number> = []
-  let contEstimatedExpenses: Array<number> = []
 
   // funções de navegação
   function handleNavigateGanhos() {
@@ -154,6 +128,8 @@ export default function Main() {
     setSelectedYear(prevDtObj.prevYear)
   }
 
+  
+
   /**Função que carrega o Saldo Total com o restante dos meses anteriores */
   async function loadBalance() {
     let sumBalance = 0
@@ -175,7 +151,7 @@ export default function Main() {
         sumBalance = sumBalance + balance
         let year = parseInt(Functions.toMonthAndYear(data).year)
         let month = parseInt(Functions.toMonthAndYear(data).month)
-        let obj: Balance = { month: month, year: year, amount: sumBalance }
+        let obj: any = { month: month, year: year, amount: sumBalance }
         if (balanceArray.indexOf(obj) > -1) {
 
         } else {
@@ -300,218 +276,21 @@ export default function Main() {
     return reload;
   }, [])
 
+  const fct = {
+    handleNextMonth,
+    handlePrevMonth,
+    CurrentMonth, 
+    CurrentYear,
+    showModalBalance,
+  }
+
   return (
     <LinearGradient colors={[primaryColor, secondColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
-      {/*Mês e ano*/}
-      <View style={styles.monthView}>
-        <TouchableOpacity onPress={handlePrevMonth}>
-          <Feather name="chevron-left" size={40} color={monthColor} />
-        </TouchableOpacity>
-        <Text style={[styles.monthText, { color: monthColor }]}>
-          {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
-        </Text>
-        <TouchableOpacity onPress={handleNextMonth}>
-          <Feather name="chevron-right" size={40} color={monthColor} />
-        </TouchableOpacity>
-      </View>
+      <Header functions={fct}></Header>
 
-      {valuesList.map(value => {
-        if (selectedMonth == CurrentMonth && selectedYear == CurrentYear) {
-          if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Ganhos') contEarnings.push(value.amount)
-          if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Despesas') contExpenses.push(value.amount)
-        }
-        if (value.amount != null && value.amount != NaN && value.amount != 0 && value.type == 'Despesas') contEstimatedExpenses.push(value.amount)
-        if (value.amount != null && value.amount != NaN && value.amount != 0 && value.type == 'Ganhos') contEstimatedEarnings.push(value.amount)
-        
-      })}
-
-
-      {/*Saldos*/}
-      <View style={styles.balanceView}>
-        <View style={styles.currentBalanceView}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => showModalBalance(1)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
-            <Text style={styles.currentBalanceText}>
-              Seu Saldo Atual
-            </Text>
-          </View>
-          {noBalance || selectedMonth != CurrentMonth || selectedYear != CurrentYear?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
-            </View>
-            :
-            <NumberFormat
-              value={contEarnings.reduce((a: any, b: any) => a + b, 0) - contExpenses.reduce((a: any, b: any) => a + b, 0)}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value =>
-                <Text style={styles.currentBalanceTextValue}>
-                  {value}
-                </Text>}
-            />
-          }
-          {balance.map((bal, index) => {
-              if (bal.year == selectedYear && bal.month == selectedMonth) {
-                let remainingValues = bal.amount - (contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0))
-                return (
-                  <View key={index}>
-                    <NumberFormat
-                      value={remainingValues}
-                      displayType={'text'}
-                      thousandSeparator={true}
-                      format={Functions.currencyFormatter}
-                      renderText={value =>
-                        <Text style={[styles.currentBalanceTextValue, { fontSize: 14 }]}>
-                          {value}
-                        </Text>}
-                    />
-                  </View>
-                )
-              }
-            })}
-        </View>
-        <View style={styles.currentBalanceView}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <Text style={styles.estimatedBalanceText}>
-              Saldo Estimado
-            </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => showModalBalance(2)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
-          </View>
-
-            {noBalance ?
-              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
-              </View>
-              :
-              <NumberFormat
-                value={
-                  contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
-                }
-                displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value =>
-                  <Text style={styles.estimatedBalanceTextValue}>
-                    {value}
-                  </Text>}
-              />
-            }
-            {balance.map((bal, index) => {
-              if (bal.year == selectedYear && bal.month == selectedMonth) {
-                return (
-                  <View key={index}>
-                    <NumberFormat
-                      value={bal.amount}
-                      displayType={'text'}
-                      thousandSeparator={true}
-                      format={Functions.currencyFormatter}
-                      renderText={value =>
-                        <Text style={[styles.estimatedBalanceTextValue, { fontSize: 14 }]}>
-                          {value}
-                        </Text>}
-                    />
-                  </View>
-                )
-              }
-            })}
-        </View>
-      </View>
-
-      {/*Ganhos e Despesas*/}
-
-      <View style={styles.valuesView}>
-        <View style={styles.currentBalanceView}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => showModalBalance(3)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
-            <Text style={styles.earningsText}>
-              Ganhos
-            </Text>
-          </View>
-          {noBalance || selectedMonth != CurrentMonth || selectedYear != CurrentYear?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={styles.earningsTextValue}>R$ 0,00</Text>
-            </View>
-            :
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <NumberFormat
-                value={contEarnings.reduce((a: any, b: any) => a + b, 0)}
-                displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-              />
-            </View>
-          }
-          {noBalance ?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
-            </View>
-            :
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <NumberFormat
-                value={contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0)}
-                displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value =>
-                  <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>
-                    {value}
-                  </Text>
-                } />
-            </View>
-          }
-        </View>
-
-
-        <View style={styles.currentBalanceView}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <Text style={styles.expensesText}>
-              Despesas
-            </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => showModalBalance(4)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
-          </View>
-          {noBalance || selectedMonth != CurrentMonth || selectedYear != CurrentYear?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={styles.expensesTextValue}>R$ 0,00</Text>
-            </View>
-            :
-            <NumberFormat
-              value={contExpenses.reduce((a: any, b: any) => a + b, 0)}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
-            />
-          }
-          {noBalance ?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
-            </View>
-            :
-            <NumberFormat
-              value={contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value =>
-                <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>
-                  {value}
-                </Text>}
-            />
-          }
-        </View>
-      </View>
+      <BalanceValues functions={fct}></BalanceValues>
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>
