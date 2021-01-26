@@ -1,42 +1,32 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect} from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Modal } from 'react-native';
-import { Feather, AntDesign, Foundation } from '@expo/vector-icons'
+import { StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { Feather, Foundation } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useNavigation } from '@react-navigation/native';
 
-import EntriesDB from '../services/entriesDB'
-import ValuesDB from '../services/valuesDB'
-import Dates from '../services/dates'
-import Functions from '../functions/index'
+import EntriesDB from '../../services/entriesDB'
+import ValuesDB from '../../services/valuesDB'
+import Dates from '../../services/dates'
+import Functions from '../../functions/index'
 
-import Header from "./components/header"
+import Header from "../components/header"
 import BalanceValues from "./components/balanceValues"
+import NextDays from "./components/nextDays"
+import ModalBox from '../components/modal'
+import ModalContent from './components/modalContent'
 
-import {useSelectedMonthAndYear} from '../contexts/selectMonthAndYear'
-import {useStylesStates} from '../contexts/stylesStates'
-import {useResultsDB} from "../contexts/resultsDBStates"
+import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
+import {useStylesStates} from '../../contexts/stylesStates'
+import {useResultsDB} from "../../contexts/resultsDBStates"
+
 
 export default function Main() {
   const navigation = useNavigation()
 
-  const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, noBalance, setNoBalance} = useSelectedMonthAndYear();
-  const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor} = useStylesStates();
-  const {
-    entries,
-    setEntries,
-    balance,
-    setBalance,
-    nextEntries,
-    setNextEntries,
-    nextEntries2,
-    setNextEntries2,
-    valuesList,
-    setValuesList,
-  }  = useResultsDB();
-
-  const [modalBalance, setModalBalance] = useState(false)
-  const [textModal, setTextModal] = useState('')
+  const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, setNoBalance} = useSelectedMonthAndYear();
+  const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor, setModalBalance, setTextModal} = useStylesStates();
+  const {setEntries,setBalance,setNextEntries,setNextEntries2,setValuesList}  = useResultsDB();
 
 
   //  Define a data atual
@@ -64,6 +54,7 @@ export default function Main() {
   /**Função que mostra o modal com a explicação dos resultados */
   function showModalBalance(idModal: number) {
     setModalBalance(true)
+
     if (idModal == 1) {
       setTextModal(`Em seu Saldo atual, o primeiro valor representa o saldo com base nos ganhos recebidos e despesas pagas no mês.
       O segundo valor, representa o valor restante dos meses anteriores.
@@ -80,53 +71,7 @@ export default function Main() {
     }
   }
 
-  /**Função que mostra os dados do mês seguinte */
 
-  function handleNextMonth() {
-    let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
-    EntriesDB.findByDate(parseInt(nextDtObj.dt)).then((res: any) => {
-      setEntries(res._array)
-    }).catch(err => {
-      setEntries([])
-      console.log(err)
-    })
-
-    ValuesDB.findByDate(parseInt(nextDtObj.dt)).then((res: any) => {
-      setValuesList(res._array)
-      setNoBalance(false)
-    }).catch(err => {
-      setValuesList([])
-      console.log(err)
-      setNoBalance(true)
-    })
-
-    setSelectedMonth(nextDtObj.nextMonth)
-    setSelectedYear(nextDtObj.nextYear)
-  }
-
-  /**Função que mostra os dados do mês anterior */
-  function handlePrevMonth() {
-    let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
-
-    EntriesDB.findByDate(parseInt(prevDtObj.dt)).then((res: any) => {
-      setEntries(res._array)
-    }).catch(err => {
-      setEntries([])
-      console.log(err)
-    })
-
-    ValuesDB.findByDate(parseInt(prevDtObj.dt)).then((res: any) => {
-      setValuesList(res._array)
-      setNoBalance(false)
-    }).catch(err => {
-      setValuesList([])
-      setNoBalance(true)
-      console.log(err)
-    })
-
-    setSelectedMonth(prevDtObj.prevMonth)
-    setSelectedYear(prevDtObj.prevYear)
-  }
 
   
 
@@ -277,18 +222,17 @@ export default function Main() {
   }, [])
 
   const fct = {
-    handleNextMonth,
-    handlePrevMonth,
     CurrentMonth, 
     CurrentYear,
     showModalBalance,
+    todayDate,
   }
 
   return (
     <LinearGradient colors={[primaryColor, secondColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
-      <Header functions={fct}></Header>
+      <Header></Header>
 
       <BalanceValues functions={fct}></BalanceValues>
 
@@ -297,19 +241,19 @@ export default function Main() {
         {/*Botões Ganhos*/}
 
         <View style={styles.buttonsView}>
-          <LinearGradient colors={['#FFFFFF', '#24DBBA22']} start={{ x: -0.1, y: 0.1 }} style={styles.earningsButton}>
-            <TouchableOpacity style={styles.earningsButton} onPress={handleNavigateGanhos}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Foundation name="dollar" size={50} color="#1A8289" style={{ marginRight: 15, marginBottom: 5 }} />
-                <Text style={styles.earningsTextButton}>Ganhos</Text>
-              </View>
-            </TouchableOpacity>
-          </LinearGradient>
-          <LinearGradient colors={['#24DBBA', '#2AC4A8']} start={{ x: -0.1, y: 0.1 }} style={styles.plusButton}>
-            <TouchableOpacity style={styles.plusButton} onPress={handleNavigateNovoGanhos}>
-              <Feather name="plus" size={40} color="#fff" />
-            </TouchableOpacity>
-          </LinearGradient>
+            <LinearGradient colors={['#FFFFFF', '#24DBBA22']} start={{ x: -0.1, y: 0.1 }} style={styles.earningsButton}>
+                <TouchableOpacity style={styles.earningsButton} onPress={handleNavigateGanhos}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Foundation name="dollar" size={50} color="#1A8289" style={{ marginRight: 15, marginBottom: 5 }} />
+                      <Text style={styles.earningsTextButton}>Ganhos</Text>
+                    </View>
+                </TouchableOpacity>
+            </LinearGradient>
+            <LinearGradient colors={['#24DBBA', '#2AC4A8']} start={{ x: -0.1, y: 0.1 }} style={styles.plusButton}>
+                <TouchableOpacity style={styles.plusButton} onPress={handleNavigateNovoGanhos}>
+                  <Feather name="plus" size={40} color="#fff" />
+                </TouchableOpacity>
+            </LinearGradient>
         </View>
 
         {/*Botões Despesas*/}
@@ -334,62 +278,14 @@ export default function Main() {
           <Text style={styles.nextDaysText}>Nos próximos dias...</Text>
         </View>
 
-        <ScrollView style={{ maxHeight: 95, elevation: 5 }}>
-          {nextEntries.map((ear, index) => {
-            if (ear.day >= todayDate.getDate() && ear.day <= (todayDate.getDate() + 10) && !ear.received) {
-              let color
-              if (ear.type == 'Ganhos') {
-                color = '#1A8289'
-              } else {
-                color = '#CC3728'
-              }
-              return (
-                <View style={styles.nextDaysContent} key={index}>
-                  <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
-                  <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.day + '  ' + Functions.convertDtToStringMonth(todayDate.getMonth() + 1)}
-                  </Text>
-                </View>
-              )
-            }
-          })
-          }
-          {todayDate.getDate() + 5 > 30 && nextEntries2.map((ear, index) => {
-            if (ear.day <= 5) {
-              let color
-              if (ear.type == 'Ganhos') {
-                color = '#1A8289'
-              } else {
-                color = '#CC3728'
-              }
-              return (
-                <View style={styles.nextDaysContent} key={index}>
-                  <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
-                  <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.day + '  ' + Functions.convertDtToStringMonth(todayDate.getMonth() + 2)}
-                  </Text>
-                </View>
-              )
-            }
-          })}
-        </ScrollView>
+        <NextDays functions={fct}></NextDays>
 
       </View>
 
-      <Modal animationType="slide" visible={modalBalance} transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={styles.questionsModalText}>
-                  {textModal}
-                </Text>
-              <TouchableOpacity onPress={() => { setModalBalance(!modalBalance) }}>
-                <Feather name="x" size={30} color={'#136065'} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <ModalBox>
+          <ModalContent></ModalContent>
+      </ModalBox>
+
     </LinearGradient>
   )
 }
@@ -398,111 +294,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 26,
-  },
-  monthView: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingHorizontal: 26,
-    marginTop: 13,
-  },
-  monthText: {
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 24,
-    marginHorizontal: 5
-  },
-  questionsModalText:{
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 22,
-    marginHorizontal: 5,
-    color: '#1A8289'
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: ' rgba(0, 0, 0, 0.39);',
-    justifyContent: 'center'
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    height: '50%',
-    padding: 30,
-    alignItems:'center',
-    justifyContent:'center'
-  },
-  balanceView: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: 26,
-    marginTop: 13,
-  },
-
-  currentBalanceView: {
-    justifyContent: 'center',
-    marginHorizontal: 26,
-  },
-
-  currentBalanceText: {
-    color: '#fff',
-    fontFamily: 'Poppins_400Regular',
-    fontSize: 14,
-    textAlign: 'center'
-  },
-
-  currentBalanceTextValue: {
-    color: '#fff',
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 24,
-    textAlign: 'center'
-  },
-
-  estimatedBalanceText: {
-    color: 'rgba(255, 255, 255, 0.62);',
-    fontFamily: 'Poppins_400Regular',
-    fontSize: 14,
-    textAlign: 'center'
-  },
-
-  estimatedBalanceTextValue: {
-    color: 'rgba(255, 255, 255, 0.62);',
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 24,
-    textAlign: 'center'
-  },
-
-
-  valuesView: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: 26,
-    marginTop: 32,
-  },
-
-  earningsText: {
-    color: '#BFFDCC',
-    fontFamily: 'Poppins_400Regular',
-    fontSize: 14,
-    textAlign: 'center'
-  },
-
-  earningsTextValue: {
-    color: '#BFFDCC',
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 24,
-    textAlign: 'center'
-  },
-
-  expensesText: {
-    color: '#FFE1E1',
-    fontFamily: 'Poppins_400Regular',
-    fontSize: 14,
-    textAlign: 'center'
-  },
-
-  expensesTextValue: {
-    color: '#FFE1E1',
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 24,
-    textAlign: 'center'
   },
 
   mainContainer: {
@@ -576,22 +367,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_500Medium',
     fontSize: 14,
   },
-
-  nextDaysContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 5,
-    marginHorizontal: 26,
-    borderColor: 'transparent',
-    borderBottomColor: '#dadada',
-    borderWidth: 1,
-
-  },
-
-  nextDaysContentText: {
-    fontSize: 14,
-    fontFamily: 'Poppins_500Medium',
-  }
 
 });

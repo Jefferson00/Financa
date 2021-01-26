@@ -1,38 +1,12 @@
 import React, { createContext, useState, useContext } from 'react'
 
+import {EntriesValues,ValuesValues,Balance} from "../interfaces"
+
 const resultsDBStatesContext = createContext({});
 
 export default function ResultsDBStatesProvider({children}:any){
     // interfaces
-  interface EntriesValues {
-    id: number,
-    title: string,
-    day: number,
-    dtStart: number,
-    dtEnd: number,
-    monthly: boolean,
-    received: boolean,
-    type: string,
-  }
-
-  interface ValuesValues {
-    description: string,
-    amount: number,
-    dtStart: number,
-    dtEnd: number,
-    entries_id: number,
-    day: number,
-    type: string,
-    received: boolean,
-  }
-
-  interface Balance {
-    month: number,
-    year: number,
-    amount: number,
-  }
-
-
+ 
     const [entries, setEntries] = useState<EntriesValues[]>([])
     const [nextEntries, setNextEntries] = useState<EntriesValues[]>([])
     const [nextEntries2, setNextEntries2] = useState<EntriesValues[]>([])

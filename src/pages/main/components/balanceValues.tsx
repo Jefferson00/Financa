@@ -2,10 +2,12 @@ import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { AntDesign} from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
-import Functions from '../../functions'
+import Functions from '../../../functions'
 
-import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
-import {useResultsDB} from '../../contexts/resultsDBStates'
+import {ValuesValues,Balance} from "../../../interfaces"
+
+import {useSelectedMonthAndYear} from '../../../contexts/selectMonthAndYear'
+import {useResultsDB} from '../../../contexts/resultsDBStates'
 
 export default function BalanceValues({functions}:{functions:any}){
 
@@ -17,7 +19,7 @@ export default function BalanceValues({functions}:{functions:any}){
     let contExpenses: Array<number> = []
     let contEstimatedExpenses: Array<number> = []
 
-    valuesList.map((value:any) => {
+    valuesList.map((value:ValuesValues) => {
         if (selectedMonth == functions.CurrentMonth && selectedYear == functions.CurrentYear) {
           if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Ganhos') contEarnings.push(value.amount)
           if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Despesas') contExpenses.push(value.amount)
@@ -54,7 +56,7 @@ export default function BalanceValues({functions}:{functions:any}){
                 </Text>}
             />
           }
-          {balance.map((bal, index) => {
+          {balance.map((bal:Balance, index:number) => {
               if (bal.year == selectedYear && bal.month == selectedMonth) {
                 let remainingValues = bal.amount - (contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0))
                 return (
@@ -102,7 +104,7 @@ export default function BalanceValues({functions}:{functions:any}){
                   </Text>}
               />
             }
-            {balance.map((bal, index) => {
+            {balance.map((bal:Balance, index:number) => {
               if (bal.year == selectedYear && bal.month == selectedMonth) {
                 return (
                   <View key={index}>

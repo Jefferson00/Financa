@@ -5,7 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack'
 
 const {Navigator, Screen} = createStackNavigator();
 
-import Main from './pages/Main'
+import Main from './pages/main'
 import Entries from './pages/Entries'
 import NewEntries from './pages/NewEntries'
 

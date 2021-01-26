@@ -135,6 +135,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         console.log(selectedYear)
         clearParams()
         nav.navigate('Entries', { item: item, month: selectedMonth, year: selectedYear })
+        setSuccessModal(false)
     }
 
     function clearParams(){
