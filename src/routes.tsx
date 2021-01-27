@@ -6,8 +6,8 @@ import {createStackNavigator} from '@react-navigation/stack'
 const {Navigator, Screen} = createStackNavigator();
 
 import Main from './pages/main'
-import Entries from './pages/Entries'
-import NewEntries from './pages/NewEntries'
+import Entries from './pages/entries'
+import NewEntries from './pages/newEntries/NewEntries'
 
 export default function Routes(){
     return(

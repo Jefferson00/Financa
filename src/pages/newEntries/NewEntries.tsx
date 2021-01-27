@@ -8,12 +8,21 @@ import { useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
 
-import Footer from './components/footer'
+import Footer from '../components/footer'
 import { ScrollView, Switch } from 'react-native-gesture-handler';
 
-import EntriesDB from '../services/entriesDB'
-import ValuesDB from '../services/valuesDB'
-import Functions from '../functions/index'
+import EntriesDB from '../../services/entriesDB'
+import ValuesDB from '../../services/valuesDB'
+import Functions from '../../functions/index'
+
+import Header from "../components/header"
+import ButtonSubmit from "./components/button"
+import FormContentCreate from "./components/formContentCreate"
+
+import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
+import {useStylesStates} from '../../contexts/stylesStates'
+import {useResultsDB} from "../../contexts/resultsDBStates"
+import { EntriesValues, ValuesValues, earningValues, ValuesItemUpdate, ValuesItem } from '../../interfaces';
 
 export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
 
@@ -21,43 +30,34 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     const { idUpdate } = route.params
     const nav = useNavigation()
 
-    /*Interfaces*/
-
-    interface ValuesItem {
-        id: number,
-        description: string,
-        amount: string,
-        monthly: boolean,
-        repeat: number,
-    }
-
-    interface ValuesItemUpdate {
-        id: number,
-        description: string,
-        amount: string,
-        dtStart: number,
-        dtEnd: number,
-        entries_id: number,
-    }
-
-    interface earningValues {
-        title: string,
-        day: number,
-        dtStart: number,
-        dtEnd: number,
-        monthly: boolean,
-        received: boolean,
-    }
+    const {
+        selectedMonth, 
+        setSelectedMonth, 
+        selectedYear, 
+        setSelectedYear, 
+    } = useSelectedMonthAndYear();
+    const {  
+        mainColor1,
+        mainColor2,
+        setColorBorderAddButton,
+        colorBorderAddButton,
+        setMainColor1,
+        setMainColor2,
+        tittleTextColor,
+        setTittleTextColor,
+    } = useStylesStates();
+    const {setEntries, entries, valuesList, setValuesList, valuesArray, setValuesArray}  = useResultsDB();
+ 
 
     /*Estados de aparencia*/
-    /**/ const [mainColor1, setMainColor1] = useState('')
-    /**/ const [mainColor2, setMainColor2] = useState('')
+    // const [mainColor1, setMainColor1] = useState('')
+    //const [mainColor2, setMainColor2] = useState('')
     /**/ const [tittleText, setTittleText] = useState('')
-    /**/ const [tittleTextColor, setTittleTextColor] = useState('#fff')
+    // const [tittleTextColor, setTittleTextColor] = useState('#fff')
     /**/ const [valueTitle, onChangeTitle] = useState('');
     /**/ const [receivedTextDate, setReceivedTextDate] = useState('');
     /**/ const [receivedText, setReceivedText] = useState('');
-    /**/ const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
+    // const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
     /**/ const [secondColor, setSecondColor] = useState('#fff')
     /**/ const [colorMonth, setColorMonth] = useState('#fff')
     /**/
@@ -66,20 +66,20 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     /*Estados de valores*/
     /**/ const [idValues, setIdValues] = useState(0)
     /**/ const [valueFrequency, setValueFrequency] = useState(1);
-    /**/ const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
+    /* const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
         id: 0,
         description: '',
         amount: '0',
         monthly: false,
         repeat: 1
-    }])
+    }])*/
     /**/ const [showValues, setShowValues] = useState(false)
     const [earning, setEarning] = useState<earningValues[]>([])
     const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
     const [valuesBeforeUpdate, setValuesBeforeUpdate] = useState<ValuesItemUpdate[]>([])
     const [frequencys, setFrequencys] = useState([])
-    /**/  const [selectedMonth, setSelectedMonth] = useState(10)
-    /**/  const [selectedYear, setSelectedYear] = useState(2020)
+    //  const [selectedMonth, setSelectedMonth] = useState(10)
+    //  const [selectedYear, setSelectedYear] = useState(2020)
 
     const todayDate = new Date()
     const selectedDate = todayDate
@@ -145,7 +145,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     /*Atualiza os valores dos inputs 'valores' */
 
     const updateValues = (subitem: any, index: any, value: any) => (e: any) => {
-        let newArr = valuesArray.map((item, i) => {
+        let newArr = valuesArray.map((item:ValuesItem, i:number) => {
             if (index == i) {
                 if (subitem == 'monthly') {
                     return { ...item, [subitem]: value = !value }
@@ -248,7 +248,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
     /*Atualiza os valores da periodicidade */
     const updateOneValue = (subitem: any, index: any, value: any) => {
-        let newArr = valuesArray.map((item, i) => {
+        let newArr = valuesArray.map((item:ValuesItem, i:number) => {
             if (index == i) {
                 if (subitem == 'monthly') {
                     return { ...item, [subitem]: value }
@@ -281,7 +281,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
         EntriesDB.all().then((res: any) => {
             //console.log(res)
-            valuesArray.map(value => {
+            valuesArray.map((value:ValuesItem) => {
                 var vlr = value.amount
                 vlr = vlr.replace(/[.]/g, '')
                 vlr = vlr.replace(/[,]/g, '')
@@ -314,6 +314,8 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
 
     }
+
+   
 
     function handleUpdate() {
         let dtStart = Functions.setDtStart(date)
@@ -585,22 +587,25 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         setFrequencys(arrFrequency)
     }, [valuesUpdate])
 
+
+    const props = {
+        item,
+        idUpdate,
+        showValues,
+        isEnabled,
+        handleUpdate,
+        handleCreateNew,
+        toggleSwitch,
+        onChange,
+        updateValues,
+    }
+
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
             <LinearGradient colors={[mainColor1, mainColor2]} start={{ x: -0.4, y: 0.1 }} style={styles.container}>
                 <StatusBar style="light" translucent />
                 {/*Mês e ano*/}
-                <View style={styles.monthView}>
-                    <TouchableOpacity onPress={handlePrevMonth}>
-                        <Feather name="chevron-left" size={40} color={colorMonth} />
-                    </TouchableOpacity>
-                    <Text style={[styles.monthText, { color: colorMonth }]}>
-                        {Functions.convertDtToStringMonth(selectedMonth)}  {selectedYear}
-                    </Text>
-                    <TouchableOpacity onPress={handleNextMonth}>
-                        <Feather name="chevron-right" size={40} color={colorMonth} />
-                    </TouchableOpacity>
-                </View>
+                <Header props={props}></Header>
 
                 {/* Main container */}
 
@@ -732,66 +737,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                                 : null
                             }
 
-                            {idUpdate == null && valuesArray.map((values, index) => {
-                                if (showValues)
-                                    return (
-                                        <View style={styles.valuesViewItem} key={index}>
-                                            <View style={styles.valuesView}>
-                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                    Descrição
-                                                </Text>
-                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                    Valor
-                                                </Text>
-                                            </View>
-                                            <View style={styles.valuesView}>
-
-                                                <TextInput
-                                                    onChange={updateValues('description', index, false)}
-                                                    value={values.description}
-                                                    style={[styles.InputText, { width: 150 }]}
-                                                />
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
-                                                        R$
-                                                </Text>
-                                                    <TextInput
-                                                        keyboardType='numeric'
-                                                        placeholder='R$ 0,00'
-                                                        onChange={updateValues('amount', index, false)}
-                                                        value={values.amount.toString()}
-                                                        style={styles.InputTextValue}
-                                                    />
-                                                </View>
-
-                                            </View>
-                                            <View style={styles.valuesView}>
-                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                    Periodicidade
-                                                </Text>
-                                            </View>
-                                            <View style={styles.frequencyView}>
-                                                <Text style={[styles.secondColorText, { color: secondColor }]}>Mensal</Text>
-                                                <Switch
-                                                    trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                                    thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
-                                                    ios_backgroundColor="#3e3e3e"
-                                                    onValueChange={updateValues('monthly', index, values.monthly)}
-                                                    value={values.monthly}
-                                                />
-
-                                                <TextInput
-                                                    onChange={updateValues('repeat', index, false)}
-                                                    value={values.repeat.toString()}
-                                                    style={styles.InputText}
-                                                    keyboardType='numeric'
-                                                />
-
-                                                <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
-                                            </View>
-                                        </View>
-                                    )
-                            })}
+                            <FormContentCreate props={props}></FormContentCreate>
 
                             {idUpdate != null && valuesUpdate.map((values, index) => {
                                 var monthly = false
@@ -924,27 +870,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                             </View>
                         </View>
 
-                        <View style={{ justifyContent: 'flex-end', flex: 1 }}>
-                            <LinearGradient
-                                colors={['#FFFFFF', colorBorderAddButton + '22']}
-                                start={{ x: -0.1, y: 0.1 }}
-                                style={[styles.addNewButton, { borderColor: colorBorderAddButton }]}>
-                                {idUpdate != null ?
-                                    <TouchableOpacity
-                                        style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
-                                        onPress={handleUpdate}
-                                    >
-                                        <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>Atualizar</Text>
-                                    </TouchableOpacity>
-                                    : <TouchableOpacity
-                                        style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
-                                        onPress={handleCreateNew}
-                                    >
-                                        <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>Adicionar</Text>
-                                    </TouchableOpacity>
-                                }
-                            </LinearGradient>
-                        </View>
+                        <ButtonSubmit props={props}></ButtonSubmit>
                     </ScrollView>
 
                     <Footer item={item}></Footer>

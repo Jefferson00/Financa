@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from 'react'
 
-import {EntriesValues,ValuesValues,Balance} from "../interfaces"
+import {EntriesValues,ValuesValues,Balance, ValuesItem} from "../interfaces"
 
 const resultsDBStatesContext = createContext({});
 
@@ -12,6 +12,13 @@ export default function ResultsDBStatesProvider({children}:any){
     const [nextEntries2, setNextEntries2] = useState<EntriesValues[]>([])
     const [valuesList, setValuesList] = useState<ValuesValues[]>([])
     const [balance, setBalance] = useState<Balance[]>([])
+    const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
+        id: 0,
+        description: '',
+        amount: '0',
+        monthly: false,
+        repeat: 1
+    }])
 
     return(
         <resultsDBStatesContext.Provider 
@@ -20,7 +27,8 @@ export default function ResultsDBStatesProvider({children}:any){
                 nextEntries, setNextEntries,
                 nextEntries2, setNextEntries2,
                 valuesList, setValuesList,
-                balance, setBalance
+                balance, setBalance,
+                valuesArray, setValuesArray
             }}
         >
             {children}
@@ -30,6 +38,6 @@ export default function ResultsDBStatesProvider({children}:any){
 
 export function useResultsDB(){
     const context = useContext(resultsDBStatesContext);
-    const { entries, setEntries, nextEntries, setNextEntries,nextEntries2, setNextEntries2,valuesList, setValuesList,balance, setBalance}: any = context
-    return {entries, setEntries, nextEntries, setNextEntries,nextEntries2, setNextEntries2,valuesList, setValuesList,balance, setBalance};
+    const { entries, setEntries, nextEntries, setNextEntries,nextEntries2, setNextEntries2,valuesList, setValuesList,balance, setBalance, valuesArray, setValuesArray}: any = context
+    return {entries, setEntries, nextEntries, setNextEntries,nextEntries2, setNextEntries2,valuesList, setValuesList,balance, setBalance, valuesArray, setValuesArray};
 }

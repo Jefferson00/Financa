@@ -26,3 +26,29 @@
     year: number,
     amount: number,
   }
+
+  export interface ValuesItem {
+    id: number,
+    description: string,
+    amount: string,
+    monthly: boolean,
+    repeat: number,
+}
+
+export interface ValuesItemUpdate {
+  id: number,
+  description: string,
+  amount: string,
+  dtStart: number,
+  dtEnd: number,
+  entries_id: number,
+}
+
+export interface earningValues {
+  title: string,
+  day: number,
+  dtStart: number,
+  dtEnd: number,
+  monthly: boolean,
+  received: boolean,
+}

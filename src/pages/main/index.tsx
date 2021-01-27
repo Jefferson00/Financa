@@ -13,7 +13,6 @@ import Functions from '../../functions/index'
 import Header from "../components/header"
 import BalanceValues from "./components/balanceValues"
 import NextDays from "./components/nextDays"
-import ModalBox from '../components/modal'
 import ModalContent from './components/modalContent'
 
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
@@ -25,7 +24,7 @@ export default function Main() {
   const navigation = useNavigation()
 
   const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, setNoBalance} = useSelectedMonthAndYear();
-  const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor, setModalBalance, setTextModal} = useStylesStates();
+  const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor, setModalBalance, setTextModal, setModalType} = useStylesStates();
   const {setEntries,setBalance,setNextEntries,setNextEntries2,setValuesList}  = useResultsDB();
 
 
@@ -54,6 +53,7 @@ export default function Main() {
   /**Função que mostra o modal com a explicação dos resultados */
   function showModalBalance(idModal: number) {
     setModalBalance(true)
+    setModalType("Balance")
 
     if (idModal == 1) {
       setTextModal(`Em seu Saldo atual, o primeiro valor representa o saldo com base nos ganhos recebidos e despesas pagas no mês.
@@ -113,13 +113,17 @@ export default function Main() {
 
   useEffect(() => {
     if (selectedMonth != CurrentMonth) {
-      setPrimaryColor('#1B5AA4')
-      setSecondColor('#F9CF3C')
-      setMonthColor('#FFFFFF')
+      if (navigation.isFocused()){
+        setPrimaryColor('#1B5AA4')
+        setSecondColor('#F9CF3C')
+        setMonthColor('#FFFFFF')
+      }
     } else {
-      setPrimaryColor('#F9CF3C')
-      setSecondColor('#B26A15')
-      setMonthColor('#1A8289')
+      if (navigation.isFocused()){
+        setPrimaryColor('#F9CF3C')
+        setSecondColor('#B26A15')
+        setMonthColor('#1A8289')
+      }
     }
   }, [selectedMonth])
 
@@ -150,6 +154,7 @@ export default function Main() {
     const reload = navigation.addListener('focus', () => {
       setSelectedMonth(CurrentMonth)
       setSelectedYear(CurrentYear)
+      setMonthColor('#1A8289')
       let firstDate
       /*Converte para a data em String e no formato que é salvo no banco de dados*/
       if (CurrentMonth < 10) {
@@ -232,7 +237,7 @@ export default function Main() {
     <LinearGradient colors={[primaryColor, secondColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
-      <Header></Header>
+      <Header props={null}></Header>
 
       <BalanceValues functions={fct}></BalanceValues>
 
@@ -282,9 +287,7 @@ export default function Main() {
 
       </View>
 
-      <ModalBox>
           <ModalContent></ModalContent>
-      </ModalBox>
 
     </LinearGradient>
   )

@@ -6,6 +6,7 @@ export default function SelectedMonthAndYearProvider({children}:any){
     const [selectedMonth, setSelectedMonth] = useState(10);
     const [selectedYear, setSelectedYear] = useState(2020);
     const [noBalance, setNoBalance] = useState(false)
+    const [selectedTotalValues, setSelectedTotalValues] = useState(0)
 
     return(
         <SelectedMonthAndYearContext.Provider 
@@ -14,7 +15,8 @@ export default function SelectedMonthAndYearProvider({children}:any){
                 setSelectedMonth,
                 selectedYear,
                 setSelectedYear,
-                noBalance, setNoBalance
+                noBalance, setNoBalance,
+                selectedTotalValues, setSelectedTotalValues
             }}
         >
             {children}
@@ -24,6 +26,6 @@ export default function SelectedMonthAndYearProvider({children}:any){
 
 export function useSelectedMonthAndYear(){
     const context = useContext(SelectedMonthAndYearContext);
-    const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, noBalance, setNoBalance}: any = context
-    return {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, noBalance, setNoBalance};
+    const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, noBalance, setNoBalance, selectedTotalValues, setSelectedTotalValues}: any = context
+    return {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, noBalance, setNoBalance, selectedTotalValues, setSelectedTotalValues};
 }

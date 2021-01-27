@@ -10,8 +10,9 @@ import EntriesDB from '../../services/entriesDB'
 import ValuesDB from '../../services/valuesDB'
 
 import Functions from '../../functions'
+import {EntriesValues} from "../../interfaces"
 
-export default function Header(){
+export default function Header({props}:{props:any}){
 
     const {selectedMonth, selectedYear, setSelectedMonth, setSelectedYear, setNoBalance} = useSelectedMonthAndYear();
     const {monthColor} = useStylesStates();
@@ -20,9 +21,14 @@ export default function Header(){
       /**Função que mostra os dados do mês seguinte */
 
   function handleNextMonth() {
+   
     let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
-    EntriesDB.findByDate(parseInt(nextDtObj.dt)).then((res: any) => {
-      setEntries(res._array)
+    EntriesDB.findByDateOrderByDay(parseInt(nextDtObj.dt)).then((res: any) => {
+      if (props.item != null){
+        setEntries(res._array.filter((earning :EntriesValues)=> earning.type == props.item))
+      }else{
+        setEntries(res._array)
+      }
     }).catch(err => {
       setEntries([])
       console.log(err)
@@ -45,8 +51,12 @@ export default function Header(){
   function handlePrevMonth() {
     let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
 
-    EntriesDB.findByDate(parseInt(prevDtObj.dt)).then((res: any) => {
-      setEntries(res._array)
+    EntriesDB.findByDateOrderByDay(parseInt(prevDtObj.dt)).then((res: any) => {
+      if (props.item != null){
+        setEntries(res._array.filter((earning :EntriesValues)=> earning.type == props.item))
+      }else{
+        setEntries(res._array)
+      }
     }).catch(err => {
       setEntries([])
       console.log(err)
