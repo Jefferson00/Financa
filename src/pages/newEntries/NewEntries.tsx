@@ -18,6 +18,9 @@ import Functions from '../../functions/index'
 import Header from "../components/header"
 import ButtonSubmit from "./components/button"
 import FormContentCreate from "./components/formContentCreate"
+import FormContentUpdate from "./components/formContentUpdate"
+import ButtonNewValue from "./components/buttonNewValue"
+import FormContent from "./components/formContent"
 
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
@@ -45,8 +48,13 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         setMainColor2,
         tittleTextColor,
         setTittleTextColor,
+        setMonthColor,
+        valueTitle, onChangeTitle,
+        receivedTextDate, setReceivedTextDate,
+        receivedText, setReceivedText,
+        secondColor, setSecondColor,
     } = useStylesStates();
-    const {setEntries, entries, valuesList, setValuesList, valuesArray, setValuesArray}  = useResultsDB();
+    const {setEntries, entries, valueFrequency, setValueFrequency, valuesArray, setValuesArray, valuesUpdate, setValuesUpdate, frequencys, setFrequencys}  = useResultsDB();
  
 
     /*Estados de aparencia*/
@@ -54,18 +62,18 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     //const [mainColor2, setMainColor2] = useState('')
     /**/ const [tittleText, setTittleText] = useState('')
     // const [tittleTextColor, setTittleTextColor] = useState('#fff')
-    /**/ const [valueTitle, onChangeTitle] = useState('');
-    /**/ const [receivedTextDate, setReceivedTextDate] = useState('');
-    /**/ const [receivedText, setReceivedText] = useState('');
+    // const [valueTitle, onChangeTitle] = useState('');
+    // const [receivedTextDate, setReceivedTextDate] = useState('');
+    // const [receivedText, setReceivedText] = useState('');
     // const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
-    /**/ const [secondColor, setSecondColor] = useState('#fff')
+    /// const [secondColor, setSecondColor] = useState('#fff')
     /**/ const [colorMonth, setColorMonth] = useState('#fff')
     /**/
     /**/
 
     /*Estados de valores*/
     /**/ const [idValues, setIdValues] = useState(0)
-    /**/ const [valueFrequency, setValueFrequency] = useState(1);
+    // const [valueFrequency, setValueFrequency] = useState(1);
     /* const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
         id: 0,
         description: '',
@@ -75,9 +83,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     }])*/
     /**/ const [showValues, setShowValues] = useState(false)
     const [earning, setEarning] = useState<earningValues[]>([])
-    const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
+   // const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
     const [valuesBeforeUpdate, setValuesBeforeUpdate] = useState<ValuesItemUpdate[]>([])
-    const [frequencys, setFrequencys] = useState([])
+    //const [frequencys, setFrequencys] = useState([])
     //  const [selectedMonth, setSelectedMonth] = useState(10)
     //  const [selectedYear, setSelectedYear] = useState(2020)
 
@@ -100,7 +108,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         setIsEnabled(previousState => !previousState)
         updateOneValue('monthly', 0, !isEnabled)
         if (!isEnabled) {
-            let newArr = valuesUpdate.map((item, i) => {
+            let newArr = valuesUpdate.map((item:ValuesItemUpdate, i:number) => {
                 if (i == 0) {
                     return { ...item, ['dtEnd']: 209912 }
                 } else {
@@ -173,7 +181,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     }
 
     const updateValuesUpdate = (subitem: any, index: any, value: any) => (e: any) => {
-        let newArr = valuesUpdate.map((item, i) => {
+        let newArr = valuesUpdate.map((item:ValuesItemUpdate, i:number) => {
             if (index == i) {
                 if (subitem == 'monthly') {
                     //console.log(value)
@@ -218,7 +226,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     }
 
     const updateFrequencyValuesUpdate = (subitem: any, index: any, value: any) => {
-        let newArr: any = valuesUpdate.map((item, i) => {
+        let newArr: any = valuesUpdate.map((item:ValuesItemUpdate, i:number) => {
             if (index == i) {
                 if (subitem == 'repeat') {
                     var dt = new Date()
@@ -330,7 +338,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             type: item
         }
         EntriesDB.update(idUpdate, GanhoObj).then(res => {
-            valuesUpdate.map((value,index) => {
+            valuesUpdate.map((value:ValuesItemUpdate,index:number) => {
                 var vlr = value.amount
                 //console.log('vlr' + vlr)
                 if (typeof (vlr) == 'string') {
@@ -481,6 +489,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             setTittleTextColor('#1A8289')
             setColorBorderAddButton('#24DBBA')
             setColorMonth('#FDDB63')
+            if (nav.isFocused()){
+                setMonthColor('#FDDB63')
+            }
             setSecondColor('#49B39F')
             setReceivedText('Recebido')
             setReceivedTextDate('Data de Recebimento')
@@ -490,6 +501,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             setMainColor2('#F9CF3C')
             setTittleText('Nova Despesa')
             setTittleTextColor('#CC3728')
+            if (nav.isFocused()){
+                setMonthColor('#FFF')
+            }
             setColorBorderAddButton('#FF4835')
             setSecondColor('#FF4835')
             setReceivedText('Pago')
@@ -550,7 +564,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 {
                     text: "OK", onPress: () =>
                         ValuesDB.remove(id).then(res => {
-                            setValuesUpdate(valuesUpdate.filter(vls => vls.id !== id))
+                            setValuesUpdate(valuesUpdate.filter((vls:ValuesItemUpdate) => vls.id !== id))
                         }).catch(err => {
                             console.log(err)
                         })
@@ -579,7 +593,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     useEffect(() => {
         setFrequencys([])
         let arrFrequency: any = []
-        valuesUpdate.map(value => {
+        valuesUpdate.map((value:ValuesItemUpdate) => {
             arrFrequency.push(Functions.toFrequency(value.dtEnd, value.dtStart) + 1)
             //console.log("Frr: " + arrFrequency)
         })
@@ -593,11 +607,23 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         idUpdate,
         showValues,
         isEnabled,
+        isEnabledReceived,
+        selectedDate,
+        date,
+        show,
         handleUpdate,
         handleCreateNew,
         toggleSwitch,
+        toggleSwitchReceived,
         onChange,
+        onChangeTitle,
         updateValues,
+        updateFrequencyValuesUpdate,
+        removeValue,
+        updateValuesUpdate,
+        updateValuesList,
+        showDatepicker,
+        updateOneValue
     }
 
     return (
@@ -617,257 +643,15 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     </View>
                     <ScrollView style={{ maxHeight: '100%' }}>
                         <View style={styles.formView}>
-                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                Título
-                            </Text>
-                            <TextInput onChangeText={text => onChangeTitle(text)} value={valueTitle} style={styles.InputText} />
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View>
-                                    <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                        {receivedTextDate}
-                                    </Text>
-                                    <View style={styles.dateView}>
-                                        <Text style={[styles.subTittleText, { color: secondColor }]} onPress={showDatepicker}>
-                                            {date.getDate()} / {Functions.convertDtToStringMonth(date.getUTCMonth() + 1)}
-                                        </Text>
-                                    </View>
-                                </View>
-                                <View>
-                                    <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                        {receivedText}
-                                    </Text>
-                                    <Switch
-                                        trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                        thumbColor={isEnabledReceived ? 'd2d2d2' : tittleTextColor}
-                                        ios_backgroundColor="#3e3e3e"
-                                        onValueChange={toggleSwitchReceived}
-                                        value={isEnabledReceived}
-                                    />
-                                </View>
-                            </View>
-
-                            {show && (
-                                <DateTimePicker
-                                    testID="dateTimePicker"
-                                    value={date}
-                                    is24Hour={true}
-                                    display="default"
-                                    onChange={onChange}
-                                />
-                            )}
-                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                Periodicidade
-                            </Text>
-                            <View style={styles.frequencyView}>
-                                <Text style={[styles.secondColorText, { color: secondColor }]}>
-                                    Mensal
-                                </Text>
-                                <Switch
-                                    trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                    thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
-                                    ios_backgroundColor="#3e3e3e"
-                                    onValueChange={toggleSwitch}
-                                    value={isEnabled}
-                                />
-                                {isEnabled ?
-                                    <>
-                                        <Feather name='chevron-left' size={30} />
-                                        <Text style={{ fontSize: 18 }}>-</Text>
-                                        <Feather name='chevron-right' size={30} />
-                                    </>
-                                    :
-                                    <>
-                                        <Feather name='chevron-left' size={30}
-                                            onPress={() => {
-                                                if (valueFrequency > 1) {
-                                                    setValueFrequency(valueFrequency - 1)
-                                                    updateOneValue('repeat', 0, (valueFrequency - 1))
-                                                    let newArr: any = frequencys.map((item, i) => {
-                                                        if (i == 0 && item == valueFrequency) {
-                                                            return item - 1
-                                                        } else {
-                                                            return item
-                                                        }
-                                                    })
-                                                    setFrequencys(newArr)
-                                                }
-                                            }}
-                                        />
-                                        <Text style={{ fontSize: 18 }}>{valueFrequency}</Text>
-                                        <Feather name='chevron-right' size={30}
-                                            onPress={() => {
-                                                setValueFrequency(valueFrequency + 1)
-                                                updateOneValue('repeat', 0, (valueFrequency + 1))
-                                                let newArr: any = frequencys.map((item, i) => {
-                                                    if (i == 0 && item == valueFrequency) {
-                                                        return item + 1
-                                                    } else {
-                                                        return item
-                                                    }
-                                                })
-                                                setFrequencys(newArr)
-                                            }}
-                                        />
-                                    </>
-                                }
-
-                                <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
-                            </View>
-                            <View style={styles.frequencyView}>
-
-                            </View>
-                            {idUpdate == null ?
-                                <>
-                                    <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                        Valor
-                            </Text>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
-                                            R$
-                                </Text>
-                                        <TextInput
-                                            keyboardType='numeric'
-                                            placeholder='R$ 0,00'
-                                            onChange={updateValues('amount', 0, false)}
-                                            value={valuesArray[0].amount.toString()}
-                                            style={styles.InputTextValue}
-                                        />
-                                    </View>
-                                </>
-                                : null
-                            }
+                            <FormContent props={props}></FormContent>
 
                             <FormContentCreate props={props}></FormContentCreate>
+                            <FormContentUpdate props={props}></FormContentUpdate>
+                           
 
-                            {idUpdate != null && valuesUpdate.map((values, index) => {
-                                var monthly = false
+                            <ButtonNewValue props={props}></ButtonNewValue>
 
-                                if (values.dtEnd == 209912) {
-                                    monthly = true
-                                }
-                                return (
-                                    <View style={styles.valuesViewItem} key={index}>
-                                        <View style={styles.valuesView}>
-                                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                Descrição
-                                            </Text>
-                                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                Valor
-                                            </Text>
-                                        </View>
-                                        <View style={styles.valuesView}>
 
-                                            <TextInput
-                                                onChange={updateValuesUpdate('description', index, false)}
-                                                value={values.description}
-                                                style={[styles.InputText, { width: 150 }]} />
-
-                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
-                                                    R$
-                                                </Text>
-                                                <TextInput
-                                                    keyboardType='numeric'
-                                                    placeholder='R$ 0,00'
-                                                    onChange={updateValuesUpdate('amount', index, false)}
-                                                    value={Functions.formatCurrency(values.amount)}
-                                                    style={styles.InputTextValue} />
-                                            </View>
-
-                                        </View>
-                                        <View style={styles.frequencyView}>
-                                            <Text style={[styles.secondColorText, { color: secondColor }]}>Mensal</Text>
-                                            <Switch
-                                                trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                                thumbColor={isEnabled ? 'd2d2d2' : tittleTextColor}
-                                                ios_backgroundColor="#3e3e3e"
-                                                onValueChange={updateValuesUpdate('monthly', index, [monthly, frequencys[index]])}
-                                                value={monthly}
-                                            />
-                                            <Feather name='chevron-left' size={30}
-                                                onPress={() => {
-                                                    let newArr: any = frequencys.map((item, i) => {
-                                                        if (index == i) {
-                                                            return item - 1
-                                                        } else {
-                                                            return item
-                                                        }
-                                                    })
-                                                    setFrequencys(newArr)
-                                                    //console.log('NewArr: ' + newArr)
-                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index] - 1])
-                                                    //console.log('freq: ' + frequencys[index])
-                                                }}
-                                            />
-                                            {monthly ?
-                                                <Text>1</Text> :
-                                                <Text style={{ fontSize: 18 }}>{frequencys[index]}</Text>}
-                                            <Feather name='chevron-right' size={30}
-                                                onPress={() => {
-                                                    let newArr: any = frequencys.map((item, i) => {
-                                                        if (index == i) {
-                                                            return item + 1
-                                                        } else {
-                                                            return item
-                                                        }
-                                                    })
-                                                    setFrequencys(newArr)
-                                                    //console.log(frequencys[index])
-                                                    updateFrequencyValuesUpdate('repeat', index, [monthly, frequencys[index] + 1])
-                                                    //console.log('freq: ' + frequencys[index])
-                                                }}
-                                            />
-
-                                            <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
-                                        </View>
-                                        <View style={{ alignItems: 'flex-end', margin: 10 }}>
-                                            <TouchableOpacity onPress={() => removeValue(values.id)}>
-                                                <Feather name="trash-2" size={20} color={colorBorderAddButton} />
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                )
-                            })}
-
-                            <View style={styles.newValuesView}>
-                                <Text style={[styles.newValuesText, { color: tittleTextColor }]}>
-                                    Adcionar Novos Valores
-                                </Text>
-                                <TouchableOpacity style={[styles.plusButtonModal, { borderColor: colorBorderAddButton }]}
-                                    onPress={() => {
-                                        setShowValues(true)
-                                        setContPlusButtonPressed(contPlusButtonPressed + 1)
-                                        if (contPlusButtonPressed > 0) {
-
-                                            setIdValues(idValues + 1)
-                                            setValuesArray([...valuesArray, { id: idValues, description: '', amount: '0', monthly: false, repeat: 1 }])
-
-                                            //console.log(idValues)
-                                            //console.log(valuesArray)
-                                        }
-                                        if (idUpdate != null) {
-                                            selectedDate.setMonth(selectedMonth - 1)
-                                            selectedDate.setFullYear(selectedYear)
-                                            const newValueObj = {
-                                                description: '',
-                                                amount: '0',
-                                                dtStart: Functions.setDtStart(selectedDate),
-                                                dtEnd: Functions.setDtEnd(false, 0, selectedDate),
-                                                entries_id: idUpdate
-                                            }
-
-                                            //console.log('selectedDate: ' + selectedDate)
-                                            //console.log('dtStart: '+newValueObj.dtStart)
-                                            //console.log('dtStart: ' + newValueObj.dtStart)
-                                            //console.log('dtEnd: ' + newValueObj.dtEnd)
-                                            ValuesDB.create(newValueObj)
-                                            updateValuesList()
-
-                                        }
-                                    }}>
-                                    <Feather name='plus' size={40} color={tittleTextColor} />
-                                </TouchableOpacity>
-                            </View>
                         </View>
 
                         <ButtonSubmit props={props}></ButtonSubmit>

@@ -22,6 +22,9 @@ export default function StylesStatesProvider({children}:any){
     const [colorBorderFooter, setColorBorderFooter] = useState('#fff')
     const [modalType, setModalType] = useState('none')
     const [tittleTextColor, setTittleTextColor] = useState('#fff')
+    const [valueTitle, onChangeTitle] = useState('')
+    const [receivedTextDate, setReceivedTextDate] = useState('');
+    const [receivedText, setReceivedText] = useState('');
 
     return(
         <StylesStatesContext.Provider 
@@ -44,7 +47,10 @@ export default function StylesStatesProvider({children}:any){
                 colorBorderAddButton, setColorBorderAddButton,
                 colorBorderFooter, setColorBorderFooter,
                 modalType, setModalType,
-                tittleTextColor, setTittleTextColor
+                tittleTextColor, setTittleTextColor,
+                valueTitle, onChangeTitle,
+                receivedTextDate, setReceivedTextDate,
+                receivedText, setReceivedText,
             }}
         >
             {children}
@@ -78,7 +84,10 @@ export function useStylesStates(){
                 colorBorderAddButton, setColorBorderAddButton,
                 colorBorderFooter, setColorBorderFooter,
                 modalType, setModalType,
-                tittleTextColor, setTittleTextColor
+                tittleTextColor, setTittleTextColor,
+                valueTitle, onChangeTitle,
+                receivedTextDate, setReceivedTextDate,
+                receivedText, setReceivedText,
         }: any = context
     return {textModal, 
         setTextModal,
@@ -104,5 +113,9 @@ export function useStylesStates(){
         colorBorderAddButton, setColorBorderAddButton,
         colorBorderFooter, setColorBorderFooter,
         modalType, setModalType,
-        tittleTextColor, setTittleTextColor};
+        tittleTextColor, setTittleTextColor,
+        valueTitle, onChangeTitle,
+        receivedTextDate, setReceivedTextDate,
+        receivedText, setReceivedText,
+    };
 }
