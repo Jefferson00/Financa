@@ -25,7 +25,7 @@ import { EntriesValues, ValuesValues } from '../../interfaces';
 export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigationScreen = useNavigation()
 
-    const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, setSelectedTotalValues} = useSelectedMonthAndYear();
+    const {selectedMonth, selectedYear, setSelectedTotalValues} = useSelectedMonthAndYear();
     const {
         setMonthColor, 
         setModalVisible,  
@@ -35,7 +35,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         setColorBorderFooter,
         setMainColor1,
         setTextReceived,
-        setColorText,
+        setTittleTextColor,
         setMainText1,
         setTextAddButton,
         setTextAlert,
@@ -44,12 +44,15 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         setModalType
 
     } = useStylesStates();
+
     const {setEntries, entries, valuesList, setValuesList}  = useResultsDB();
 
     const [selectedId, setSelectedId] = useState(0) 
-    //const [selectedTotalValues, setSelectedTotalValues] = useState(0)
+  
+    const { item } = route.params
 
-    const { item , month, year} = route.params
+    let cont: any = []
+    let cont2: any = []
 
     const todayDate = new Date()
     const currentDate = new Date()
@@ -73,23 +76,10 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
 
 
-    const setData = (date: Date) => {
-        return new Promise((resolve, reject) => {
-            let cont: any = []
-            let cont2: any = []
-            valuesList.map((value: ValuesValues) => {
-                if (value.amount != null && value.amount != 0) cont.push(value.amount)
-                if (value.day <= date.getDate()) cont2.push(value.amount)
-            })
-            resolve(cont)
-        })
-
-    }
-    let cont: any = []
-    let cont2: any = []
-
+    
+    
+    /* Função que deleta um item (Entrie) */
     function removeItem(id: number) {
-        //console.log(id)
         Alert.alert(
             "Remover",
             "Deseja mesmo remover?",
@@ -115,6 +105,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         );
     }
 
+     /* Função que deleta um valor*/
     function removeValue(id: number) {
         Alert.alert(
             "Remover",
@@ -138,6 +129,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         );
     }
 
+    /*Função que atualiza uma entrada como recebida/paga*/
     function updateReceived(selectedId:number){
         EntriesDB.findById(selectedId).then((res:any)=>{
             let obj = {
@@ -162,19 +154,19 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     function loadResults(){
             let firstDate
-            if (month < 10) {
-                firstDate = year.toString() + '0' + month.toString()
+            if (selectedMonth < 10) {
+                firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
             } else {
-                firstDate = year.toString() + month.toString()
+                firstDate = selectedYear.toString() + selectedMonth.toString()
             }
-
+            console.log("firstDate: "+firstDate)
             EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res:any) => {
                setEntries(res._array.filter((entrie:EntriesValues) => entrie.type == item))
             }).catch(err => {
                 console.log(err)
             })
             ValuesDB.findByDate(parseInt(firstDate)).then((res:any) => {
-                console.log(res)
+                //console.log(res)
                 setValuesList(res._array)
             }).catch(err => {
                 console.log(err)
@@ -183,47 +175,39 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     useEffect(() => {
         if (item === 'Ganhos') {
-            setMainColor1('#155F69')
-            setMainColor2('#F9CF3C')
-            setMainText1('Ganhos Atuais')
-            setMainText2('Ganhos Estimados')
             if (navigationScreen.isFocused()){
+                setMainColor1('#155F69')
+                setMainColor2('#F9CF3C')
+                setMainText1('Ganhos Atuais')
+                setMainText2('Ganhos Estimados')
                 setMonthColor('#FDDB63')
+                setTittleTextColor('#1A8289')
+                setColorBorderAddButton('#24DBBA')
+                setColorBorderFooter('#1A828922')
+                setTextAddButton('Adicionar Novo Ganho')
+                setTextReceived('Esse ganho já foi recebido?')
+                setTextAlert('Ganho não recebido!')
             }
-            setColorText('#1A8289')
-            setColorBorderAddButton('#24DBBA')
-            setColorBorderFooter('#1A828922')
-            setTextAddButton('Adicionar Novo Ganho')
-            setTextReceived('Esse ganho já foi recebido?')
-            setTextAlert('Ganho não recebido!')
 
         } else if (item === 'Despesas') {
-            setMainColor1('#CC3728')
-            setMainColor2('#F9CF3C')
-            setMainText1('Despesas Atuais')
-            setMainText2('Despesas Estimadas')
             if (navigationScreen.isFocused()){
-                setMonthColor('#FFF')
+                setMainColor1('#CC3728')
+                setMainColor2('#F9CF3C')
+                setMainText1('Despesas Atuais')
+                setMainText2('Despesas Estimadas')
+                setMonthColor('#FFFFFF')
+                setTittleTextColor('#CC3728')
+                setColorBorderAddButton('#FF4835')
+                setColorBorderFooter('#CC372822')
+                setTextAddButton('Adicionar Nova Despesa')
+                setTextReceived('Essa despesa já foi paga?')
+                setTextAlert('Despesa não paga!')
             }
-            setColorText('#CC3728')
-            setColorBorderAddButton('#FF4835')
-            setColorBorderFooter('#CC372822')
-            setTextAddButton('Adicionar Nova Despesa')
-            setTextReceived('Essa despesa já foi paga?')
-            setTextAlert('Despesa não paga!')
         }
-
-        setSelectedMonth(month)
-        setSelectedYear(year)
-
-        setData(todayDate)
-
-
-
         const unsubscribe = navigationScreen.addListener('focus', () => {
             console.log('Refreshed!');
             loadResults()
-
+            
         });
         return unsubscribe;
 
@@ -234,15 +218,15 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         CurrentMonth,
         CurrentYear,
         selectedId,
-        removeItem,
         currentDate,
+        todayDate,
+        cont,
+        cont2,
+        removeItem,
         removeValue,
         updateReceived,
         handleNavigateNovoUpdate,
         handleNavigateNovo,
-        todayDate,
-        cont,
-        cont2,
         showModal,
     }
 

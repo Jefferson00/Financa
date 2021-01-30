@@ -3,28 +3,29 @@ import React, { createContext, useState, useContext } from 'react'
 const StylesStatesContext = createContext({});
 
 export default function StylesStatesProvider({children}:any){
+    const [monthColor, setMonthColor] = useState('#1A8289') //cor do mês da header
+    const [primaryColor, setPrimaryColor] = useState('#F9CF3C') // primeira cor do gradiente da main
+    const [secondColor, setSecondColor] = useState('#B26A15') // segunda cor do gradiente da main
+    const [mainColor1, setMainColor1] = useState('') // primeira cor do gradiente das outras pages
+    const [mainColor2, setMainColor2] = useState('') // segunda cor do gradiente das outras pages
+    const [colorBorderAddButton, setColorBorderAddButton] = useState('#ffffff') // #24DBBA ou #FF4835
+    const [colorBorderFooter, setColorBorderFooter] = useState('#ffffff') // #1A828922 ou #CC372822
+    const [tittleTextColor, setTittleTextColor] = useState('#ffffff') // Cor primaria de texto e outros detalhes :#1A8289 ou #CC3728
+    const [subtittleTextColor, setSubtittleTextColor] = useState('#ffffff') // Cor secundaria de texto e outros detalhes: #49B39F ou #FF4835
+
     const [textModal, setTextModal] = useState('')
-    const [primaryColor, setPrimaryColor] = useState('#F9CF3C')
-    const [secondColor, setSecondColor] = useState('#B26A15')
-    const [monthColor, setMonthColor] = useState('#1A8289')
-    const [modalBalance, setModalBalance] = useState(false)
-    const [modalVisible, setModalVisible] = useState(false)
-    const [mainColor1, setMainColor1] = useState('')
-    const [mainColor2, setMainColor2] = useState('')
     const [mainText1, setMainText1] = useState('')
     const [mainText2, setMainText2] = useState('')
     const [TextAddButton, setTextAddButton] = useState('')
     const [textReceived, setTextReceived] = useState('')
     const [textAlert, setTextAlert] = useState('')
-    const [colorMonth, setColorMonth] = useState('#fff')
-    const [colorText, setColorText] = useState('#fff')
-    const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
-    const [colorBorderFooter, setColorBorderFooter] = useState('#fff')
     const [modalType, setModalType] = useState('none')
-    const [tittleTextColor, setTittleTextColor] = useState('#fff')
     const [valueTitle, onChangeTitle] = useState('')
     const [receivedTextDate, setReceivedTextDate] = useState('');
     const [receivedText, setReceivedText] = useState('');
+
+    const [modalBalance, setModalBalance] = useState(false)
+    const [modalVisible, setModalVisible] = useState(false)
 
     return(
         <StylesStatesContext.Provider 
@@ -42,12 +43,11 @@ export default function StylesStatesProvider({children}:any){
                 TextAddButton, setTextAddButton,
                 textReceived, setTextReceived,
                 textAlert, setTextAlert,
-                colorMonth, setColorMonth,
-                colorText, setColorText,
                 colorBorderAddButton, setColorBorderAddButton,
                 colorBorderFooter, setColorBorderFooter,
                 modalType, setModalType,
                 tittleTextColor, setTittleTextColor,
+                subtittleTextColor, setSubtittleTextColor,
                 valueTitle, onChangeTitle,
                 receivedTextDate, setReceivedTextDate,
                 receivedText, setReceivedText,
@@ -79,12 +79,11 @@ export function useStylesStates(){
                 TextAddButton, setTextAddButton,
                 textReceived, setTextReceived,
                 textAlert, setTextAlert,
-                colorMonth, setColorMonth,
-                colorText, setColorText,
                 colorBorderAddButton, setColorBorderAddButton,
                 colorBorderFooter, setColorBorderFooter,
                 modalType, setModalType,
                 tittleTextColor, setTittleTextColor,
+                subtittleTextColor, setSubtittleTextColor,
                 valueTitle, onChangeTitle,
                 receivedTextDate, setReceivedTextDate,
                 receivedText, setReceivedText,
@@ -108,12 +107,11 @@ export function useStylesStates(){
         TextAddButton, setTextAddButton,
         textReceived, setTextReceived,
         textAlert, setTextAlert,
-        colorMonth, setColorMonth,
-        colorText, setColorText,
         colorBorderAddButton, setColorBorderAddButton,
         colorBorderFooter, setColorBorderFooter,
         modalType, setModalType,
         tittleTextColor, setTittleTextColor,
+        subtittleTextColor, setSubtittleTextColor,
         valueTitle, onChangeTitle,
         receivedTextDate, setReceivedTextDate,
         receivedText, setReceivedText,

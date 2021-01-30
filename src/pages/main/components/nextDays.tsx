@@ -7,13 +7,13 @@ import Functions from '../../../functions'
 
 import {EntriesValues} from "../../../interfaces"
 
-export default function NextDays({functions}:{functions:any}){
+export default function NextDays({props}:{props:any}){
 
-    const {nextEntries,nextEntries2} = useResultsDB()
+    const {nextEntries,nextMonthEntries} = useResultsDB()
     return(
     <ScrollView style={{ maxHeight: 95, elevation: 5 }}>
           {nextEntries.map((ear:EntriesValues, index:number) => {
-            if (ear.day >= functions.todayDate.getDate() && ear.day <= (functions.todayDate.getDate() + 10) && !ear.received) {
+            if (ear.day >= props.todayDate.getDate() && ear.day <= (props.todayDate.getDate() + 10) && !ear.received) {
               let color
               if (ear.type == 'Ganhos') {
                 color = '#1A8289'
@@ -24,14 +24,14 @@ export default function NextDays({functions}:{functions:any}){
                 <View style={styles.nextDaysContent} key={index}>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.day + '  ' + Functions.convertDtToStringMonth(functions.todayDate.getMonth() + 1)}
+                    {ear.day + '  ' + Functions.convertDtToStringMonth(props.todayDate.getMonth() + 1)}
                   </Text>
                 </View>
               )
             }
           })
           }
-          {functions.todayDate.getDate() + 5 > 30 && nextEntries2.map((ear:EntriesValues, index:number) => {
+          {props.todayDate.getDate() + 5 > 30 && nextMonthEntries.map((ear:EntriesValues, index:number) => {
             if (ear.day <= 5) {
               let color
               if (ear.type == 'Ganhos') {
@@ -43,7 +43,7 @@ export default function NextDays({functions}:{functions:any}){
                 <View style={styles.nextDaysContent} key={index}>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>{ear.title}</Text>
                   <Text style={[styles.nextDaysContentText, { color: color }]}>
-                    {ear.day + '  ' + Functions.convertDtToStringMonth(functions.todayDate.getMonth() + 2)}
+                    {ear.day + '  ' + Functions.convertDtToStringMonth(props.todayDate.getMonth() + 2)}
                   </Text>
                 </View>
               )

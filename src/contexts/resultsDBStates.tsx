@@ -5,11 +5,10 @@ import {EntriesValues,ValuesValues,Balance, ValuesItem, ValuesItemUpdate} from "
 const resultsDBStatesContext = createContext({});
 
 export default function ResultsDBStatesProvider({children}:any){
-    // interfaces
- 
+
     const [entries, setEntries] = useState<EntriesValues[]>([])
     const [nextEntries, setNextEntries] = useState<EntriesValues[]>([])
-    const [nextEntries2, setNextEntries2] = useState<EntriesValues[]>([])
+    const [nextMonthEntries, setNextMonthEntries] = useState<EntriesValues[]>([])
     const [valuesList, setValuesList] = useState<ValuesValues[]>([])
     const [balance, setBalance] = useState<Balance[]>([])
     const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
@@ -28,7 +27,7 @@ export default function ResultsDBStatesProvider({children}:any){
             value={{
                 entries, setEntries,
                 nextEntries, setNextEntries,
-                nextEntries2, setNextEntries2,
+                nextMonthEntries, setNextMonthEntries,
                 valuesList, setValuesList,
                 balance, setBalance,
                 valuesArray, setValuesArray,
@@ -49,8 +48,8 @@ export function useResultsDB(){
          setEntries, 
          nextEntries, 
          setNextEntries,
-         nextEntries2, 
-         setNextEntries2,
+         nextMonthEntries, 
+         setNextMonthEntries,
          valuesList, 
          setValuesList,
          balance, 
@@ -69,8 +68,8 @@ export function useResultsDB(){
         setEntries, 
         nextEntries, 
         setNextEntries,
-        nextEntries2, 
-        setNextEntries2,
+        nextMonthEntries, 
+        setNextMonthEntries,
         valuesList, 
         setValuesList,
         balance, 

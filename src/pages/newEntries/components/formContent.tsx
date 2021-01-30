@@ -13,7 +13,7 @@ import { ValuesItemUpdate } from "../../../interfaces"
 
 
 export default function FormContent({ props }: { props: any }) {
-    const { tittleTextColor, secondColor, valueTitle, receivedTextDate, receivedText } = useStylesStates()
+    const { tittleTextColor, subtittleTextColor, valueTitle, onChangeTitle, receivedTextDate, receivedText } = useStylesStates()
     const { frequencys, setFrequencys, valueFrequency, setValueFrequency, valuesArray } = useResultsDB()
 
     return (
@@ -21,15 +21,15 @@ export default function FormContent({ props }: { props: any }) {
             <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                 Título
             </Text>
-            <TextInput onChangeText={text => props.onChangeTitle(text)} value={valueTitle} style={styles.InputText} />
+            <TextInput onChangeText={text => onChangeTitle(text)} value={valueTitle} style={styles.InputText} />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View>
                     <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                         {receivedTextDate}
                     </Text>
                     <View style={styles.dateView}>
-                        <Text style={[styles.subTittleText, { color: secondColor }]} onPress={props.showDatepicker}>
-                            {props.date.getDate()} / {Functions.convertDtToStringMonth(props.date.getUTCMonth() + 1)}
+                        <Text style={[styles.subTittleText, { color: subtittleTextColor }]} onPress={props.showDatepicker}>
+                            {props.date.getDate()} / {Functions.convertDtToStringMonth(props.date.getMonth() + 1)}
                         </Text>
                     </View>
                 </View>
@@ -60,7 +60,7 @@ export default function FormContent({ props }: { props: any }) {
                 Periodicidade
                             </Text>
             <View style={styles.frequencyView}>
-                <Text style={[styles.secondColorText, { color: secondColor }]}>
+                <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>
                     Mensal
                                 </Text>
                 <Switch
@@ -112,7 +112,7 @@ export default function FormContent({ props }: { props: any }) {
                     </>
                 }
 
-                <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
+                <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Vezes</Text>
             </View>
             <View style={styles.frequencyView}>
 
@@ -123,7 +123,7 @@ export default function FormContent({ props }: { props: any }) {
                         Valor
                             </Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
+                        <Text style={[styles.secondColorText, { color: subtittleTextColor, marginRight: 10, fontSize: 18 }]}>
                             R$
                                 </Text>
                         <TextInput

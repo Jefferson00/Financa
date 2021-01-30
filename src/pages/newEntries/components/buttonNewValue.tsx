@@ -14,7 +14,7 @@ import ValuesDB from '../../../services/valuesDB'
 
 export default function ButtonNewValue({ props }: { props: any }) {
 
-    const [showValues, setShowValues] = useState(false)
+    
     const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
     const [idValues, setIdValues] = useState(0)
 
@@ -29,7 +29,7 @@ export default function ButtonNewValue({ props }: { props: any }) {
             </Text>
             <TouchableOpacity style={[styles.plusButtonModal, { borderColor: colorBorderAddButton }]}
                 onPress={() => {
-                    setShowValues(true)
+                    props.setShowValues(true)
                     setContPlusButtonPressed(contPlusButtonPressed + 1)
                     if (contPlusButtonPressed > 0) {
 

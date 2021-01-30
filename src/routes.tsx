@@ -7,7 +7,7 @@ const {Navigator, Screen} = createStackNavigator();
 
 import Main from './pages/main'
 import Entries from './pages/entries'
-import NewEntries from './pages/newEntries/NewEntries'
+import NewEntries from './pages/newEntries'
 
 export default function Routes(){
     return(

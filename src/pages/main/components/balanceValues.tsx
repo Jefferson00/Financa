@@ -9,7 +9,7 @@ import {ValuesValues,Balance} from "../../../interfaces"
 import {useSelectedMonthAndYear} from '../../../contexts/selectMonthAndYear'
 import {useResultsDB} from '../../../contexts/resultsDBStates'
 
-export default function BalanceValues({functions}:{functions:any}){
+export default function BalanceValues({props}:{props:any}){
 
     const {selectedMonth, selectedYear, noBalance} = useSelectedMonthAndYear();
     const {balance,valuesList} = useResultsDB();
@@ -20,7 +20,7 @@ export default function BalanceValues({functions}:{functions:any}){
     let contEstimatedExpenses: Array<number> = []
 
     valuesList.map((value:ValuesValues) => {
-        if (selectedMonth == functions.CurrentMonth && selectedYear == functions.CurrentYear) {
+        if (selectedMonth == props.CurrentMonth && selectedYear == props.CurrentYear) {
           if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Ganhos') contEarnings.push(value.amount)
           if (value.amount != null && value.amount != NaN && value.amount != 0 && value.received && value.type == 'Despesas') contExpenses.push(value.amount)
         }
@@ -33,14 +33,14 @@ export default function BalanceValues({functions}:{functions:any}){
         <View style={styles.balanceView}>
         <View style={styles.currentBalanceView}>
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => functions.showModalBalance(1)}>
+            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => props.showModalBalance(1)}>
               <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
             </TouchableOpacity>
             <Text style={styles.currentBalanceText}>
               Seu Saldo Atual
             </Text>
           </View>
-          {noBalance || selectedMonth != functions.CurrentMonth || selectedYear != functions.CurrentYear?
+          {noBalance || selectedMonth != props.CurrentMonth || selectedYear != props.CurrentYear?
             <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
               <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
             </View>
@@ -81,7 +81,7 @@ export default function BalanceValues({functions}:{functions:any}){
             <Text style={styles.estimatedBalanceText}>
               Saldo Estimado
             </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => functions.showModalBalance(2)}>
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => props.showModalBalance(2)}>
               <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
             </TouchableOpacity>
           </View>
@@ -128,14 +128,14 @@ export default function BalanceValues({functions}:{functions:any}){
       <View style={styles.valuesView}>
       <View style={styles.currentBalanceView}>
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          <TouchableOpacity style={{ marginRight: 5 }} onPress={() => functions.showModalBalance(3)}>
+          <TouchableOpacity style={{ marginRight: 5 }} onPress={() => props.showModalBalance(3)}>
             <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
           </TouchableOpacity>
           <Text style={styles.earningsText}>
             Ganhos
           </Text>
         </View>
-        {noBalance || selectedMonth != functions.CurrentMonth || selectedYear != functions.CurrentYear?
+        {noBalance || selectedMonth != props.CurrentMonth || selectedYear != props.CurrentYear?
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Text style={styles.earningsTextValue}>R$ 0,00</Text>
           </View>
@@ -176,11 +176,11 @@ export default function BalanceValues({functions}:{functions:any}){
           <Text style={styles.expensesText}>
             Despesas
           </Text>
-          <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => functions.showModalBalance(4)}>
+          <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => props.showModalBalance(4)}>
             <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
           </TouchableOpacity>
         </View>
-        {noBalance || selectedMonth != functions.CurrentMonth || selectedYear != functions.CurrentYear?
+        {noBalance || selectedMonth != props.CurrentMonth || selectedYear != props.CurrentYear?
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Text style={styles.expensesTextValue}>R$ 0,00</Text>
           </View>

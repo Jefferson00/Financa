@@ -14,7 +14,7 @@ import Functions from '../../../functions/index'
 
 export default function ModalContent({props}:{props:any}) {
 
-    const {setModalVisible, modalVisible, colorText, colorBorderAddButton, textAlert, textReceived } = useStylesStates()
+    const {setModalVisible, modalVisible, tittleTextColor, colorBorderAddButton, textAlert, textReceived } = useStylesStates()
     const {entries, valuesList} = useResultsDB()
     const {selectedMonth, selectedYear, selectedTotalValues} = useSelectedMonthAndYear()
 
@@ -43,11 +43,11 @@ export default function ModalContent({props}:{props:any}) {
                                     <View key={index}>
                                         <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(26, 130, 137, 0.33)', paddingBottom: 17, marginBottom: 37 }}>
                                             <View style={styles.tittleView}>
-                                                <Text style={[styles.tittleText, { color: colorText }]}>
+                                                <Text style={[styles.tittleText, { color: tittleTextColor }]}>
                                                     {entrie.title}
                                                 </Text>
                                                 <TouchableOpacity onPress={() => props.removeItem(entrie.id)}>
-                                                    <Feather name="trash-2" size={20} color={colorText} />
+                                                    <Feather name="trash-2" size={20} color={tittleTextColor} />
                                                 </TouchableOpacity>
                                             </View>
                                             <View style={styles.tittleView}>
@@ -56,10 +56,10 @@ export default function ModalContent({props}:{props:any}) {
                                                     displayType={'text'}
                                                     thousandSeparator={true}
                                                     format={Functions.currencyFormatter}
-                                                    renderText={value => <Text style={[styles.subTittleText, { color: colorText }]}> {value} </Text>}
+                                                    renderText={value => <Text style={[styles.subTittleText, { color: tittleTextColor }]}> {value} </Text>}
                                                 />
 
-                                                <Text style={[styles.subTittleText, { color: colorText }]}>
+                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                                                     {entrie.day} {Functions.convertDtToStringMonth(selectedMonth)}
                                                 </Text>
                                             </View>
@@ -76,11 +76,11 @@ export default function ModalContent({props}:{props:any}) {
                                                         <View style={styles.valuesList} key={index}>
                                                         <View style={{ flexDirection: 'row' }}>
                                                             {value.description==''?
-                                                            <Text style={[styles.valuesListText, { color: colorText, marginRight: 5 }]}>
+                                                            <Text style={[styles.valuesListText, { color: tittleTextColor, marginRight: 5 }]}>
                                                                 {entrie.title}
                                                             </Text>
                                                             :
-                                                            <Text style={[styles.valuesListText, { color: colorText, marginRight: 5 }]}>
+                                                            <Text style={[styles.valuesListText, { color: tittleTextColor, marginRight: 5 }]}>
                                                                 {value.description}
                                                             </Text>
                                                             }
@@ -96,7 +96,7 @@ export default function ModalContent({props}:{props:any}) {
                                                                 displayType={'text'}
                                                                 thousandSeparator={true}
                                                                 format={Functions.currencyFormatter}
-                                                                renderText={value => <Text style={[styles.valuesListText, { color: colorText }]}> {value} </Text>}
+                                                                renderText={value => <Text style={[styles.valuesListText, { color: tittleTextColor }]}> {value} </Text>}
                                                             />
                                                             <TouchableOpacity onPress={() => props.removeValue(value.id)}>
                                                                 <Feather name="trash-2" size={20} color={colorBorderAddButton} />
@@ -119,13 +119,13 @@ export default function ModalContent({props}:{props:any}) {
                                     <View style={{ paddingHorizontal: 26 ,marginTop:32}}>
                                         {atrasado ? 
                                             <View style={{flexDirection:'row',alignItems:'center'}}>
-                                                <Ionicons name="alert-circle" size={40} color={colorText}/>
+                                                <Ionicons name="alert-circle" size={40} color={tittleTextColor}/>
                                                 <Text style={[styles.tittleText, { color: colorBorderAddButton , marginLeft:5}]}>
                                                     {textAlert}
                                                 </Text> 
                                             </View>
                                         : null}
-                                        <Text style={[styles.subTittleText, { color: colorText , marginTop:15}]}>
+                                        <Text style={[styles.subTittleText, { color: tittleTextColor , marginTop:15}]}>
                                             {textReceived}
                                         </Text>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
@@ -151,10 +151,10 @@ export default function ModalContent({props}:{props:any}) {
 
                         <View style={styles.footerModal}>
                             <TouchableOpacity onPress={() => { props.handleNavigateNovoUpdate(props.selectedId) }}>
-                                <Feather name="edit-2" size={30} color={colorText} />
+                                <Feather name="edit-2" size={30} color={tittleTextColor} />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => { setModalVisible(!modalVisible) }}>
-                                <Feather name="x" size={30} color={colorText} />
+                                <Feather name="x" size={30} color={tittleTextColor} />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
       },
       modalContent: {
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         height: '80%',
         paddingTop: 30,
     },
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#1A828922',
         width: '100%',
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',

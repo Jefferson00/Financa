@@ -16,7 +16,7 @@ export default function EntriesResults({props}:{props:any}){
 
     const {entries, valuesList} = useResultsDB()
     const { selectedMonth, selectedYear} = useSelectedMonthAndYear()
-    const {colorText} = useStylesStates()
+    const {tittleTextColor} = useStylesStates()
 
     return(
         <View style={{ flex: 1, height: '100%' }}>
@@ -32,7 +32,7 @@ export default function EntriesResults({props}:{props:any}){
                 }
                 if (!entrie.received && entrie.day <= props.todayDate.getDate()) {
                     atrs = true
-                    borderColor = colorText
+                    borderColor = tittleTextColor
                 }
                 if(selectedMonth != props.CurrentMonth || selectedYear != props.CurrentYear){
                     atrs = false
@@ -46,7 +46,7 @@ export default function EntriesResults({props}:{props:any}){
                         style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
                         onPress={() => props.showModal(entrie.id, totalValues)}
                         >
-                        <MaterialIcons name="monetization-on" size={40} color={colorText+'AA'} />
+                        <MaterialIcons name="monetization-on" size={40} color={tittleTextColor+'AA'} />
                         {valuesList.map((value:ValuesValues) => {
                             if (entries[index].id == value.entries_id) {
                                 totalValues = totalValues + value.amount
@@ -54,10 +54,10 @@ export default function EntriesResults({props}:{props:any}){
                         })}
 
                         <View style={styles.earningTextView}>
-                            <Text style={[styles.earningTittleText, { color: colorText+'AA' }]}>
+                            <Text style={[styles.earningTittleText, { color: tittleTextColor+'AA' }]}>
                                 {entrie.title}
                             </Text>
-                            <Text style={[styles.earningDateText, { color: colorText+'AA' }]}>
+                            <Text style={[styles.earningDateText, { color: tittleTextColor+'AA' }]}>
                                 {entrie.day}/{Functions.convertDtToStringMonth(selectedMonth)}
                             </Text>
                         </View>
@@ -67,7 +67,7 @@ export default function EntriesResults({props}:{props:any}){
                             displayType={'text'}
                             thousandSeparator={true}
                             format={Functions.currencyFormatter}
-                            renderText={value => <Text style={[styles.earningTittleText, { color: colorText+'AA' }]}> {value} </Text>}
+                            renderText={value => <Text style={[styles.earningTittleText, { color: tittleTextColor+'AA' }]}> {value} </Text>}
                         />
 
                     </TouchableOpacity>
@@ -76,7 +76,7 @@ export default function EntriesResults({props}:{props:any}){
                         style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1 }]}
                         onPress={() => props.showModal(entrie.id, totalValues)}
                         >
-                        <MaterialIcons name="monetization-on" size={40} color={colorText} />
+                        <MaterialIcons name="monetization-on" size={40} color={tittleTextColor} />
                         {valuesList.map((value:ValuesValues) => {
                             if (entries[index].id == value.entries_id) {
                                 totalValues = totalValues + value.amount
@@ -86,10 +86,10 @@ export default function EntriesResults({props}:{props:any}){
 
                         
                         <View style={styles.earningTextView}>
-                            <Text style={[styles.earningTittleText, { color: colorText }]}>
+                            <Text style={[styles.earningTittleText, { color: tittleTextColor }]}>
                                 {entrie.title}
                             </Text>
-                            <Text style={[styles.earningDateText, { color: colorText }]}>
+                            <Text style={[styles.earningDateText, { color: tittleTextColor }]}>
                                 {entrie.day}/{Functions.convertDtToStringMonth(selectedMonth)}
                             </Text>
                         </View>
@@ -99,14 +99,14 @@ export default function EntriesResults({props}:{props:any}){
                             displayType={'text'}
                             thousandSeparator={true}
                             format={Functions.currencyFormatter}
-                            renderText={value => <Text style={[styles.earningTittleText, { color: colorText }]}> {value} </Text>}
+                            renderText={value => <Text style={[styles.earningTittleText, { color: tittleTextColor }]}> {value} </Text>}
                         />
 
                     </TouchableOpacity>
                     }
                     
                     {atrs? 
-                    <Ionicons name="alert-circle" size={40} color={colorText} style={styles.alertSign}/>
+                    <Ionicons name="alert-circle" size={40} color={tittleTextColor} style={styles.alertSign}/>
                     :null}
                     </View>
                 )
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.5,
         shadowRadius: 4.65,
-        backgroundColor: "#fff",
+        backgroundColor: "#ffffff",
         borderRadius: 20,
         zIndex:0,
     },

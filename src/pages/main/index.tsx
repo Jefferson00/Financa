@@ -1,7 +1,6 @@
 import React, { useEffect} from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import { Feather, Foundation } from '@expo/vector-icons'
+import { StyleSheet, Text, View} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
 import { useNavigation } from '@react-navigation/native';
 
@@ -14,6 +13,8 @@ import Header from "../components/header"
 import BalanceValues from "./components/balanceValues"
 import NextDays from "./components/nextDays"
 import ModalContent from './components/modalContent'
+import ButtonsEarnings from "./components/buttonsEarnings"
+import ButtonsExpanses from "./components/buttonsExpanses"
 
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
@@ -25,7 +26,7 @@ export default function Main() {
 
   const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, setNoBalance} = useSelectedMonthAndYear();
   const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor, setModalBalance, setTextModal, setModalType} = useStylesStates();
-  const {setEntries,setBalance,setNextEntries,setNextEntries2,setValuesList}  = useResultsDB();
+  const {setEntries,setBalance,setNextEntries,setNextMonthEntries,setValuesList}  = useResultsDB();
 
 
   //  Define a data atual
@@ -70,10 +71,6 @@ export default function Main() {
       setTextModal('O valor superior representa todos as despesas pagas no mês. O valor inferior representa as despesas estimadas a serem pagas até o final do mês')
     }
   }
-
-
-
-  
 
   /**Função que carrega o Saldo Total com o restante dos meses anteriores */
   async function loadBalance() {
@@ -190,7 +187,7 @@ export default function Main() {
       let nMonth = Functions.nextMonth(CurrentMonth, CurrentYear)
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação ordenado pelo dia do Mês seguinte
       EntriesDB.findByDateOrderByDay(parseInt(nMonth.dt)).then((res: any) => {
-        setNextEntries2(res._array)
+        setNextMonthEntries(res._array)
       }).catch(err => {
         console.log(err)
       })
@@ -226,56 +223,37 @@ export default function Main() {
     return reload;
   }, [])
 
-  const fct = {
+  
+  const props = {
+    idUpdate:null,
+    date:null,
     CurrentMonth, 
     CurrentYear,
-    showModalBalance,
     todayDate,
+    showModalBalance,
+    handleNavigateDespesas,
+    handleNavigateGanhos,
+    handleNavigateNovoDespesas,
+    handleNavigateNovoGanhos
   }
 
   return (
     <LinearGradient colors={[primaryColor, secondColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
-      <Header props={null}></Header>
+      <Header props={props}></Header>
 
-      <BalanceValues functions={fct}></BalanceValues>
+      <BalanceValues props={props}></BalanceValues>
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>
         {/*Botões Ganhos*/}
 
-        <View style={styles.buttonsView}>
-            <LinearGradient colors={['#FFFFFF', '#24DBBA22']} start={{ x: -0.1, y: 0.1 }} style={styles.earningsButton}>
-                <TouchableOpacity style={styles.earningsButton} onPress={handleNavigateGanhos}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Foundation name="dollar" size={50} color="#1A8289" style={{ marginRight: 15, marginBottom: 5 }} />
-                      <Text style={styles.earningsTextButton}>Ganhos</Text>
-                    </View>
-                </TouchableOpacity>
-            </LinearGradient>
-            <LinearGradient colors={['#24DBBA', '#2AC4A8']} start={{ x: -0.1, y: 0.1 }} style={styles.plusButton}>
-                <TouchableOpacity style={styles.plusButton} onPress={handleNavigateNovoGanhos}>
-                  <Feather name="plus" size={40} color="#fff" />
-                </TouchableOpacity>
-            </LinearGradient>
-        </View>
+        <ButtonsEarnings props={props}></ButtonsEarnings>
 
         {/*Botões Despesas*/}
 
-        <View style={styles.buttonsView}>
-          <LinearGradient colors={['#FFFFFF', '#CC372822']} start={{ x: -0.1, y: 0.1 }} style={styles.expensesButton}>
-            <TouchableOpacity style={styles.expensesButton} onPress={handleNavigateDespesas}>
-              <Foundation name="dollar" size={50} color="#CC3728" style={{ marginRight: 15, marginBottom: 5 }} />
-              <Text style={styles.expensesTextButton}>Despesas</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-          <LinearGradient colors={['#F4786C', '#CC3728']} start={{ x: -0.1, y: 0.1 }} style={styles.plusButton}>
-            <TouchableOpacity style={styles.plusButton} onPress={handleNavigateNovoDespesas}>
-              <Feather name="plus" size={40} color="#fff" />
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
+       <ButtonsExpanses props={props}></ButtonsExpanses>
 
         {/* Nos próximos dias, aqui será mostrado os ganhos/despesas mais próximos */}
 
@@ -283,7 +261,7 @@ export default function Main() {
           <Text style={styles.nextDaysText}>Nos próximos dias...</Text>
         </View>
 
-        <NextDays functions={fct}></NextDays>
+        <NextDays props={props}></NextDays>
 
       </View>
 
@@ -306,57 +284,6 @@ const styles = StyleSheet.create({
     borderTopStartRadius: 40,
     borderTopEndRadius: 40,
     justifyContent: 'flex-start'
-  },
-
-  buttonsView: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: 38,
-  },
-
-  earningsButton: {
-    borderStyle: 'solid',
-    borderRadius: 20,
-    borderColor: '#24DBBA',
-    borderWidth: 1,
-    height: 83,
-    width: 207,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: "center",
-  },
-
-  expensesButton: {
-    borderStyle: 'solid',
-    borderRadius: 20,
-    borderColor: '#CC3728',
-    borderWidth: 1,
-    height: 83,
-    width: 207,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: "center",
-  },
-
-
-  earningsTextButton: {
-    color: "#1A8289",
-    fontFamily: 'Poppins_500Medium',
-    fontSize: 24,
-  },
-
-  expensesTextButton: {
-    color: "#CC3728",
-    fontFamily: 'Poppins_500Medium',
-    fontSize: 24,
-  },
-
-  plusButton: {
-    width: 91,
-    height: 83,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20,
   },
 
   nextDaysView: {

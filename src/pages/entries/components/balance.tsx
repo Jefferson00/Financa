@@ -70,14 +70,14 @@ const styles = StyleSheet.create({
     },
 
     currentBalanceText: {
-        color: '#fff',
+        color: '#ffffff',
         fontFamily: 'Poppins_400Regular',
         fontSize: 14,
         textAlign: 'center'
     },
 
     currentBalanceTextValue: {
-        color: '#fff',
+        color: '#ffffff',
         fontFamily: 'Poppins_600SemiBold',
         fontSize: 24,
         textAlign: 'center'

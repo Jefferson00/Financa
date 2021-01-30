@@ -12,7 +12,7 @@ import {ValuesItemUpdate} from "../../../interfaces"
 
 export default function FormContentUpdate({ props }: { props: any }) {
 
-    const {tittleTextColor, secondColor, colorBorderAddButton } = useStylesStates()
+    const {tittleTextColor, subtittleTextColor, colorBorderAddButton } = useStylesStates()
     const {frequencys, setFrequencys, valuesUpdate} = useResultsDB()
     
     return(
@@ -40,7 +40,7 @@ export default function FormContentUpdate({ props }: { props: any }) {
                             style={[styles.InputText, { width: 150 }]} />
 
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
+                            <Text style={[styles.secondColorText, { color: subtittleTextColor, marginRight: 10, fontSize: 18 }]}>
                                 R$
                             </Text>
                             <TextInput
@@ -53,7 +53,7 @@ export default function FormContentUpdate({ props }: { props: any }) {
 
                     </View>
                     <View style={styles.frequencyView}>
-                        <Text style={[styles.secondColorText, { color: secondColor }]}>Mensal</Text>
+                        <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Mensal</Text>
                         <Switch
                             trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
                             thumbColor={ props.isEnabled ? 'd2d2d2' : tittleTextColor}
@@ -95,7 +95,7 @@ export default function FormContentUpdate({ props }: { props: any }) {
                             }}
                         />
 
-                        <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
+                        <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Vezes</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end', margin: 10 }}>
                         <TouchableOpacity onPress={() =>  props.removeValue(values.id)}>

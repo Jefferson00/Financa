@@ -7,7 +7,7 @@ import { useStylesStates } from "../../../contexts/stylesStates"
 
 export default function ButtonNewEntrie({ props }: { props: any }) {
   
-    const {colorText, colorBorderFooter, colorBorderAddButton, TextAddButton} = useStylesStates()
+    const {tittleTextColor, colorBorderFooter, colorBorderAddButton, TextAddButton} = useStylesStates()
 
     return (
         <View style={{ justifyContent: 'flex-end', flex: 1 }}>
@@ -18,10 +18,10 @@ export default function ButtonNewEntrie({ props }: { props: any }) {
                 <TouchableOpacity
                     style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
                     onPress={props.handleNavigateNovo}>
-                    <Text style={[styles.addNewButtonText, { color: colorText }]}>
+                    <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>
                         {TextAddButton}
                     </Text>
-                    <Feather name="plus" size={40} color={colorText} style={{ marginLeft: 10 }} />
+                    <Feather name="plus" size={40} color={tittleTextColor} style={{ marginLeft: 10 }} />
                 </TouchableOpacity>
             </LinearGradient>
         </View>

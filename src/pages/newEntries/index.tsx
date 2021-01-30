@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, Text, TouchableOpacity, View, Button, TextInput, Platform, KeyboardAvoidingView, Modal, Alert } from 'react-native'
-import { Feather } from '@expo/vector-icons'
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { StyleSheet, Text, TouchableOpacity, View, Platform, KeyboardAvoidingView, Modal, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
 
 import Footer from '../components/footer'
-import { ScrollView, Switch } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 
 import EntriesDB from '../../services/entriesDB'
 import ValuesDB from '../../services/valuesDB'
@@ -21,15 +19,16 @@ import FormContentCreate from "./components/formContentCreate"
 import FormContentUpdate from "./components/formContentUpdate"
 import ButtonNewValue from "./components/buttonNewValue"
 import FormContent from "./components/formContent"
+import SuccessModal from "./components/modal"
 
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
 import {useResultsDB} from "../../contexts/resultsDBStates"
-import { EntriesValues, ValuesValues, earningValues, ValuesItemUpdate, ValuesItem } from '../../interfaces';
+import {earningValues, ValuesItemUpdate, ValuesItem } from '../../interfaces';
 
 export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
 
-    const { item, month, year } = route.params
+    const { item } = route.params
     const { idUpdate } = route.params
     const nav = useNavigation()
 
@@ -43,51 +42,27 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         mainColor1,
         mainColor2,
         setColorBorderAddButton,
-        colorBorderAddButton,
         setMainColor1,
         setMainColor2,
         tittleTextColor,
         setTittleTextColor,
         setMonthColor,
         valueTitle, onChangeTitle,
-        receivedTextDate, setReceivedTextDate,
-        receivedText, setReceivedText,
-        secondColor, setSecondColor,
+        setReceivedTextDate,
+        setReceivedText,
+        setSubtittleTextColor
     } = useStylesStates();
-    const {setEntries, entries, valueFrequency, setValueFrequency, valuesArray, setValuesArray, valuesUpdate, setValuesUpdate, frequencys, setFrequencys}  = useResultsDB();
+    const {valueFrequency, setValueFrequency, valuesArray, setValuesArray, valuesUpdate, setValuesUpdate, setFrequencys, setEntries}  = useResultsDB();
  
 
     /*Estados de aparencia*/
-    // const [mainColor1, setMainColor1] = useState('')
-    //const [mainColor2, setMainColor2] = useState('')
+
     /**/ const [tittleText, setTittleText] = useState('')
-    // const [tittleTextColor, setTittleTextColor] = useState('#fff')
-    // const [valueTitle, onChangeTitle] = useState('');
-    // const [receivedTextDate, setReceivedTextDate] = useState('');
-    // const [receivedText, setReceivedText] = useState('');
-    // const [colorBorderAddButton, setColorBorderAddButton] = useState('#fff')
-    /// const [secondColor, setSecondColor] = useState('#fff')
-    /**/ const [colorMonth, setColorMonth] = useState('#fff')
-    /**/
-    /**/
 
     /*Estados de valores*/
-    /**/ const [idValues, setIdValues] = useState(0)
-    // const [valueFrequency, setValueFrequency] = useState(1);
-    /* const [valuesArray, setValuesArray] = useState<ValuesItem[]>([{
-        id: 0,
-        description: '',
-        amount: '0',
-        monthly: false,
-        repeat: 1
-    }])*/
     /**/ const [showValues, setShowValues] = useState(false)
     const [earning, setEarning] = useState<earningValues[]>([])
-   // const [valuesUpdate, setValuesUpdate] = useState<ValuesItemUpdate[]>([])
     const [valuesBeforeUpdate, setValuesBeforeUpdate] = useState<ValuesItemUpdate[]>([])
-    //const [frequencys, setFrequencys] = useState([])
-    //  const [selectedMonth, setSelectedMonth] = useState(10)
-    //  const [selectedYear, setSelectedYear] = useState(2020)
 
     const todayDate = new Date()
     const selectedDate = todayDate
@@ -96,7 +71,6 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
 
     /*Outros Estados*/
-    /**/ const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
     /**/ const [successModal, setSuccessModal] = useState(false)
 
 
@@ -139,16 +113,12 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
      // funções de navegação
     function handleNavigateEntries() {
-        console.log(selectedMonth)
-        console.log(selectedYear)
-        clearParams()
-        nav.navigate('Entries', { item: item, month: selectedMonth, year: selectedYear })
+        setEntries([])
+        nav.navigate('Entries', { item: item})
         setSuccessModal(false)
     }
 
-    function clearParams(){
-        nav.setParams({month:selectedMonth,year:selectedYear})
-    }
+
 
     /*Atualiza os valores dos inputs 'valores' */
 
@@ -301,11 +271,6 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     dtEnd: Functions.setDtEnd(value.monthly, value.repeat, date),
                     entries_id: res._array.slice(-1)[0].id
                 }
-               /* console.log('Descricao: ' + ValueObj.description)
-                console.log('valor: ' + ValueObj.amount)
-                console.log('dtStart: ' + ValueObj.dtStart)
-                console.log('dtEnd: ' + ValueObj.dtEnd)
-                console.log('id: ' + ValueObj.entries_id)*/
 
                 ValuesDB.create(ValueObj).then(() => {
 
@@ -352,8 +317,8 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     console.log("dtStart: "+valuesBeforeUpdate[index].dtStart)
                     newDtStart.setMonth(parseInt(Functions.toMonthAndYear(valuesBeforeUpdate[index].dtStart).month)-1)
                     newDtStart.setFullYear(parseInt(Functions.toMonthAndYear(valuesBeforeUpdate[index].dtStart).year))
-                    selectedDate.setMonth(month-1)
-                    selectedDate.setFullYear(year)
+                    selectedDate.setMonth(selectedMonth-1)
+                    selectedDate.setFullYear(selectedYear)
                     let newDtEnd
                     if ((selectedDate.getMonth() + 1) < 10) {
                         newDtEnd = selectedDate.getFullYear().toString() + '0' + (selectedDate.getMonth() + 1).toString()
@@ -424,97 +389,51 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         ValuesDB.update(value.id, ValueObj)
     }
 
-    function handleNextMonth() {
-        let nextDtObj = Functions.nextMonth(selectedMonth, selectedYear)
-        setSelectedMonth(nextDtObj.nextMonth)
-        setSelectedYear(nextDtObj.nextYear)
-
-        selectedDate.setMonth(nextDtObj.nextMonth - 1)
-        selectedDate.setFullYear(nextDtObj.nextYear)
-        //console.log(selectedDate)
-
-        if (idUpdate == null) {
-            date.setMonth(nextDtObj.nextMonth - 1)
-            date.setFullYear(nextDtObj.nextYear)
-        } else {
-            ValuesDB.findByDate(parseInt(nextDtObj.dt)).then((res: any) => {
-                var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
-                setValuesUpdate(arr)
-            })
-        }
-    }
-
-    function handlePrevMonth() {
-        let prevDtObj = Functions.prevMonth(selectedMonth, selectedYear)
-
-        setSelectedMonth(prevDtObj.prevMonth)
-        setSelectedYear(prevDtObj.prevYear)
-
-        selectedDate.setMonth(prevDtObj.prevMonth - 1)
-        selectedDate.setFullYear(prevDtObj.prevYear)
-        //console.log(selectedDate)
-
-        if (idUpdate == null) {
-            date.setMonth(prevDtObj.prevMonth - 1)
-            date.setFullYear(prevDtObj.prevYear)
-        } else {
-            ValuesDB.findByDate(parseInt(prevDtObj.dt)).then((res: any) => {
-                var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
-                setValuesUpdate(arr)
-            })
-        }
-    }
-
     useEffect(() => {
-        if (month != null && year != null) {
-            setSelectedMonth(month)
-            setSelectedYear(year)
-            selectedDate.setMonth(month - 1)
-            selectedDate.setFullYear(year)
-            console.log('Mes: '+month)
-            console.log('Ano: '+year)
+
+            selectedDate.setMonth(selectedMonth - 1)
+            selectedDate.setFullYear(selectedYear)
+          
             if (idUpdate == null) {
-                date.setMonth(month - 1)
-                date.setFullYear(year)
+                date.setMonth(selectedMonth - 1)
+                date.setFullYear(selectedYear)
             }
-        } else {
-            setSelectedMonth(CurrentMonth)
-            setSelectedYear(CurrentYear)
-        }
+       
 
         if (item === 'Ganhos') {
-            setMainColor1('#155F69')
-            setMainColor2('#F9CF3C')
-            setTittleText('Novo Ganho')
-            setTittleTextColor('#1A8289')
-            setColorBorderAddButton('#24DBBA')
-            setColorMonth('#FDDB63')
             if (nav.isFocused()){
+                setMainColor1('#155F69')
+                setMainColor2('#F9CF3C')
+                setTittleText('Novo Ganho')
+                setTittleTextColor('#1A8289')
+                setColorBorderAddButton('#24DBBA')
                 setMonthColor('#FDDB63')
+                setSubtittleTextColor('#49B39F')
+                setReceivedText('Recebido')
+                setReceivedTextDate('Data de Recebimento')
             }
-            setSecondColor('#49B39F')
-            setReceivedText('Recebido')
-            setReceivedTextDate('Data de Recebimento')
 
         } else if (item === 'Despesas') {
-            setMainColor1('#CC3728')
-            setMainColor2('#F9CF3C')
-            setTittleText('Nova Despesa')
-            setTittleTextColor('#CC3728')
             if (nav.isFocused()){
+                setMainColor1('#CC3728')
+                setMainColor2('#F9CF3C')
+                setTittleText('Nova Despesa')
+                setTittleTextColor('#CC3728')
                 setMonthColor('#FFF')
+                setColorBorderAddButton('#FF4835')
+                setSubtittleTextColor('#FF4835')
+                setReceivedText('Pago')
+                setReceivedTextDate('Data de Pagamento')
             }
-            setColorBorderAddButton('#FF4835')
-            setSecondColor('#FF4835')
-            setReceivedText('Pago')
-            setReceivedTextDate('Data de Pagamento')
         }
+
+
         if (idUpdate != null) {
             let firstDate
-            if (month < 10) {
-                firstDate = year.toString() + '0' + month.toString()
+            if (selectedMonth < 10) {
+                firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
             } else {
-                firstDate = year.toString() + month.toString()
+                firstDate = selectedYear.toString() + selectedMonth.toString()
             }
             ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
                 var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
@@ -528,16 +447,15 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 console.log(err)
             })
 
-
         }
     }, [])
 
     function updateValuesList() {
         let firstDate
-        if (month < 10) {
-            firstDate = year.toString() + '0' + month.toString()
+        if (selectedMonth < 10) {
+            firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
         } else {
-            firstDate = year.toString() + month.toString()
+            firstDate = selectedYear.toString() + selectedMonth.toString()
         }
         ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
             var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
@@ -585,8 +503,14 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             if (earning[0].received) {
                 setIsEnabledReceived(true)
             }
+            date.setMonth(parseInt(Functions.toMonthAndYear(earning[0].dtStart).month)-1)
             date.setDate(earning[0].day)
 
+        }else{
+            onChangeTitle()
+            setValueFrequency(1)
+            let arr = [{id: 1, description: '', amount: '0', monthly: false, repeat: 1}]
+            setValuesArray(arr)
         }
     }, [earning])
 
@@ -595,9 +519,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         let arrFrequency: any = []
         valuesUpdate.map((value:ValuesItemUpdate) => {
             arrFrequency.push(Functions.toFrequency(value.dtEnd, value.dtStart) + 1)
-            //console.log("Frr: " + arrFrequency)
         })
-        //console.log(arrFrequency)
         setFrequencys(arrFrequency)
     }, [valuesUpdate])
 
@@ -611,19 +533,21 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         selectedDate,
         date,
         show,
+        successModal,
         handleUpdate,
         handleCreateNew,
         toggleSwitch,
         toggleSwitchReceived,
         onChange,
-        onChangeTitle,
         updateValues,
         updateFrequencyValuesUpdate,
         removeValue,
         updateValuesUpdate,
         updateValuesList,
         showDatepicker,
-        updateOneValue
+        updateOneValue,
+        handleNavigateEntries,
+        setShowValues
     }
 
     return (
@@ -651,7 +575,6 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
                             <ButtonNewValue props={props}></ButtonNewValue>
 
-
                         </View>
 
                         <ButtonSubmit props={props}></ButtonSubmit>
@@ -660,26 +583,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     <Footer item={item}></Footer>
                 </View>
 
-                <Modal animationType="slide" visible={successModal} transparent>
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.modalTextView}>
-                                {idUpdate == null ?
-                                    <Text style={styles.modalText}>
-                                        Cadastro realizado com sucesso!
-                                </Text>
-                                    :
-                                    <Text style={styles.modalText}>
-                                        Atualizado com sucesso!
-                                </Text>
-                                }
-                            </View>
-                            <TouchableOpacity onPress={handleNavigateEntries} style={styles.modalButton}>
-                                <Text style={[styles.tittleText, { color: tittleTextColor }]}>Ok</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
+                <SuccessModal props={props}></SuccessModal>
             </LinearGradient>
         </KeyboardAvoidingView>
     )
@@ -697,187 +601,13 @@ const styles = StyleSheet.create({
     formView: {
         marginHorizontal: 43
     },
-    InputText: {
-        height: 40,
-        borderBottomWidth: 1,
-        borderColor: '#d2d2d2',
-        color: '#136065',
-    },
-    InputTextValue: {
-        height: 40,
-        color: '#136065',
-        fontFamily: 'Poppins_500Medium',
-        fontSize: 18,
-        textAlign: 'center',
-    },
-    frequencyView: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 19,
-    },
-    valuesView: {
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    dateView: {
-        borderWidth: 1,
-        borderColor: '#d3d3d3',
-        width: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#E9E9E9',
-        flexDirection: 'row'
-    },
-    valuesViewItem: {
-        backgroundColor: '#f1f1f1',
-        paddingHorizontal: 15,
-        paddingVertical: 5,
-        paddingBottom: 10,
-        justifyContent: 'center',
-        marginBottom: 10,
-        borderColor: '#eaeaea',
-        borderWidth: 1,
-    },
 
-    modalContainer: {
-        flex: 1,
-        backgroundColor: ' rgba(0, 0, 0, 0.39);',
-        justifyContent: 'center'
-    },
-    modalContent: {
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        marginHorizontal: 20,
-        paddingTop: 30,
-    },
-    modalButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: 52,
-        borderTopWidth: 1,
-        borderTopColor: '#d2d2d2',
-        width: '100%'
-    },
-    modalTextView: {
-        minHeight: 170,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    modalText: {
-        color: '#136065',
-        fontFamily: 'Poppins_400Regular',
-        fontSize: 18,
-    },
-    tittleView: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginHorizontal: 26,
-    },
+
     tittleText: {
         fontSize: 24,
         fontFamily: 'Poppins_600SemiBold',
     },
-    subTittleText: {
-        fontFamily: 'Poppins_500Medium',
-        fontSize: 14,
-        marginTop: 13,
-    },
-    earningsTextColor: {
-        color: '#1A8289',
-    },
-    valuesList: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginHorizontal: 26,
-        borderBottomWidth: 1,
-        borderBottomColor: '#C4C4C4',
-        padding: 5,
-        flexWrap: 'wrap'
-    },
-    valuesListText: {
-        fontFamily: 'Poppins_500Medium',
-        fontSize: 14,
-    },
-    plusButtonModal: {
-        borderRadius: 10,
-        width: 40,
-        height: 40,
-        borderWidth: 1,
-        borderColor: '#1A8289',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    footerModal: {
-        height: 75,
-        borderTopWidth: 1,
-        borderTopColor: '#1A828922',
-        width: '100%',
-        backgroundColor: '#fff',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 26,
-        position: 'absolute',
-        bottom: 0,
-    },
-    scrollViewContainer: {
-        maxHeight: 320,
-        marginTop: 20,
-    },
-    monthView: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingHorizontal: 26,
-        marginTop: 13,
-    },
-    monthText: {
-        color: "#FDDB63",
-        fontFamily: 'Poppins_600SemiBold',
-        fontSize: 24,
-        marginHorizontal: 5
-    },
 
-    balanceView: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        paddingHorizontal: 26,
-        marginTop: 13,
-    },
-
-    currentBalanceView: {
-        justifyContent: 'center',
-        marginHorizontal: 26,
-    },
-
-    currentBalanceText: {
-        color: '#fff',
-        fontFamily: 'Poppins_400Regular',
-        fontSize: 14,
-        textAlign: 'center'
-    },
-
-    currentBalanceTextValue: {
-        color: '#fff',
-        fontFamily: 'Poppins_600SemiBold',
-        fontSize: 24,
-        textAlign: 'center'
-    },
-
-    estimatedBalanceText: {
-        color: 'rgba(255, 255, 255, 0.62);',
-        fontFamily: 'Poppins_400Regular',
-        fontSize: 14,
-        textAlign: 'center'
-    },
-
-    estimatedBalanceTextValue: {
-        color: 'rgba(255, 255, 255, 0.62);',
-        fontFamily: 'Poppins_600SemiBold',
-        fontSize: 24,
-        textAlign: 'center'
-    },
     mainContainer: {
         flex: 1,
         backgroundColor: '#fff',
@@ -886,75 +616,5 @@ const styles = StyleSheet.create({
         borderTopEndRadius: 40,
         justifyContent: 'flex-start',
     },
-
-    earningsItemView: {
-        marginHorizontal: 24,
-        marginTop: 22,
-        height: 80,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        elevation: 6,
-        shadowColor: '#CAD3DD',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4.65,
-        backgroundColor: "#fff",
-        borderRadius: 20,
-    },
-    earningsItemViewOpacity: {
-        opacity: 0.8,
-    },
-
-    earningTextView: {
-
-    },
-    earningTittleText: {
-        color: '#1A8289',
-        fontSize: 14,
-        fontFamily: 'Poppins_600SemiBold',
-    },
-    earningDateText: {
-        color: '#1A8289',
-        fontSize: 12,
-        fontFamily: 'Poppins_400Regular',
-    },
-    earningValueText: {
-        color: '#1A8289',
-        fontSize: 14,
-        fontFamily: 'Poppins_600SemiBold',
-    },
-    addNewButton: {
-        borderStyle: 'solid',
-        borderRadius: 20,
-        borderColor: '#24DBBA',
-        borderWidth: 1,
-        height: 83,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: "center",
-        marginHorizontal: 26,
-        marginVertical: 25,
-    },
-    addNewButtonText: {
-        color: '#1A8289',
-        fontSize: 18,
-        fontFamily: 'Poppins_600SemiBold',
-    },
-    secondColorText: {
-        fontFamily: 'Poppins_500Medium',
-        fontSize: 12,
-    },
-    newValuesView: {
-        alignItems: "center",
-        paddingVertical: 26,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    newValuesText: {
-        fontSize: 18,
-        fontFamily: 'Poppins_600SemiBold',
-    }
-
 })
 

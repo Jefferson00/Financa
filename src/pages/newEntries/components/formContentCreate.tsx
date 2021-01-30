@@ -9,7 +9,7 @@ import {ValuesItem} from "../../../interfaces"
 
 export default function FormContentCreate({ props }: { props: any }) {
 
-    const {tittleTextColor, secondColor } = useStylesStates()
+    const {tittleTextColor, subtittleTextColor } = useStylesStates()
     const {valuesArray} = useResultsDB()
     
     return(
@@ -33,7 +33,7 @@ export default function FormContentCreate({ props }: { props: any }) {
                                 style={[styles.InputText, { width: 150 }]}
                             />
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={[styles.secondColorText, { color: secondColor, marginRight: 10, fontSize: 18 }]}>
+                                <Text style={[styles.secondColorText, { color: subtittleTextColor, marginRight: 10, fontSize: 18 }]}>
                                     R$
                             </Text>
                                 <TextInput
@@ -52,7 +52,7 @@ export default function FormContentCreate({ props }: { props: any }) {
                             </Text>
                         </View>
                         <View style={styles.frequencyView}>
-                            <Text style={[styles.secondColorText, { color: secondColor }]}>Mensal</Text>
+                            <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Mensal</Text>
                             <Switch
                                 trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
                                 thumbColor={props.isEnabled ? 'd2d2d2' : tittleTextColor}
@@ -68,7 +68,7 @@ export default function FormContentCreate({ props }: { props: any }) {
                                 keyboardType='numeric'
                             />
     
-                            <Text style={[styles.secondColorText, { color: secondColor }]}>Vezes</Text>
+                            <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Vezes</Text>
                         </View>
                     </View>
                 )
