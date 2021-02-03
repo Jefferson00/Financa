@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, View,  Alert } from 'react-native'
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
 
@@ -160,6 +160,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 firstDate = selectedYear.toString() + selectedMonth.toString()
             }
             console.log("firstDate: "+firstDate)
+           
             EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res:any) => {
                setEntries(res._array.filter((entrie:EntriesValues) => entrie.type == item))
             }).catch(err => {
@@ -172,10 +173,14 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 console.log(err)
             })
     }
+    const isFocused = useIsFocused()
 
     useEffect(() => {
+        
         if (item === 'Ganhos') {
             if (navigationScreen.isFocused()){
+                console.log("Mes selecionado: "+selectedMonth)
+                console.log("Ano: "+selectedYear)
                 setMainColor1('#155F69')
                 setMainColor2('#F9CF3C')
                 setMainText1('Ganhos Atuais')
@@ -204,14 +209,10 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 setTextAlert('Despesa não paga!')
             }
         }
-        const unsubscribe = navigationScreen.addListener('focus', () => {
-            console.log('Refreshed!');
-            loadResults()
-            
-        });
-        return unsubscribe;
+        console.log('Refreshed!');
+        loadResults()
 
-    }, [navigationScreen])
+    }, [isFocused])
 
     const props = {
         item,

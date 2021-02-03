@@ -54,7 +54,7 @@ export default function EntriesResults({props}:{props:any}){
                         })}
 
                         <View style={styles.earningTextView}>
-                            <Text style={[styles.earningTittleText, { color: tittleTextColor+'AA' }]}>
+                            <Text numberOfLines={1} style={[styles.earningTittleText, { color: tittleTextColor+'AA', width: 150 }]}>
                                 {entrie.title}
                             </Text>
                             <Text style={[styles.earningDateText, { color: tittleTextColor+'AA' }]}>
@@ -86,7 +86,7 @@ export default function EntriesResults({props}:{props:any}){
 
                         
                         <View style={styles.earningTextView}>
-                            <Text style={[styles.earningTittleText, { color: tittleTextColor }]}>
+                            <Text numberOfLines={1} style={[styles.earningTittleText, { color: tittleTextColor, width: 150 }]}>
                                 {entrie.title}
                             </Text>
                             <Text style={[styles.earningDateText, { color: tittleTextColor }]}>
