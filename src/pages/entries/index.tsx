@@ -16,10 +16,12 @@ import ButtonNewEntrie from "./components/buttonNewEntrie"
 import EntriesDB from '../../services/entriesDB'
 import ValuesDB from '../../services/valuesDB';
 
+import Functions from "../../functions"
+
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
 import {useResultsDB} from "../../contexts/resultsDBStates"
-import { EntriesValues, ValuesValues } from '../../interfaces';
+import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces';
 
 
 export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
@@ -76,7 +78,46 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
 
 
-    
+   async function verifyMonthly(id: number){
+        let isMonthly = false
+        await ValuesDB.allOrderByDate().then((res: any) =>{
+            const vlr : any = res._array.filter((vl:any) => vl.id == id)
+ 
+            if (vlr[0].dtEnd == 209912){
+                isMonthly = true
+            }
+        }).catch(error =>{
+            console.log("Error: "+error)
+        })
+        console.log(isMonthly)
+        return isMonthly
+    }
+
+    function deleteMonthlyValue(id: number){
+        valuesList.map((value:any, index:number)=>{
+            if (value.id == id){
+                const newDate = new Date()
+                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month)-1)
+                newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
+                let newDtEnd
+                if ((selectedMonth) < 10) {
+                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
+                } else {
+                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
+                }
+
+                let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
+                const vlObj = {
+                    description: value.description,
+                    amount: value.amount,
+                    dtStart: value.dtStart,
+                    dtEnd: Functions.setDtEnd(false,contRep,newDate),
+                    entries_id: value.entries_id
+                }
+                ValuesDB.update(id, vlObj)
+            }
+        })
+    }
     
     /* Função que deleta um item (Entrie) */
     function removeItem(id: number) {
@@ -91,6 +132,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 },
                 {
                     text: "OK", onPress: () =>
+                       {
                         EntriesDB.remove2(id).then(() => {
                             alert('removido!')
                             setEntries(entries.filter((ern:EntriesValues) => ern.id !== id))
@@ -99,6 +141,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                         }).catch(err => {
                             console.log(err)
                         })
+                       }
                 }
             ],
             { cancelable: false }
@@ -118,11 +161,17 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 },
                 {
                     text: "OK", onPress: () =>
-                        ValuesDB.remove(id).then(res => {
-                            setValuesList(valuesList.filter((vls: any)=> vls.id !== id))
-                        }).catch(err => {
-                            console.log(err)
-                        })
+                        {
+                            if(!verifyMonthly(id)){
+                                ValuesDB.remove(id).then(res => {
+                                    setValuesList(valuesList.filter((vls: any)=> vls.id !== id))
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+                            }else{
+                                deleteMonthlyValue(id)
+                            }
+                        }
                 }
             ],
             { cancelable: false }

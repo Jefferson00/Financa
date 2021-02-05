@@ -311,7 +311,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     vlr = vlr.replace(/[,]/g, '')
                 }
 
-                if (value.dtEnd == 209912) {
+                if (value.dtEnd == 209912 && valuesBeforeUpdate[index] != null) {
                     console.log('Valor antes: '+valuesBeforeUpdate[index].amount)
                     const newDtStart = new Date()
                     console.log("dtStart: "+valuesBeforeUpdate[index].dtStart)
@@ -459,7 +459,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         }
         ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
             var arr: any = (res._array.filter((vlr: ValuesItemUpdate) => vlr.entries_id == idUpdate))
-            setValuesUpdate(arr)
+            setValuesUpdate([...valuesUpdate, arr[arr.length -1]])
         })
         EntriesDB.findById(idUpdate).then((res: any) => {
             setEarning(res._array)

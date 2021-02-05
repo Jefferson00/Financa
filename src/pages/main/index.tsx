@@ -164,6 +164,7 @@ export default function Main() {
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação
       EntriesDB.findByDate(parseInt(firstDate)).then((res: any) => {
         setEntries(res._array)
+        
       }).catch(err => {
         console.log(err)
       })
@@ -171,6 +172,7 @@ export default function Main() {
       //Procura todos os valores correspondente a data atual ao abrir a aplicação
       ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
         setValuesList(res._array)
+        
         setNoBalance(false)
       }).catch(err => {
         console.log(err)
@@ -193,6 +195,7 @@ export default function Main() {
       })
 
       ValuesDB.allOrderByDate().then((res: any) => {
+        console.log(res._array)
         let dtStart = res._array[0].dtStart
         if (dtStart != undefined) {
           let ano: number = parseInt(Functions.toMonthAndYear(dtStart).year)
