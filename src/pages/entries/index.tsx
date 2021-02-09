@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, View,  Alert } from 'react-native'
+import { StyleSheet, View, Alert } from 'react-native'
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
@@ -18,19 +18,19 @@ import ValuesDB from '../../services/valuesDB';
 
 import Functions from "../../functions"
 
-import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
-import {useStylesStates} from '../../contexts/stylesStates'
-import {useResultsDB} from "../../contexts/resultsDBStates"
+import { useSelectedMonthAndYear } from '../../contexts/selectMonthAndYear'
+import { useStylesStates } from '../../contexts/stylesStates'
+import { useResultsDB } from "../../contexts/resultsDBStates"
 import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces';
 
 
 export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigationScreen = useNavigation()
 
-    const {selectedMonth, selectedYear, setSelectedTotalValues} = useSelectedMonthAndYear();
+    const { selectedMonth, selectedYear, setSelectedTotalValues } = useSelectedMonthAndYear();
     const {
-        setMonthColor, 
-        setModalVisible,  
+        setMonthColor,
+        setModalVisible,
         mainColor1,
         mainColor2,
         setColorBorderAddButton,
@@ -42,15 +42,15 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         setTextAddButton,
         setTextAlert,
         setMainColor2,
-        setMainText2, 
+        setMainText2,
         setModalType
 
     } = useStylesStates();
 
-    const {setEntries, entries, valuesList, setValuesList}  = useResultsDB();
+    const { setEntries, entries, valuesList, setValuesList } = useResultsDB();
 
-    const [selectedId, setSelectedId] = useState(0) 
-  
+    const [selectedId, setSelectedId] = useState(0)
+
     const { item } = route.params
 
     let cont: any = []
@@ -69,7 +69,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
 
     function handleNavigateNovo() {
-        navigationScreen.navigate('NewEntries', { item: item , month: selectedMonth, year: selectedYear})
+        navigationScreen.navigate('NewEntries', { item: item, month: selectedMonth, year: selectedYear })
     }
 
     function handleNavigateNovoUpdate(id: number) {
@@ -78,26 +78,26 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
 
 
-   async function verifyMonthly(id: number){
+    async function verifyMonthly(id: number) {
         let isMonthly = false
-        await ValuesDB.allOrderByDate().then((res: any) =>{
-            const vlr : any = res._array.filter((vl:any) => vl.id == id)
- 
-            if (vlr[0].dtEnd == 209912){
+        await ValuesDB.allOrderByDate().then((res: any) => {
+            const vlr: any = res._array.filter((vl: any) => vl.id == id)
+
+            if (vlr[0].dtEnd == 209912) {
                 isMonthly = true
             }
-        }).catch(error =>{
-            console.log("Error: "+error)
+        }).catch(error => {
+            console.log("Error: " + error)
         })
         console.log(isMonthly)
         return isMonthly
     }
 
-    function deleteMonthlyValue(id: number){
-        valuesList.map((value:any, index:number)=>{
-            if (value.id == id){
+    function deleteValue(id: number) {
+        valuesList.map((value: any, index: number) => {
+            if (value.id == id) {
                 const newDate = new Date()
-                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month)-1)
+                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month) - 1)
                 newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
                 let newDtEnd
                 if ((selectedMonth) < 10) {
@@ -107,18 +107,62 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 }
 
                 let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
-                const vlObj = {
-                    description: value.description,
-                    amount: value.amount,
-                    dtStart: value.dtStart,
-                    dtEnd: Functions.setDtEnd(false,contRep,newDate),
-                    entries_id: value.entries_id
+
+                if (contRep > 0) {
+                    const vlObj = {
+                        description: value.description,
+                        amount: value.amount,
+                        dtStart: value.dtStart,
+                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
+                        entries_id: value.entries_id
+                    }
+                    ValuesDB.update(id, vlObj)
+                } else {
+                    ValuesDB.remove(id)
+                    setValuesList(valuesList.filter((vlu: any) => vlu.id !== id))
                 }
-                ValuesDB.update(id, vlObj)
             }
         })
     }
-    
+
+    function deleteEntrie(id: number) {
+        entries.map((entrie: any) => {
+            if (entrie.id == id) {
+                const newDate = new Date()
+                newDate.setMonth(parseInt(Functions.toMonthAndYear(entrie.dtStart).month) - 1)
+                newDate.setFullYear(parseInt(Functions.toMonthAndYear(entrie.dtStart).year))
+                let newDtEnd
+                if ((selectedMonth) < 10) {
+                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
+                } else {
+                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
+                }
+
+                let contRep = Functions.toFrequency(parseInt(newDtEnd), entrie.dtStart)
+
+                if (contRep > 0) {
+                    const vlObj = {
+                        title: entrie.valueTitle,
+                        day: entrie.day,
+                        dtStart: entrie.dtStart,
+                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
+                        monthly: entrie.monthly,
+                        received: entrie.received,
+                        type: entrie.type
+                    }
+                    EntriesDB.update(id, vlObj)
+                } else {
+                    EntriesDB.remove2(id).then(()=>{
+                        setEntries(entries.filter((ern: EntriesValues) => ern.id !== id))
+                        setModalVisible(false)
+                    }).catch(err =>{
+                        console.log(err)
+                    })
+                }
+            }
+        })
+    }
+
     /* Função que deleta um item (Entrie) */
     function removeItem(id: number) {
         Alert.alert(
@@ -131,24 +175,16 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                     style: "cancel"
                 },
                 {
-                    text: "OK", onPress: () =>
-                       {
-                        EntriesDB.remove2(id).then(() => {
-                            alert('removido!')
-                            setEntries(entries.filter((ern:EntriesValues) => ern.id !== id))
-                            setValuesList(valuesList.filter((vlu: ValuesValues) => vlu.entries_id !== id))
-                            setModalVisible(false)
-                        }).catch(err => {
-                            console.log(err)
-                        })
-                       }
+                    text: "OK", onPress: () => {
+                        deleteEntrie(id)
+                    }
                 }
             ],
             { cancelable: false }
         );
     }
 
-     /* Função que deleta um valor*/
+    /* Função que deleta um valor*/
     function removeValue(id: number) {
         Alert.alert(
             "Remover",
@@ -160,18 +196,9 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                     style: "cancel"
                 },
                 {
-                    text: "OK", onPress: () =>
-                        {
-                            if(!verifyMonthly(id)){
-                                ValuesDB.remove(id).then(res => {
-                                    setValuesList(valuesList.filter((vls: any)=> vls.id !== id))
-                                }).catch(err => {
-                                    console.log(err)
-                                })
-                            }else{
-                                deleteMonthlyValue(id)
-                            }
-                        }
+                    text: "OK", onPress: () => {
+                        deleteValue(id)
+                    }
                 }
             ],
             { cancelable: false }
@@ -179,57 +206,57 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
 
     /*Função que atualiza uma entrada como recebida/paga*/
-    function updateReceived(selectedId:number){
-        EntriesDB.findById(selectedId).then((res:any)=>{
+    function updateReceived(selectedId: number) {
+        EntriesDB.findById(selectedId).then((res: any) => {
             let obj = {
                 title: res._array[0].title,
                 day: res._array[0].day,
-                dtStart:res._array[0].dtStart,
-                dtEnd:res._array[0].dtEnd,
-                monthly:res._array[0].monthly,
-                received:true,
-                type:res._array[0].type,
+                dtStart: res._array[0].dtStart,
+                dtEnd: res._array[0].dtEnd,
+                monthly: res._array[0].monthly,
+                received: true,
+                type: res._array[0].type,
             }
-            EntriesDB.update(selectedId, obj).then(res=>{
+            EntriesDB.update(selectedId, obj).then(res => {
                 alert("Pago!")
                 setModalVisible(false)
                 loadResults()
-            }).catch(err=>{
+            }).catch(err => {
                 console.log(err)
             })
             //console.log('Obj: '+obj.title)
         })
     }
 
-    function loadResults(){
-            let firstDate
-            if (selectedMonth < 10) {
-                firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
-            } else {
-                firstDate = selectedYear.toString() + selectedMonth.toString()
-            }
-            console.log("firstDate: "+firstDate)
-           
-            EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res:any) => {
-               setEntries(res._array.filter((entrie:EntriesValues) => entrie.type == item))
-            }).catch(err => {
-                console.log(err)
-            })
-            ValuesDB.findByDate(parseInt(firstDate)).then((res:any) => {
-                //console.log(res)
-                setValuesList(res._array)
-            }).catch(err => {
-                console.log(err)
-            })
+    function loadResults() {
+        let firstDate
+        if (selectedMonth < 10) {
+            firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
+        } else {
+            firstDate = selectedYear.toString() + selectedMonth.toString()
+        }
+        console.log("firstDate: " + firstDate)
+
+        EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res: any) => {
+            setEntries(res._array.filter((entrie: EntriesValues) => entrie.type == item))
+        }).catch(err => {
+            console.log(err)
+        })
+        ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
+            //console.log(res)
+            setValuesList(res._array)
+        }).catch(err => {
+            console.log(err)
+        })
     }
     const isFocused = useIsFocused()
 
     useEffect(() => {
-        
+
         if (item === 'Ganhos') {
-            if (navigationScreen.isFocused()){
-                console.log("Mes selecionado: "+selectedMonth)
-                console.log("Ano: "+selectedYear)
+            if (navigationScreen.isFocused()) {
+                console.log("Mes selecionado: " + selectedMonth)
+                console.log("Ano: " + selectedYear)
                 setMainColor1('#155F69')
                 setMainColor2('#F9CF3C')
                 setMainText1('Ganhos Atuais')
@@ -244,7 +271,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             }
 
         } else if (item === 'Despesas') {
-            if (navigationScreen.isFocused()){
+            if (navigationScreen.isFocused()) {
                 setMainColor1('#CC3728')
                 setMainColor2('#F9CF3C')
                 setMainText1('Despesas Atuais')
@@ -287,7 +314,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             style={styles.container}>
             <StatusBar style="light" translucent />
             <Header props={props}></Header>
-           
+
             <Balance props={props}></Balance>
 
             <View style={styles.mainContainer}>
@@ -298,9 +325,9 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 <Footer item={item}></Footer>
             </View>
 
-    
-            <ModalContent props={props}></ModalContent>         
- 
+
+            <ModalContent props={props}></ModalContent>
+
 
         </LinearGradient>
     )
