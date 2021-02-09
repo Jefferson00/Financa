@@ -52,7 +52,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         setReceivedText,
         setSubtittleTextColor
     } = useStylesStates();
-    const {valueFrequency, setValueFrequency, valuesArray, setValuesArray, valuesUpdate, setValuesUpdate, setFrequencys, setEntries}  = useResultsDB();
+    const {valueFrequency, setValueFrequency, valuesArray, setValuesArray, valuesUpdate, setValuesUpdate, setFrequencys, setEntries, entries}  = useResultsDB();
  
 
     /*Estados de aparencia*/
@@ -291,8 +291,15 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
    
 
     function handleUpdate() {
-        let dtStart = Functions.setDtStart(date)
+        const dateStart = new Date()
+        let entr = entries.filter((ent: any) => ent.id == idUpdate)
+      
+        dateStart.setMonth(parseInt(Functions.toMonthAndYear(entr[0].dtStart).month)-1)
+        dateStart.setFullYear(parseInt(Functions.toMonthAndYear(entr[0].dtStart).year))
+        let dtStart = Functions.setDtStart(dateStart)
+        
         let dtEnd = Functions.setDtEnd(isEnabled, valueFrequency, date)
+        
         const GanhoObj = {
             title: valueTitle,
             day: date.getDate(),

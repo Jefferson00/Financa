@@ -22,10 +22,13 @@ import { useSelectedMonthAndYear } from '../../contexts/selectMonthAndYear'
 import { useStylesStates } from '../../contexts/stylesStates'
 import { useResultsDB } from "../../contexts/resultsDBStates"
 import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces';
+import Loader from './components/loader';
 
 
 export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigationScreen = useNavigation()
+
+    const [done, setDone] = useState(false)
 
     const { selectedMonth, selectedYear, setSelectedTotalValues } = useSelectedMonthAndYear();
     const {
@@ -125,6 +128,40 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         })
     }
 
+    function updateValueOfAEntrie(id: number){
+        valuesList.map((value: any) => {
+            if (value.entries_id == id) {
+                const newDate = new Date()
+                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month) - 1)
+                newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
+                let newDtEnd
+
+                if ((selectedMonth) < 10) {
+                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
+                } else {
+                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
+                }
+
+                let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
+
+                if (contRep > 0) {
+                    const vlObj = {
+                        description: value.description,
+                        amount: value.amount,
+                        dtStart: value.dtStart,
+                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
+                        entries_id: value.entries_id
+                    }
+                    ValuesDB.update(value.id, vlObj)
+                    loadResults()
+                } else {
+                    ValuesDB.remove(value.id)
+                    setValuesList(valuesList.filter((vlu: any) => vlu.id !== value.id))
+                }
+            }
+        })
+    }
+
     function deleteEntrie(id: number) {
         entries.map((entrie: any) => {
             if (entrie.id == id) {
@@ -142,7 +179,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
                 if (contRep > 0) {
                     const vlObj = {
-                        title: entrie.valueTitle,
+                        title: entrie.title,
                         day: entrie.day,
                         dtStart: entrie.dtStart,
                         dtEnd: Functions.setDtEnd(false, contRep, newDate),
@@ -150,15 +187,19 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                         received: entrie.received,
                         type: entrie.type
                     }
+                    
                     EntriesDB.update(id, vlObj)
+                    loadResults()
                 } else {
                     EntriesDB.remove2(id).then(()=>{
                         setEntries(entries.filter((ern: EntriesValues) => ern.id !== id))
-                        setModalVisible(false)
+                        
                     }).catch(err =>{
                         console.log(err)
                     })
                 }
+                updateValueOfAEntrie(id)
+                setModalVisible(false)
             }
         })
     }
@@ -229,6 +270,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
 
     function loadResults() {
+        setDone(false)
         let firstDate
         if (selectedMonth < 10) {
             firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
@@ -239,6 +281,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
         EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res: any) => {
             setEntries(res._array.filter((entrie: EntriesValues) => entrie.type == item))
+            setDone(true)
         }).catch(err => {
             console.log(err)
         })
@@ -287,6 +330,12 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         }
         console.log('Refreshed!');
         loadResults()
+        EntriesDB.all().then((res: any) => {
+            console.log(res._array)
+            
+          }).catch(err => {
+            console.log(err)
+          })
 
     }, [isFocused])
 
@@ -318,7 +367,11 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             <Balance props={props}></Balance>
 
             <View style={styles.mainContainer}>
+                {done?
                 <EntriesResults props={props}></EntriesResults>
+                :
+                <Loader></Loader>
+                }
 
                 <ButtonNewEntrie props={props}></ButtonNewEntrie>
 

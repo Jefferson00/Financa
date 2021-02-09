@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
@@ -9,10 +9,14 @@ import { ValuesValues, Balance } from "../../../interfaces"
 import { useSelectedMonthAndYear } from '../../../contexts/selectMonthAndYear'
 import { useResultsDB } from '../../../contexts/resultsDBStates'
 
+import Loader from "../../entries/components/loader"
+
 export default function BalanceValues({ props }: { props: any }) {
 
   const { selectedMonth, selectedYear, noBalance } = useSelectedMonthAndYear();
   const { balance, valuesList } = useResultsDB();
+
+  const [done, setDone] = useState(false)
 
   let contEarnings: Array<number> = []
   let contEstimatedEarnings: Array<number> = []
@@ -33,6 +37,21 @@ export default function BalanceValues({ props }: { props: any }) {
   let currentExpenses = contExpenses.reduce((a: any, b: any) => a + b, 0)
   let estimatedExpenses = contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
   let estimatedEarnings = contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0)
+
+  let remainingValues
+  let totalEstimatedBalance
+
+  balance.map((bal: Balance, index: number) => {
+    if (bal.year == selectedYear && bal.month == selectedMonth) {
+      remainingValues = bal.amount - (contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0))
+    } 
+  })
+
+  balance.map((bal: Balance, index: number) => {
+    if (bal.year == selectedYear && bal.month == selectedMonth) {
+      totalEstimatedBalance = bal.amount
+    }
+  })
 
   return (
     <>
@@ -66,25 +85,18 @@ export default function BalanceValues({ props }: { props: any }) {
           }
 
           {/* Valor restante dos meses anteriores */}
-          {balance.map((bal: Balance, index: number) => {
-            if (bal.year == selectedYear && bal.month == selectedMonth) {
-              let remainingValues = bal.amount - (contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0))
-              return (
-                <View key={index}>
-                  <NumberFormat
-                    value={remainingValues}
-                    displayType={'text'}
-                    thousandSeparator={true}
-                    format={Functions.currencyFormatter}
-                    renderText={value =>
-                      <Text style={[styles.currentBalanceTextValue, { fontSize: 14 }]}>
-                        {value}
-                      </Text>}
-                  />
-                </View>
-              )
-            }
-          })}
+          
+          <NumberFormat
+              value={remainingValues}
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value =>
+              <Text style={[styles.currentBalanceTextValue, { fontSize: 14 }]}>
+                {value}
+              </Text>
+              }
+          /> 
         </View>
 
         <View style={styles.currentBalanceView}>
@@ -117,24 +129,17 @@ export default function BalanceValues({ props }: { props: any }) {
             />
           }
           {/* Valor do Saldo Estimado Total com os valores restantes  */}
-          {balance.map((bal: Balance, index: number) => {
-            if (bal.year == selectedYear && bal.month == selectedMonth) {
-              return (
-                <View key={index}>
-                  <NumberFormat
-                    value={bal.amount}
-                    displayType={'text'}
-                    thousandSeparator={true}
-                    format={Functions.currencyFormatter}
-                    renderText={value =>
-                      <Text style={[styles.estimatedBalanceTextValue, { fontSize: 14 }]}>
-                        {value}
-                      </Text>}
-                  />
-                </View>
-              )
-            }
-          })}
+          {}
+          <NumberFormat
+              value={totalEstimatedBalance}
+              displayType={'text'}
+              thousandSeparator={true}
+              format={Functions.currencyFormatter}
+              renderText={value =>
+                <Text style={[styles.estimatedBalanceTextValue, { fontSize: 14 }]}>
+                  {value}
+                </Text>}
+              />
         </View>
       </View>
 

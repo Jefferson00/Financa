@@ -1,4 +1,4 @@
-import React, { useEffect} from 'react'
+import React, { useEffect, useState} from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
@@ -16,6 +16,8 @@ import ModalContent from './components/modalContent'
 import ButtonsEarnings from "./components/buttonsEarnings"
 import ButtonsExpanses from "./components/buttonsExpanses"
 
+import Loader from "../entries/components/loader"
+
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
 import {useResultsDB} from "../../contexts/resultsDBStates"
@@ -28,6 +30,7 @@ export default function Main() {
   const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor, setModalBalance, setTextModal, setModalType} = useStylesStates();
   const {setEntries,setBalance,setNextEntries,setNextMonthEntries,setValuesList}  = useResultsDB();
 
+  const [done, setDone] = useState(false)
 
   //  Define a data atual
   const todayDate = new Date()
@@ -104,6 +107,7 @@ export default function Main() {
       })
     }
     setBalance(balanceArray)
+   
 
     balanceArray = []
   }
@@ -149,6 +153,7 @@ export default function Main() {
 
 
     const reload = navigation.addListener('focus', () => {
+      setDone(false)
       setSelectedMonth(CurrentMonth)
       setSelectedYear(CurrentYear)
       setMonthColor('#1A8289')
@@ -168,6 +173,8 @@ export default function Main() {
       }).catch(err => {
         console.log(err)
       })
+
+     
 
       //Procura todos os valores correspondente a data atual ao abrir a aplicação
       ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
@@ -216,13 +223,16 @@ export default function Main() {
                 datas.push(dateP)
               }
             }
+            //console.log("done? "+done)
           } while (ano < CurrentYear + 20)
           loadBalance()
+          //console.log("Done!")
         }
       })
       datas = []
 
     });
+    //setDone(true)
     return reload;
   }, [])
 
@@ -239,6 +249,7 @@ export default function Main() {
     handleNavigateNovoDespesas,
     handleNavigateNovoGanhos
   }
+  
 
   return (
     <LinearGradient colors={[primaryColor, secondColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
@@ -247,6 +258,7 @@ export default function Main() {
       <Header props={props}></Header>
 
       <BalanceValues props={props}></BalanceValues>
+  
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>
