@@ -8,11 +8,13 @@ const {Navigator, Screen} = createStackNavigator();
 import Main from './pages/main'
 import Entries from './pages/entries'
 import NewEntries from './pages/newEntries'
+import Login from './pages/login'
 
 export default function Routes(){
     return(
         <NavigationContainer>
             <Navigator screenOptions={{headerShown:false}}>
+                <Screen name="Login" component={Login} />
                 <Screen name="Main" component={Main}/>
                 <Screen name="Entries" component={Entries}/>
                 <Screen name="NewEntries" component={NewEntries}/>
