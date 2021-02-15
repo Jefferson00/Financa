@@ -31,17 +31,19 @@ export default function FormContentCreate({ props }: { props: any }) {
                                 onChange={props.updateValues('description', index, false)}
                                 value={values.description}
                                 style={[styles.InputText, { width: 150 }]}
+                                multiline={true}
                             />
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:10}}>
                                 <Text style={[styles.secondColorText, { color: subtittleTextColor, marginRight: 10, fontSize: 18 }]}>
                                     R$
-                            </Text>
+                                </Text>
                                 <TextInput
                                     keyboardType='numeric'
                                     placeholder='R$ 0,00'
                                     onChange={props.updateValues('amount', index, false)}
                                     value={values.amount.toString()}
                                     style={styles.InputTextValue}
+                                    maxLength={10}
                                 />
                             </View>
     
@@ -66,6 +68,7 @@ export default function FormContentCreate({ props }: { props: any }) {
                                 value={values.repeat.toString()}
                                 style={styles.InputText}
                                 keyboardType='numeric'
+                                maxLength={2}
                             />
     
                             <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Vezes</Text>
@@ -106,7 +109,7 @@ const styles = StyleSheet.create({
         color: '#136065',
         fontFamily: 'Poppins_500Medium',
         fontSize: 18,
-        textAlign: 'center',
+        width:'100%'
     },
     
     frequencyView: {

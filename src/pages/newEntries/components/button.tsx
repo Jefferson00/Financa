@@ -9,7 +9,7 @@ export default function ButtonSubmit({ props }: { props: any }) {
     const {colorBorderAddButton , tittleTextColor} = useStylesStates()
 
     return (
-        <View style={{ justifyContent: 'flex-end', flex: 1 }}>
+        <View>
             <LinearGradient
                 colors={['#FFFFFF', colorBorderAddButton + '22']}
                 start={{ x: -0.1, y: 0.1 }}

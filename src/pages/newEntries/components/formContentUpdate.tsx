@@ -39,7 +39,7 @@ export default function FormContentUpdate({ props }: { props: any }) {
                             value={values.description}
                             style={[styles.InputText, { width: 150 }]} />
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:10}}>
                             <Text style={[styles.secondColorText, { color: subtittleTextColor, marginRight: 10, fontSize: 18 }]}>
                                 R$
                             </Text>
@@ -48,7 +48,9 @@ export default function FormContentUpdate({ props }: { props: any }) {
                                 placeholder='R$ 0,00'
                                 onChange={ props.updateValuesUpdate('amount', index, false)}
                                 value={Functions.formatCurrency(values.amount)}
-                                style={styles.InputTextValue} />
+                                style={styles.InputTextValue} 
+                                maxLength={10}
+                                />
                         </View>
 
                     </View>
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
         color: '#136065',
         fontFamily: 'Poppins_500Medium',
         fontSize: 18,
-        textAlign: 'center',
+        width:'100%'
     },
     
     frequencyView: {

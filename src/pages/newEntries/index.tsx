@@ -21,6 +21,8 @@ import ButtonNewValue from "./components/buttonNewValue"
 import FormContent from "./components/formContent"
 import SuccessModal from "./components/modal"
 
+import LoaderUpdate from "./components/loaderUpdate"
+
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
 import {useResultsDB} from "../../contexts/resultsDBStates"
@@ -34,9 +36,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
     const {
         selectedMonth, 
-        setSelectedMonth, 
-        selectedYear, 
-        setSelectedYear, 
+        selectedYear,  
     } = useSelectedMonthAndYear();
     const {  
         mainColor1,
@@ -52,7 +52,16 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         setReceivedText,
         setSubtittleTextColor
     } = useStylesStates();
-    const {valueFrequency, setValueFrequency, valuesArray, setValuesArray, valuesUpdate, setValuesUpdate, setFrequencys, setEntries, entries}  = useResultsDB();
+    const {valueFrequency, 
+            setValueFrequency, 
+            valuesArray, 
+            setValuesArray, 
+            valuesUpdate, 
+            setValuesUpdate, 
+            setFrequencys, 
+            setEntries, 
+            entries
+        }  = useResultsDB();
  
 
     /*Estados de aparencia*/
@@ -66,22 +75,23 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
     const todayDate = new Date()
     const selectedDate = todayDate
-    const CurrentMonth = todayDate.getMonth() + 1
-    const CurrentYear = todayDate.getFullYear()
 
-
+    
     /*Outros Estados*/
     /**/ const [successModal, setSuccessModal] = useState(false)
+    const [done, setDone] = useState(false)
 
 
     //Switch control monthly
     const [show, setShow] = useState(false);
 
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => {
-        setIsEnabled(previousState => !previousState)
-        updateOneValue('monthly', 0, !isEnabled)
-        if (!isEnabled) {
+    const [switchMonthlyisEnabled, setSwitchMonthlyIsEnabled] = useState(false);
+
+    const toggleSwitchMonthly = () => {
+        //seta o switch mensal como true ou false
+        setSwitchMonthlyIsEnabled(previousState => !previousState)
+        updateOneValue('monthly', 0, !switchMonthlyisEnabled)
+        if (!switchMonthlyisEnabled) {
             let newArr = valuesUpdate.map((item:ValuesItemUpdate, i:number) => {
                 if (i == 0) {
                     return { ...item, ['dtEnd']: 209912 }
@@ -101,7 +111,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     //Calendar function
     const [date, setDate] = useState(new Date());
 
-    const onChange = (event: any, selectedDate: any) => {
+    const onChangeDate = (event: any, selectedDate: any) => {
         const currentDate = selectedDate || date;
         setShow(Platform.OS === 'ios');
         setDate(currentDate);
@@ -113,11 +123,21 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
      // funções de navegação
     function handleNavigateEntries() {
-        setEntries([])
+        resetValues()
+        
         nav.navigate('Entries', { item: item})
         setSuccessModal(false)
     }
 
+    function resetValues(){
+        setEntries([])
+        onChangeTitle()
+        setValueFrequency(1)
+        let arr = [{id: 1, description: '', amount: '0', monthly: false, repeat: 1}]
+        setValuesArray(arr)
+        setSwitchMonthlyIsEnabled(false)
+        setIsEnabledReceived(false)
+    }
 
 
     /*Atualiza os valores dos inputs 'valores' */
@@ -134,10 +154,10 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     valor = parseInt(valor.replace(/[\D]+/g, ''));
                     valor = valor + '';
                     valor = valor.replace(/([0-9]{2})$/g, ",$1");
-
                     if (valor.length > 6) {
                         valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
                     }
+                    if (valor =="NaN") valor = 0
                     return { ...item, [subitem]: valor }
                 }
                 else {
@@ -183,6 +203,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     if (valor.length > 6) {
                         valor = valor.replace(/([0-9]{3}),([0-9]{2}$)/g, ".$1,$2");
                     }
+                    if (valor =="NaN") valor = 0
                     return { ...item, [subitem]: valor }
                 }
                 else {
@@ -244,13 +265,13 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
     function handleCreateNew() {
         let dtStart = Functions.setDtStart(date)
-        let dtEnd = Functions.setDtEnd(isEnabled, valueFrequency, date)
+        let dtEnd = Functions.setDtEnd(switchMonthlyisEnabled, valueFrequency, date)
         const GanhoObj = {
             title: valueTitle,
             day: date.getDate(),
             dtStart: dtStart,
             dtEnd: dtEnd,
-            monthly: isEnabled,
+            monthly: switchMonthlyisEnabled,
             received: isEnabledReceived,
             type: item
         }
@@ -298,14 +319,14 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         dateStart.setFullYear(parseInt(Functions.toMonthAndYear(entr[0].dtStart).year))
         let dtStart = Functions.setDtStart(dateStart)
         
-        let dtEnd = Functions.setDtEnd(isEnabled, valueFrequency, date)
+        let dtEnd = Functions.setDtEnd(switchMonthlyisEnabled, valueFrequency, date)
         
         const GanhoObj = {
             title: valueTitle,
             day: date.getDate(),
             dtStart: dtStart,
             dtEnd: dtEnd,
-            monthly: isEnabled,
+            monthly: switchMonthlyisEnabled,
             received: isEnabledReceived,
             type: item
         }
@@ -436,6 +457,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
 
         if (idUpdate != null) {
+            setDone(false)
             let firstDate
             if (selectedMonth < 10) {
                 firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
@@ -449,12 +471,12 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             })
             EntriesDB.findById(idUpdate).then((res: any) => {
                 setEarning(res._array)
-
+                setDone(true)
             }).catch(err => {
                 console.log(err)
             })
-
         }
+        
     }, [])
 
     function updateValuesList() {
@@ -503,7 +525,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         if (earning.length > 0) {
             onChangeTitle(earning[0].title)
             if (earning[0].monthly) {
-                setIsEnabled(true)
+                setSwitchMonthlyIsEnabled(true)
             } else {
                 setValueFrequency(Functions.toFrequency(earning[0].dtEnd, earning[0].dtStart) + 1)
             }
@@ -513,11 +535,6 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             date.setMonth(parseInt(Functions.toMonthAndYear(earning[0].dtStart).month)-1)
             date.setDate(earning[0].day)
 
-        }else{
-            onChangeTitle()
-            setValueFrequency(1)
-            let arr = [{id: 1, description: '', amount: '0', monthly: false, repeat: 1}]
-            setValuesArray(arr)
         }
     }, [earning])
 
@@ -535,7 +552,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         item,
         idUpdate,
         showValues,
-        isEnabled,
+        switchMonthlyisEnabled,
         isEnabledReceived,
         selectedDate,
         date,
@@ -543,9 +560,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         successModal,
         handleUpdate,
         handleCreateNew,
-        toggleSwitch,
+        toggleSwitchMonthly,
         toggleSwitchReceived,
-        onChange,
+        onChangeDate,
         updateValues,
         updateFrequencyValuesUpdate,
         removeValue,
@@ -572,20 +589,26 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                             {tittleText}
                         </Text>
                     </View>
-                    <ScrollView style={{ maxHeight: '100%' }}>
-                        <View style={styles.formView}>
-                            <FormContent props={props}></FormContent>
-
-                            <FormContentCreate props={props}></FormContentCreate>
-                            <FormContentUpdate props={props}></FormContentUpdate>
-                           
-
-                            <ButtonNewValue props={props}></ButtonNewValue>
-
-                        </View>
-
-                        <ButtonSubmit props={props}></ButtonSubmit>
-                    </ScrollView>
+                    {done || !idUpdate?
+                        <>
+                        <ScrollView style={{ maxHeight: '100%' }}>
+                            <View style={styles.formView}>
+                                <FormContent props={props}></FormContent>
+    
+                                <FormContentCreate props={props}></FormContentCreate>
+                                <FormContentUpdate props={props}></FormContentUpdate>
+                               
+    
+                                <ButtonNewValue props={props}></ButtonNewValue>
+    
+                            </View>
+    
+                        </ScrollView>
+                            <ButtonSubmit props={props}></ButtonSubmit>
+                        </>
+                        :
+                        <LoaderUpdate></LoaderUpdate>
+                    }
 
                     <Footer item={item}></Footer>
                 </View>

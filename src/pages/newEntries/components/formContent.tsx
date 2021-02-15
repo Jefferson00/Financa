@@ -9,19 +9,22 @@ import { Feather } from '@expo/vector-icons'
 import { useStylesStates } from "../../../contexts/stylesStates"
 import { useResultsDB } from "../../../contexts/resultsDBStates"
 
-import { ValuesItemUpdate } from "../../../interfaces"
-
 
 export default function FormContent({ props }: { props: any }) {
     const { tittleTextColor, subtittleTextColor, valueTitle, onChangeTitle, receivedTextDate, receivedText } = useStylesStates()
     const { frequencys, setFrequencys, valueFrequency, setValueFrequency, valuesArray } = useResultsDB()
-
+    console.log("COLOR: "+tittleTextColor)
     return (
         <>
             <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                 Título
             </Text>
-            <TextInput onChangeText={text => onChangeTitle(text)} value={valueTitle} style={styles.InputText} />
+            <TextInput 
+                onChangeText={text => onChangeTitle(text)} 
+                value={valueTitle} 
+                style={styles.InputText} 
+                maxLength={45}
+            />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View>
                     <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
@@ -53,24 +56,24 @@ export default function FormContent({ props }: { props: any }) {
                     value={props.date}
                     is24Hour={true}
                     display="default"
-                    onChange={props.onChange}
+                    onChange={props.onChangeDate}
                 />
             )}
             <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
                 Periodicidade
-                            </Text>
+            </Text>
             <View style={styles.frequencyView}>
                 <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>
                     Mensal
-                                </Text>
+                </Text>
                 <Switch
                     trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                    thumbColor={props.isEnabled ? 'd2d2d2' : tittleTextColor}
+                    thumbColor={props.switchMonthlyisEnabled ? 'd2d2d2' : tittleTextColor}
                     ios_backgroundColor="#3e3e3e"
-                    onValueChange={props.toggleSwitch}
-                    value={props.isEnabled}
+                    onValueChange={props.toggleSwitchMonthly}
+                    value={props.switchMonthlyisEnabled}
                 />
-                {props.isEnabled ?
+                {props.switchMonthlyisEnabled ?
                     <>
                         <Feather name='chevron-left' size={30} />
                         <Text style={{ fontSize: 18 }}>-</Text>
@@ -128,7 +131,6 @@ export default function FormContent({ props }: { props: any }) {
                                 </Text>
                         <TextInput
                             keyboardType='numeric'
-                            placeholder='R$ 0,00'
                             onChange={props.updateValues('amount', 0, false)}
                             value={valuesArray[0].amount.toString()}
                             style={styles.InputTextValue}
@@ -177,6 +179,6 @@ const styles = StyleSheet.create({
         color: '#136065',
         fontFamily: 'Poppins_500Medium',
         fontSize: 18,
-        textAlign: 'center',
+        width:'100%'
     },
 })

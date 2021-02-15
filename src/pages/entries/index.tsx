@@ -46,11 +46,12 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         setTextAlert,
         setMainColor2,
         setMainText2,
-        setModalType
+        setModalType,
+        onChangeTitle
 
     } = useStylesStates();
 
-    const { setEntries, entries, valuesList, setValuesList } = useResultsDB();
+    const { setEntries, entries, valuesList, setValuesList, setValueFrequency, setValuesArray } = useResultsDB();
 
     const [selectedId, setSelectedId] = useState(0)
 
@@ -122,8 +123,8 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                     ValuesDB.update(id, vlObj)
                 } else {
                     ValuesDB.remove(id)
-                    setValuesList(valuesList.filter((vlu: any) => vlu.id !== id))
                 }
+                setValuesList(valuesList.filter((vlu: any) => vlu.id !== id))
             }
         })
     }
@@ -156,8 +157,8 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                     loadResults()
                 } else {
                     ValuesDB.remove(value.id)
-                    setValuesList(valuesList.filter((vlu: any) => vlu.id !== value.id))
                 }
+                setValuesList(valuesList.filter((vlu: any) => vlu.id !== value.id))
             }
         })
     }
@@ -192,12 +193,12 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                     loadResults()
                 } else {
                     EntriesDB.remove2(id).then(()=>{
-                        setEntries(entries.filter((ern: EntriesValues) => ern.id !== id))
                         
                     }).catch(err =>{
                         console.log(err)
                     })
                 }
+                setEntries(entries.filter((ern: EntriesValues) => ern.id !== id))
                 updateValueOfAEntrie(id)
                 setModalVisible(false)
             }
@@ -294,6 +295,14 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     }
     const isFocused = useIsFocused()
 
+    function resetValues(){
+        setEntries([])
+        onChangeTitle()
+        setValueFrequency(1)
+        let arr = [{id: 1, description: '', amount: '0', monthly: false, repeat: 1}]
+        setValuesArray(arr)
+    }
+
     useEffect(() => {
 
         if (item === 'Ganhos') {
@@ -328,6 +337,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 setTextAlert('Despesa não paga!')
             }
         }
+        resetValues()
         console.log('Refreshed!');
         loadResults()
         EntriesDB.all().then((res: any) => {
