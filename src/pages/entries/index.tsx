@@ -278,7 +278,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         } else {
             firstDate = selectedYear.toString() + selectedMonth.toString()
         }
-        console.log("firstDate: " + firstDate)
+        //console.log("firstDate: " + firstDate)
 
         EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res: any) => {
             setEntries(res._array.filter((entrie: EntriesValues) => entrie.type == item))
@@ -307,8 +307,6 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
         if (item === 'Ganhos') {
             if (navigationScreen.isFocused()) {
-                console.log("Mes selecionado: " + selectedMonth)
-                console.log("Ano: " + selectedYear)
                 setMainColor1('#155F69')
                 setMainColor2('#F9CF3C')
                 setMainText1('Ganhos Atuais')
@@ -341,7 +339,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         console.log('Refreshed!');
         loadResults()
         EntriesDB.all().then((res: any) => {
-            console.log(res._array)
+           // console.log(res._array)
             
           }).catch(err => {
             console.log(err)

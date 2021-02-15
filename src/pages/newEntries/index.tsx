@@ -340,9 +340,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 }
 
                 if (value.dtEnd == 209912 && valuesBeforeUpdate[index] != null) {
-                    console.log('Valor antes: '+valuesBeforeUpdate[index].amount)
+                    //console.log('Valor antes: '+valuesBeforeUpdate[index].amount)
                     const newDtStart = new Date()
-                    console.log("dtStart: "+valuesBeforeUpdate[index].dtStart)
+                   // console.log("dtStart: "+valuesBeforeUpdate[index].dtStart)
                     newDtStart.setMonth(parseInt(Functions.toMonthAndYear(valuesBeforeUpdate[index].dtStart).month)-1)
                     newDtStart.setFullYear(parseInt(Functions.toMonthAndYear(valuesBeforeUpdate[index].dtStart).year))
                     selectedDate.setMonth(selectedMonth-1)
@@ -355,9 +355,9 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                     }
                     let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
                     if (contRep > 0){
-                        console.log("dtEnd: "+newDtEnd)
-                        console.log("contRep: "+contRep)
-                        console.log("newdtStart: "+newDtStart)
+                        //console.log("dtEnd: "+newDtEnd)
+                        //console.log("contRep: "+contRep)
+                        //console.log("newdtStart: "+newDtStart)
                         const ValueObjMonthly = {
                             description: value.description,
                             amount: valuesBeforeUpdate[index].amount,
