@@ -16,7 +16,7 @@ import ModalContent from './components/modalContent'
 import ButtonsEarnings from "./components/buttonsEarnings"
 import ButtonsExpanses from "./components/buttonsExpanses"
 
-import Loader from "../entries/components/loader"
+import * as FileSystem from 'expo-file-system';
 
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
@@ -132,6 +132,9 @@ export default function Main() {
 
     setSelectedMonth(CurrentMonth)
     setSelectedYear(CurrentYear)
+
+    const databaseFileUri = `${FileSystem.documentDirectory}SQLite/financadb2.db`;
+    console.log(' :'+databaseFileUri)
 
     /*Verifica se houve mudança de mês, caso sim, atualiza todos os recebidos/pagos como falso*/
     Dates.findByDate(CurrentMonth, CurrentYear).then(() => {

@@ -1,21 +1,69 @@
 import React, { useState } from 'react';
 
-import { StyleSheet, View, Text, Image, TextInput, KeyboardAvoidingView, Platform, Keyboard } from "react-native";
+
+import { StyleSheet, View, Text, TextInput, KeyboardAvoidingView, Platform, Keyboard } from "react-native";
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store';
 
 import { FontAwesome } from '@expo/vector-icons'
 
 import LogoView from './components/logoView'
+import UserDB from '../../services/userDB'
+import firebase from '../../services/firebaseDB'
+
+import {useUserDB} from '../../contexts/auth'
 
 import { TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Header } from 'react-native/Libraries/NewAppScreen';
 
 export default function Login() {
+    const navigation = useNavigation()
+    const {setUser, setIsLogged} = useUserDB()
 
     const [emailInputIsFocused, setEmailInputIsFocused] = useState(false)
     const [passwordInputIsFocused, setPasswordInputIsFocused] = useState(false)
 
+    const [inputEmail, setInputEmail] = useState('')
+    const [inputPassword, setInputPassword] = useState('')
+
     const [seePassword, setSeePassword] = useState(false)
+
+    function handleSignUp(){
+        navigation.navigate('SignUp')
+    }
+
+    async function save(key:any, value:any) {
+        await SecureStore.setItemAsync(key, value);
+    }
+
+    function storeEmail(userId:number, email:string) {
+        firebase
+          .database()
+          .ref('users/' + userId)
+          .set({
+            email: email,
+          });
+      }
+
+    function handleLogin(){
+        if(inputEmail){
+            UserDB.findUser(inputEmail).then((res:any)=>{
+                console.log(res._array)
+                if (inputPassword == res._array[0].password){
+                    const cred = JSON.stringify({inputEmail, inputPassword})
+                    save('credentials', cred ).then(()=>{
+                        setIsLogged(true)
+                        setUser(res._array)
+                        storeEmail(res._array[0].id, res._array[0].email)
+                    })
+                }
+            }).catch(err=>{
+                alert('usuario não encontrado')
+            })
+        }
+        
+    }
 
     return (
         <>
@@ -33,11 +81,12 @@ export default function Login() {
                         <View style={styles.formGroup}>
                             <Text style={styles.formLabel}>
                                 E-mail
-                        </Text>
+                            </Text>
                             <TextInput
                                 style={[styles.formTextInput, emailInputIsFocused && { borderColor: '#1A8289' }]}
                                 onFocus={() => setEmailInputIsFocused(true)}
                                 onBlur={() => setEmailInputIsFocused(false)}
+                                onChangeText={inputEmail => setInputEmail(inputEmail)}
                             />
                         </View>
                         <View style={styles.formGroup}>
@@ -49,11 +98,12 @@ export default function Login() {
                                     style={{width:'80%'}}
                                     onFocus={() => setPasswordInputIsFocused(true)}
                                     onBlur={() => setPasswordInputIsFocused(false)}
-                                    secureTextEntry={seePassword}
+                                    secureTextEntry={!seePassword}
+                                    onChangeText={password => setInputPassword(password)}
                                 />
                                 <TouchableOpacity style={styles.seePasswordButton} 
                                     onPress={()=> setSeePassword(previousState => !previousState)}>
-                                    {seePassword?
+                                    {!seePassword?
                                          <FontAwesome name="eye" size={24} color="black" />
                                          :
                                          <FontAwesome name="eye-slash" size={24} color="black" />
@@ -65,23 +115,23 @@ export default function Login() {
                         <TouchableOpacity style={{ padding: 10, alignItems: 'flex-end' }}>
                             <Text style={styles.formLabel}>
                                 Esqueci minha senha
-                        </Text>
+                            </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.buttonLogin}>
+                        <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin}>
                             <Text style={styles.buttonText}>
                                 Entrar
-                        </Text>
+                            </Text>
                         </TouchableOpacity>
 
                         <View style={styles.toSignUpView}>
                             <Text style={styles.formLabel}>
                                 Não tem cadastro?
-                        </Text>
-                            <TouchableOpacity style={{ marginLeft: 5 }}>
+                            </Text>
+                            <TouchableOpacity style={{ marginLeft: 5 }} onPress={handleSignUp}>
                                 <Text style={styles.formLinkText}>
                                     Crie uma conta
-                            </Text>
+                                </Text>
                             </TouchableOpacity>
                         </View>
 

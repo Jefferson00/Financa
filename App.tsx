@@ -6,6 +6,7 @@ import{Poppins_400Regular,Poppins_500Medium, Poppins_600SemiBold,Poppins_700Bold
 import SelectedMonthAndYearProvider from "./src/contexts/selectMonthAndYear"
 import StylesStatesProvider from "./src/contexts/stylesStates"
 import ResultsDBStatesProvider from "./src/contexts/resultsDBStates"
+import AuthContextProvider from "./src/contexts/auth"
 
 import Routes from './src/routes'
 
@@ -22,6 +23,7 @@ export default function App() {
   }
 
   return (
+    <AuthContextProvider>
     <ResultsDBStatesProvider>
         <StylesStatesProvider>
           <SelectedMonthAndYearProvider>
@@ -29,6 +31,7 @@ export default function App() {
           </SelectedMonthAndYearProvider>
       </StylesStatesProvider>
     </ResultsDBStatesProvider>
+    </AuthContextProvider>
   );
 }
 
