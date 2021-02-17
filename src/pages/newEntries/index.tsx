@@ -125,7 +125,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     function handleNavigateEntries() {
         resetValues()
         
-        nav.navigate('Entries', { item: item})
+        nav.goBack()
         setSuccessModal(false)
     }
 
@@ -527,10 +527,13 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             if (earning[0].monthly) {
                 setSwitchMonthlyIsEnabled(true)
             } else {
+                setSwitchMonthlyIsEnabled(false)
                 setValueFrequency(Functions.toFrequency(earning[0].dtEnd, earning[0].dtStart) + 1)
             }
             if (earning[0].received) {
                 setIsEnabledReceived(true)
+            }else{
+                setIsEnabledReceived(false)
             }
             date.setMonth(parseInt(Functions.toMonthAndYear(earning[0].dtStart).month)-1)
             date.setDate(earning[0].day)
