@@ -46,6 +46,11 @@ export default function Login() {
           });
       }
 
+    async function LoginFirebase(email:string, password:string) {
+        const user = await firebase.auth().signInWithEmailAndPassword(email,password)
+        console.log(user)
+    }
+
     function handleLogin(){
         if(inputEmail){
             UserDB.findUser(inputEmail).then((res:any)=>{
@@ -55,7 +60,7 @@ export default function Login() {
                     save('credentials', cred ).then(()=>{
                         setIsLogged(true)
                         setUser(res._array)
-                        storeEmail(res._array[0].id, res._array[0].email)
+                        LoginFirebase(res._array[0].email, res._array[0].password)
                     })
                 }
             }).catch(err=>{

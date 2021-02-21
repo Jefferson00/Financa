@@ -29,14 +29,14 @@ export default function Routes(){
       }
 
     useEffect(()=>{
-        getValueFor('credentials').then(res=>{
+        /*getValueFor('credentials').then(res=>{
             //console.log('get: '+res)
-            /*if(res){
+            if(res){
                 setIsLogged(true)
                 //console.log('ISLOGGED: '+isLogged)
-            }*/
-        })
-        //SecureStore.deleteItemAsync('credentials')
+            }
+        })*/
+        SecureStore.deleteItemAsync('credentials')
     },[])
     
 
