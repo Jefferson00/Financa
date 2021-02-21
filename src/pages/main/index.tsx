@@ -113,16 +113,16 @@ export default function Main() {
   }
 
   useEffect(() => {
-    if (selectedMonth != CurrentMonth) {
+    if (selectedMonth != CurrentMonth || selectedYear != CurrentYear) {
       if (navigation.isFocused()){
-        setPrimaryColor('#1B5AA4')
-        setSecondColor('#F9CF3C')
+        setPrimaryColor('#F9CF3C')
+        setSecondColor('#B26A15')
         setMonthColor('#FFFFFF')
       }
     } else {
       if (navigation.isFocused()){
-        setPrimaryColor('#F9CF3C')
-        setSecondColor('#B26A15')
+        setPrimaryColor('#FCC70F')
+        setSecondColor('#CC6E00')
         setMonthColor('#1A8289')
       }
     }
