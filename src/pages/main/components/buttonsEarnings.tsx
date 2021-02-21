@@ -3,27 +3,34 @@ import React from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
 
+import { useNavigation } from '@react-navigation/native';
+
 import { Feather, Foundation } from '@expo/vector-icons'
 
 
-export default function ButtonsEarnings({props}:{props:any}) {
+export default function ButtonsEarnings() {
 
+    const navigation = useNavigation()
 
+    function handleNavigateGanhos() {
+      navigation.navigate('Entries', { item: 'Ganhos'})
+    }
+    function handleNavigateNovoGanhos() {
+      navigation.navigate('NewEntries', { item: 'Ganhos'})
+    }
     return(
         <View style={styles.buttonsView}>
-            <LinearGradient colors={['#FFFFFF', '#24DBBA22']} start={{ x: -0.1, y: 0.1 }} style={styles.earningsButton}>
-                <TouchableOpacity style={styles.earningsButton} onPress={props.handleNavigateGanhos}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Foundation name="dollar" size={50} color="#1A8289" style={{ marginRight: 15, marginBottom: 5 }} />
+            
+                <TouchableOpacity style={styles.earningsButton} onPress={handleNavigateGanhos}>
+                      <Foundation name="dollar" size={40} color="#ffffff" style={{ marginRight: 15}} />
                       <Text style={styles.earningsTextButton}>Ganhos</Text>
-                    </View>
                 </TouchableOpacity>
-            </LinearGradient>
-            <LinearGradient colors={['#24DBBA', '#2AC4A8']} start={{ x: -0.1, y: 0.1 }} style={styles.plusButton}>
-                <TouchableOpacity style={styles.plusButton} onPress={props.handleNavigateNovoGanhos}>
-                  <Feather name="plus" size={40} color="#fff" />
+        
+          
+                <TouchableOpacity style={styles.plusButton} onPress={handleNavigateNovoGanhos}>
+                  <Feather name="plus" size={40} color="#ffffff" />
                 </TouchableOpacity>
-            </LinearGradient>
+
         </View>
     )
 
@@ -40,25 +47,30 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
         borderRadius: 20,
         borderColor: '#24DBBA',
+        backgroundColor:'rgba(26, 130, 137, 0.5)',
         borderWidth: 1,
-        height: 83,
-        width: 207,
+        height: 55,
+        width: 247,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: "center",
+        justifyContent: "flex-start",
+        paddingLeft:24,
       },
     
       earningsTextButton: {
-        color: "#1A8289",
+        color: "#ffffff",
         fontFamily: 'Poppins_500Medium',
-        fontSize: 24,
+        fontSize: 18,
       },
     
       plusButton: {
-        width: 91,
-        height: 83,
+        width: 55,
+        height: 55,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#24DBBA',
+        backgroundColor:'rgba(26, 130, 137, 0.5)',
       },
 })

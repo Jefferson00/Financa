@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, Ionicons } from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
 import Functions from '../../../functions'
 
@@ -9,7 +9,8 @@ import { ValuesValues, Balance } from "../../../interfaces"
 import { useSelectedMonthAndYear } from '../../../contexts/selectMonthAndYear'
 import { useResultsDB } from '../../../contexts/resultsDBStates'
 
-import Loader from "../../entries/components/loader"
+import ButtonsEarnings from "./buttonsEarnings"
+import ButtonsExpanses from "./buttonsExpanses"
 
 export default function BalanceValues({ props }: { props: any }) {
 
@@ -17,6 +18,10 @@ export default function BalanceValues({ props }: { props: any }) {
   const { balance, valuesList } = useResultsDB();
 
   const [done, setDone] = useState(false)
+
+  const [isBalanceActive, setIsBalanceActive] = useState(true)
+  const [isEarningsActive, setIsEarningsActive] = useState(false)
+  const [isExpansesActive, setIsExpansesActive] = useState(false)
 
   let contEarnings: Array<number> = []
   let contEstimatedEarnings: Array<number> = []
@@ -44,7 +49,7 @@ export default function BalanceValues({ props }: { props: any }) {
   balance.map((bal: Balance, index: number) => {
     if (bal.year == selectedYear && bal.month == selectedMonth) {
       remainingValues = bal.amount - (contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0))
-    } 
+    }
   })
 
   balance.map((bal: Balance, index: number) => {
@@ -55,217 +60,305 @@ export default function BalanceValues({ props }: { props: any }) {
 
   return (
     <>
-      <View style={styles.balanceView}>
-        <View style={styles.currentBalanceView}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => props.showModalBalance(1)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
-            <Text style={styles.currentBalanceText}>
-              Seu Saldo Atual
-            </Text>
-          </View>
-          {/* Valor do Saldo Atual */}
-          {/* Se não tiver saldo ou o mês selecionado for diferente do mês atual..., mostra o valor R$ 0,00 */}
-          {noBalance || currentBalance == 0 ?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
-            </View>
-            :
-            <NumberFormat
-              value={currentBalance}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value =>
-                <Text style={styles.currentBalanceTextValue}>
-                  {value}
-                </Text>}
-            />
-          }
-
-          {/* Valor restante dos meses anteriores */}
-          
-          <NumberFormat
-              value={remainingValues}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value =>
-              <Text style={[styles.currentBalanceTextValue, { fontSize: 14 }]}>
-                {value}
-              </Text>
-              }
-          /> 
-        </View>
-
-        <View style={styles.currentBalanceView}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <Text style={styles.estimatedBalanceText}>
-              Saldo Estimado
-            </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => props.showModalBalance(2)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Valor do Saldo Estimado */}
-          {noBalance ?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
-            </View>
-            :
-            <NumberFormat
-              value={
-                contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
-              }
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value =>
-                <Text style={styles.estimatedBalanceTextValue}>
-                  {value}
-                </Text>}
-            />
-          }
-          {/* Valor do Saldo Estimado Total com os valores restantes  */}
-          {}
-          <NumberFormat
-              value={totalEstimatedBalance}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value =>
-                <Text style={[styles.estimatedBalanceTextValue, { fontSize: 14 }]}>
-                  {value}
-                </Text>}
-              />
-        </View>
+      <View style={styles.selectValuesView}>
+        <TouchableOpacity style={isBalanceActive ? styles.activeButton : styles.nonActiveButton}
+          onPress={() => {
+            setIsBalanceActive(true)
+            setIsEarningsActive(false)
+            setIsExpansesActive(false)
+          }}
+        >
+          <Text style={isBalanceActive ? styles.activeText : styles.nonActiveText}>
+            Saldo
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={isEarningsActive ? styles.activeButton : styles.nonActiveButton}
+          onPress={() => {
+            setIsBalanceActive(false)
+            setIsEarningsActive(true)
+            setIsExpansesActive(false)
+          }}
+        >
+          <Text style={isEarningsActive ? styles.activeText : styles.nonActiveText}>
+            Ganhos
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={isExpansesActive ? styles.activeButton : styles.nonActiveButton}
+          onPress={() => {
+            setIsBalanceActive(false)
+            setIsEarningsActive(false)
+            setIsExpansesActive(true)
+          }}
+        >
+          <Text style={isExpansesActive ? styles.activeText : styles.nonActiveText}>
+            Despesas
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.valuesView}>
-        {/* GANHOS*/}
-        <View style={styles.currentBalanceView}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <TouchableOpacity style={{ marginRight: 5 }} onPress={() => props.showModalBalance(3)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
+      {/*SALDOS*/}
+      {isBalanceActive ?
+        <>
+          <View style={styles.balanceTitleView}>
+            <Text style={styles.currentBalanceText}>
+              Seu Saldo do mês
+              </Text>
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
+              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
             </TouchableOpacity>
-            <Text style={styles.earningsText}>
-              Ganhos
-            </Text>
           </View>
-          {/* Valor dos ganhos atuais */}
-          {/* Se é um mês anterior ao mês atual, mostra o ganhos estimados daquele mês 
-            do contrario, verifica se os ganhos atuais são iguais a zero, caso não for, mostra os ganhos atuais
-          */}
-          {(selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <View style={styles.balanceView}>
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={styles.currentBalanceText}>
+                  Atual
+              </Text>
+              </View>
+              {/* Valor do Saldo Atual */}
+              {/* Se não tiver saldo ou o mês selecionado for diferente do mês atual..., mostra o valor R$ 0,00 */}
+              {noBalance || currentBalance == 0 ?
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                  <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+                </View>
+                :
+                <NumberFormat
+                  value={currentBalance}
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  format={Functions.currencyFormatter}
+                  renderText={value =>
+                    <Text style={styles.currentBalanceTextValue}>
+                      {value}
+                    </Text>}
+                />
+              }
+
+            </View>
+
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={styles.estimatedBalanceText}>
+                  Estimado
+              </Text>
+              </View>
+
+              {/* Valor do Saldo Estimado */}
+              {noBalance ?
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                  <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
+                </View>
+                :
+                <NumberFormat
+                  value={
+                    contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
+                  }
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  format={Functions.currencyFormatter}
+                  renderText={value =>
+                    <Text style={styles.estimatedBalanceTextValue}>
+                      {value}
+                    </Text>}
+                />
+              }
+
+            </View>
+          </View>
+          <View style={styles.balanceTitleView}>
+            <Text style={styles.currentBalanceText}>
+              Seu Saldo Total
+              </Text>
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
+              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.balanceView}>
+
+            {/* Valor restante dos meses anteriores */}
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={styles.currentBalanceText}>
+                  Atual
+                </Text>
+              </View>
+
               <NumberFormat
-                value={estimatedEarnings}
+                value={remainingValues}
                 displayType={'text'}
                 thousandSeparator={true}
                 format={Functions.currencyFormatter}
-                renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                renderText={value =>
+                  <Text style={[styles.currentBalanceTextValue]}>
+                    {value}
+                  </Text>
+                }
               />
             </View>
-            : noBalance || currentEarnings == 0
-              ?
-              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+
+            {/* Valor do Saldo Estimado Total com os valores restantes  */}
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={styles.estimatedBalanceText}>
+                  Estimado
+                </Text>
               </View>
-              :
-              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+
+              <NumberFormat
+                value={totalEstimatedBalance}
+                displayType={'text'}
+                thousandSeparator={true}
+                format={Functions.currencyFormatter}
+                renderText={value =>
+                  <Text style={styles.estimatedBalanceTextValue}>
+                    {value}
+                  </Text>}
+              />
+            </View>
+          </View>
+
+        </>
+        : null
+      }
+
+      {isEarningsActive ?
+        <>
+          <View style={styles.balanceTitleView}>
+            <Text style={styles.currentBalanceText}>
+              Seus ganhos do Mês
+              </Text>
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
+              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.balanceView}>
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={styles.earningsText}>
+                  Recebido
+                  </Text>
+              </View>
+              {(selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
                 <NumberFormat
-                  value={currentEarnings}
+                  value={estimatedEarnings}
                   displayType={'text'}
                   thousandSeparator={true}
                   format={Functions.currencyFormatter}
                   renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
                 />
+                : noBalance || currentEarnings == 0
+                  ?
+                  <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+                  :
+                  <NumberFormat
+                    value={currentEarnings}
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    format={Functions.currencyFormatter}
+                    renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                  />
+              }
+            </View>
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={[styles.earningsText, { color: 'rgba(26, 130, 137, 0.6)' }]}>
+                  Estimado
+                </Text>
               </View>
-          }
-          {/* Valor dos ganhos estimados */}
-          {/* verifica se possui saldo, caso possua mostra os ganhos estimados
-          */}
-
-          {noBalance ?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
+              {noBalance ?
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                  <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+                </View>
+                :
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                  <NumberFormat
+                    value={estimatedEarnings}
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    format={Functions.currencyFormatter}
+                    renderText={value =>
+                      <Text style={[styles.earningsTextValue, { color: 'rgba(26, 130, 137, 0.6)' }]}>
+                        {value}
+                      </Text>
+                    } />
+                </View>
+              }
             </View>
-            :
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <NumberFormat
-                value={estimatedEarnings}
-                displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value =>
-                  <Text style={[styles.earningsTextValue, { fontSize: 14 }]}>
-                    {value}
-                  </Text>
-                } />
-            </View>
-          }
-        </View>
+          </View>
+          <ButtonsEarnings></ButtonsEarnings>
+        </>
+        : null
+      }
 
-
-        <View style={styles.currentBalanceView}>
-          {/* DESPESAS*/}
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <Text style={styles.expensesText}>
-              Despesas
-            </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => props.showModalBalance(4)}>
-              <AntDesign name="questioncircle" size={20} color="#136065" style={{ opacity: 0.5 }} />
+      {isExpansesActive ?
+        <>
+          <View style={styles.balanceTitleView}>
+            <Text style={styles.currentBalanceText}>
+              Suas despesas do mês
+              </Text>
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
+              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
             </TouchableOpacity>
           </View>
-          {/* Valor das despesas atuais */}
-          {/* Se é um mês anterior ao mês atual, mostra as despesas estimadas daquele mês 
-            do contrario, verifica se as despesas atuais são iguais a zero, caso não for, mostra as despesas atuais
-          */}
-          {(selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
-            <NumberFormat
-              value={estimatedExpenses}
-              displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
-            />
-            : noBalance || currentExpenses == 0 ?
-              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <Text style={styles.expensesTextValue}>R$ 0,00</Text>
+          <View style={styles.balanceView}>
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={styles.expensesText}>
+                  Pago
+                  </Text>
               </View>
-              :
-              <NumberFormat
-                value={currentExpenses}
-                displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
-              />
-          }
+              {(selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
+                <NumberFormat
+                  value={estimatedExpenses}
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  format={Functions.currencyFormatter}
+                  renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
+                />
+                : noBalance || currentExpenses == 0 ?
+                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <Text style={styles.expensesTextValue}>R$ 0,00</Text>
+                  </View>
+                  :
+                  <NumberFormat
+                    value={currentExpenses}
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    format={Functions.currencyFormatter}
+                    renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
+                  />
+              }
 
-           {/* Valor das despesas estimadas */}
-          {/* verifica se possui saldo, caso possua mostra as despesas estimadas
-          */}
-          {noBalance ?
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>R$ 0,00</Text>
             </View>
-            :
-            <NumberFormat
-              value={estimatedExpenses}
-              displayType={'text'}
-              thousandSeparator={true}
-              format={Functions.currencyFormatter}
-              renderText={value =>
-                <Text style={[styles.expensesTextValue, { fontSize: 14 }]}>
-                  {value}
-                </Text>}
-            />
-          }
-        </View>
-      </View>
+            <View style={styles.currentBalanceView}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <Text style={[styles.expensesText, { color: 'rgba(204, 55, 40, 0.6)' }]}>
+                  Estimado
+                </Text>
+              </View>
+              {noBalance ?
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                  <Text style={styles.expensesTextValue}>R$ 0,00</Text>
+                </View>
+                :
+                <NumberFormat
+                  value={estimatedExpenses}
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  format={Functions.currencyFormatter}
+                  renderText={value =>
+                    <Text style={[styles.expensesTextValue,{color:'rgba(204, 55, 40, 0.6)'}]}>
+                      {value}
+                    </Text>}
+                />
+              }
+            </View>
+
+          </View>
+          <ButtonsExpanses></ButtonsExpanses>
+        </>
+        : null
+      }
     </>
   )
 }
@@ -282,6 +375,41 @@ const styles = StyleSheet.create({
     marginHorizontal: 26,
   },
 
+  balanceTitleView: {
+    flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 33, marginTop: 14, alignItems: 'center'
+  },
+  activeText:{
+    fontSize: 14,
+    fontFamily: 'Poppins_500Medium',
+    color:'#1A8289'
+  },
+  nonActiveText:{
+    fontSize: 14,
+    fontFamily: 'Poppins_500Medium',
+    color:'rgba(26, 130, 137, 0.6)'
+  },
+  selectValuesView: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: 26,
+    marginTop: 13,
+  },
+  activeButton: {
+    height: 30,
+    marginHorizontal: 15,
+    minWidth:120,
+    borderRadius: 20,
+    backgroundColor: '#ffffffaa',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  nonActiveButton: {
+    height: 30,
+    marginHorizontal: 15,
+    width: 85,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   currentBalanceText: {
     color: '#fff',
     fontFamily: 'Poppins_400Regular',
@@ -314,32 +442,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     paddingHorizontal: 26,
-    marginTop: 32,
   },
 
   earningsText: {
-    color: '#BFFDCC',
+    color: '#1A8289',
     fontFamily: 'Poppins_400Regular',
     fontSize: 14,
     textAlign: 'center'
   },
 
   earningsTextValue: {
-    color: '#BFFDCC',
+    color: '#1A8289',
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 24,
     textAlign: 'center'
   },
 
   expensesText: {
-    color: '#FFE1E1',
+    color: '#CC3728',
     fontFamily: 'Poppins_400Regular',
     fontSize: 14,
     textAlign: 'center'
   },
 
   expensesTextValue: {
-    color: '#FFE1E1',
+    color: '#CC3728',
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 24,
     textAlign: 'center'

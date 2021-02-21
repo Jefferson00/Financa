@@ -3,25 +3,28 @@ import React from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
 
+import { useNavigation } from '@react-navigation/native';
+
 import { Feather, Foundation } from '@expo/vector-icons'
 
 
-export default function ButtonsExpanses({props}:{props:any}) {
-
-
+export default function ButtonsExpanses() {
+    const navigation = useNavigation()
+    function handleNavigateDespesas() {
+      navigation.navigate('Entries', { item: 'Despesas'})
+    }
+    function handleNavigateNovoDespesas() {
+      navigation.navigate('NewEntries', { item: 'Despesas'})
+    }
     return(
         <View style={styles.buttonsView}>
-          <LinearGradient colors={['#FFFFFF', '#CC372822']} start={{ x: -0.1, y: 0.1 }} style={styles.expensesButton}>
-            <TouchableOpacity style={styles.expensesButton} onPress={props.handleNavigateDespesas}>
-              <Foundation name="dollar" size={50} color="#CC3728" style={{ marginRight: 15, marginBottom: 5 }} />
+            <TouchableOpacity style={styles.expensesButton} onPress={handleNavigateDespesas}>
+              <Foundation name="dollar" size={40} color="#ffffff" style={{ marginRight: 15}} />
               <Text style={styles.expensesTextButton}>Despesas</Text>
             </TouchableOpacity>
-          </LinearGradient>
-          <LinearGradient colors={['#F4786C', '#CC3728']} start={{ x: -0.1, y: 0.1 }} style={styles.plusButton}>
-            <TouchableOpacity style={styles.plusButton} onPress={props.handleNavigateNovoDespesas}>
-              <Feather name="plus" size={40} color="#fff" />
+            <TouchableOpacity style={styles.plusButton} onPress={handleNavigateNovoDespesas}>
+              <Feather name="plus" size={40} color="#ffffff" />
             </TouchableOpacity>
-          </LinearGradient>
         </View>
     )
 
@@ -36,24 +39,29 @@ const styles = StyleSheet.create({
       expensesButton: {
         borderStyle: 'solid',
         borderRadius: 20,
-        borderColor: '#CC3728',
+        borderColor: '#FF4835',
+        backgroundColor:'rgba(255, 72, 53, 0.5)',
         borderWidth: 1,
-        height: 83,
-        width: 207,
+        height: 55,
+        width: 247,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: "center",
+        justifyContent: "flex-start",
+        paddingLeft:24,
       },
       expensesTextButton: {
-        color: "#CC3728",
+        color: "#ffffff",
         fontFamily: 'Poppins_500Medium',
-        fontSize: 24,
+        fontSize: 18,
       },
       plusButton: {
-        width: 91,
-        height: 83,
+        width: 55,
+        height: 55,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#FF4835',
+        backgroundColor:'rgba(255, 72, 53, 0.5)',
       },
 })

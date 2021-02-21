@@ -264,11 +264,11 @@ export default function Main() {
       <View style={styles.mainContainer}>
         {/*Botões Ganhos*/}
 
-        <ButtonsEarnings props={props}></ButtonsEarnings>
+       
 
         {/*Botões Despesas*/}
 
-       <ButtonsExpanses props={props}></ButtonsExpanses>
+       
 
         {/* Nos próximos dias, aqui será mostrado os ganhos/despesas mais próximos */}
 
