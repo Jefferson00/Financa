@@ -13,10 +13,7 @@ import Header from "../components/header"
 import BalanceValues from "./components/balanceValues"
 import NextDays from "./components/nextDays"
 import ModalContent from './components/modalContent'
-import ButtonsEarnings from "./components/buttonsEarnings"
-import ButtonsExpanses from "./components/buttonsExpanses"
-
-import Loader from "../entries/components/loader"
+import MenuFooter from '../components/menuFooter'
 
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
@@ -279,6 +276,8 @@ export default function Main() {
         <NextDays props={props}></NextDays>
 
       </View>
+
+      <MenuFooter/>
 
           <ModalContent></ModalContent>
 
