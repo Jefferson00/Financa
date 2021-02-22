@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { AntDesign, Ionicons } from '@expo/vector-icons'
+import  {Ionicons } from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
 import Functions from '../../../functions'
 
@@ -22,6 +22,10 @@ export default function BalanceValues({ props }: { props: any }) {
   const [isBalanceActive, setIsBalanceActive] = useState(true)
   const [isEarningsActive, setIsEarningsActive] = useState(false)
   const [isExpansesActive, setIsExpansesActive] = useState(false)
+
+  const [seeBalanceValues, setSeeBalanceValues] = useState(true)
+  const [seeEarningsValues, setSeeEarningsValues] = useState(true)
+  const [seeExpansesValues, setSeeExpansesValues] = useState(true)
 
   let contEarnings: Array<number> = []
   let contEstimatedEarnings: Array<number> = []
@@ -57,6 +61,18 @@ export default function BalanceValues({ props }: { props: any }) {
       totalEstimatedBalance = bal.amount
     }
   })
+
+  function updateSeeValue(item:String){
+      if (item == "Saldo"){
+        setSeeBalanceValues(!seeBalanceValues)
+      }
+      else if( item == "Ganhos"){
+        setSeeEarningsValues(!seeEarningsValues)
+      }
+      else if (item == "Despesas"){
+        setSeeExpansesValues(!seeExpansesValues)
+      }
+  }
 
   return (
     <>
@@ -103,8 +119,12 @@ export default function BalanceValues({ props }: { props: any }) {
             <Text style={styles.currentBalanceText}>
               Seu Saldo do mês
               </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
-              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> updateSeeValue('Saldo')}>
+                {seeBalanceValues?
+                <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+                :
+                <Ionicons name="eye" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+                }
             </TouchableOpacity>
           </View>
           <View style={styles.balanceView}>
@@ -116,7 +136,9 @@ export default function BalanceValues({ props }: { props: any }) {
               </View>
               {/* Valor do Saldo Atual */}
               {/* Se não tiver saldo ou o mês selecionado for diferente do mês atual..., mostra o valor R$ 0,00 */}
-              {noBalance || currentBalance == 0 ?
+              {
+                seeBalanceValues?
+                noBalance || currentBalance == 0 ?
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                   <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
                 </View>
@@ -128,9 +150,12 @@ export default function BalanceValues({ props }: { props: any }) {
                   format={Functions.currencyFormatter}
                   renderText={value =>
                     <Text style={styles.currentBalanceTextValue}>
-                      {value}
-                    </Text>}
+                       {value}
+                    </Text> 
+                  }
                 />
+                :
+                <View style={styles.censoredValue}/>
               }
 
             </View>
@@ -143,23 +168,26 @@ export default function BalanceValues({ props }: { props: any }) {
               </View>
 
               {/* Valor do Saldo Estimado */}
-              {noBalance ?
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                  <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
-                </View>
+              {seeBalanceValues?
+                  noBalance ?
+                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
+                  </View>
+                  :
+                  <NumberFormat
+                    value={
+                      contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
+                    }
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    format={Functions.currencyFormatter}
+                    renderText={value =>
+                      <Text style={styles.estimatedBalanceTextValue}>
+                        {value}
+                      </Text>}
+                  />
                 :
-                <NumberFormat
-                  value={
-                    contEstimatedEarnings.reduce((a: any, b: any) => a + b, 0) - contEstimatedExpenses.reduce((a: any, b: any) => a + b, 0)
-                  }
-                  displayType={'text'}
-                  thousandSeparator={true}
-                  format={Functions.currencyFormatter}
-                  renderText={value =>
-                    <Text style={styles.estimatedBalanceTextValue}>
-                      {value}
-                    </Text>}
-                />
+                <View style={styles.censoredValue}/>
               }
 
             </View>
@@ -168,9 +196,6 @@ export default function BalanceValues({ props }: { props: any }) {
             <Text style={styles.currentBalanceText}>
               Seu Saldo Total
               </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
-              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
           </View>
 
           <View style={styles.balanceView}>
@@ -183,17 +208,21 @@ export default function BalanceValues({ props }: { props: any }) {
                 </Text>
               </View>
 
-              <NumberFormat
-                value={remainingValues}
-                displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value =>
-                  <Text style={[styles.currentBalanceTextValue]}>
-                    {value}
-                  </Text>
-                }
-              />
+              {seeBalanceValues?
+                  <NumberFormat
+                  value={remainingValues}
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  format={Functions.currencyFormatter}
+                  renderText={value =>
+                    <Text style={[styles.currentBalanceTextValue]}>
+                      {value}
+                    </Text>
+                    }
+                  />
+                  :
+                  <View style={styles.censoredValue}/>
+              }
             </View>
 
             {/* Valor do Saldo Estimado Total com os valores restantes  */}
@@ -204,16 +233,20 @@ export default function BalanceValues({ props }: { props: any }) {
                 </Text>
               </View>
 
-              <NumberFormat
-                value={totalEstimatedBalance}
-                displayType={'text'}
-                thousandSeparator={true}
-                format={Functions.currencyFormatter}
-                renderText={value =>
-                  <Text style={styles.estimatedBalanceTextValue}>
-                    {value}
-                  </Text>}
-              />
+              {seeBalanceValues?
+                  <NumberFormat
+                  value={totalEstimatedBalance}
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  format={Functions.currencyFormatter}
+                  renderText={value =>
+                    <Text style={styles.estimatedBalanceTextValue}>
+                      {value}
+                    </Text>}
+                  />
+                  :
+                  <View style={styles.censoredValue}/>
+              }
             </View>
           </View>
 
@@ -221,15 +254,22 @@ export default function BalanceValues({ props }: { props: any }) {
         : null
       }
 
+
+
+
       {isEarningsActive ?
         <>
           <View style={styles.balanceTitleView}>
             <Text style={styles.currentBalanceText}>
               Seus ganhos do Mês
               </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
-              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
-            </TouchableOpacity>
+              <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> updateSeeValue('Ganhos')}>
+                {seeEarningsValues?
+                <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+                :
+                <Ionicons name="eye" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+                }
+              </TouchableOpacity>
           </View>
           <View style={styles.balanceView}>
             <View style={styles.currentBalanceView}>
@@ -238,25 +278,28 @@ export default function BalanceValues({ props }: { props: any }) {
                   Recebido
                   </Text>
               </View>
-              {(selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
-                <NumberFormat
-                  value={estimatedEarnings}
-                  displayType={'text'}
-                  thousandSeparator={true}
-                  format={Functions.currencyFormatter}
-                  renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
-                />
-                : noBalance || currentEarnings == 0
-                  ?
-                  <Text style={styles.earningsTextValue}>R$ 0,00</Text>
-                  :
+              {seeEarningsValues?
+                  (selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
                   <NumberFormat
-                    value={currentEarnings}
+                    value={estimatedEarnings}
                     displayType={'text'}
                     thousandSeparator={true}
                     format={Functions.currencyFormatter}
                     renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
                   />
+                  : noBalance || currentEarnings == 0
+                    ?
+                    <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+                    :
+                    <NumberFormat
+                      value={currentEarnings}
+                      displayType={'text'}
+                      thousandSeparator={true}
+                      format={Functions.currencyFormatter}
+                      renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                    />
+                  :
+                  <View style={styles.censoredValue}/>
               }
             </View>
             <View style={styles.currentBalanceView}>
@@ -265,23 +308,29 @@ export default function BalanceValues({ props }: { props: any }) {
                   Estimado
                 </Text>
               </View>
-              {noBalance ?
+              {
+              seeEarningsValues?
+              noBalance ?
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                   <Text style={styles.earningsTextValue}>R$ 0,00</Text>
                 </View>
                 :
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                  <NumberFormat
-                    value={estimatedEarnings}
-                    displayType={'text'}
-                    thousandSeparator={true}
-                    format={Functions.currencyFormatter}
-                    renderText={value =>
-                      <Text style={[styles.earningsTextValue, { color: 'rgba(26, 130, 137, 0.6)' }]}>
-                        {value}
-                      </Text>
-                    } />
+                  
+                       <NumberFormat
+                       value={estimatedEarnings}
+                       displayType={'text'}
+                       thousandSeparator={true}
+                       format={Functions.currencyFormatter}
+                       renderText={value =>
+                         <Text style={[styles.earningsTextValue, { color: 'rgba(26, 130, 137, 0.6)' }]}>
+                           {value}
+                         </Text>
+                       } />
+                  
                 </View>
+                :
+                <View style={styles.censoredValue}/>
               }
             </View>
           </View>
@@ -296,8 +345,12 @@ export default function BalanceValues({ props }: { props: any }) {
             <Text style={styles.currentBalanceText}>
               Suas despesas do mês
               </Text>
-            <TouchableOpacity style={{ marginLeft: 5 }} onPress={() => { }}>
-              <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+            <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> updateSeeValue('Despesas')}>
+                {seeExpansesValues?
+                <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+                :
+                <Ionicons name="eye" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
+                }
             </TouchableOpacity>
           </View>
           <View style={styles.balanceView}>
@@ -307,7 +360,9 @@ export default function BalanceValues({ props }: { props: any }) {
                   Pago
                   </Text>
               </View>
-              {(selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
+              { 
+                seeExpansesValues?
+                (selectedMonth < props.CurrentMonth && selectedYear <= props.CurrentYear) || selectedYear < props.CurrentYear ?
                 <NumberFormat
                   value={estimatedExpenses}
                   displayType={'text'}
@@ -327,6 +382,8 @@ export default function BalanceValues({ props }: { props: any }) {
                     format={Functions.currencyFormatter}
                     renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
                   />
+                :
+                <View style={styles.censoredValue}/>
               }
 
             </View>
@@ -336,7 +393,9 @@ export default function BalanceValues({ props }: { props: any }) {
                   Estimado
                 </Text>
               </View>
-              {noBalance ?
+              {
+                seeExpansesValues?
+                noBalance ?
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                   <Text style={styles.expensesTextValue}>R$ 0,00</Text>
                 </View>
@@ -351,6 +410,8 @@ export default function BalanceValues({ props }: { props: any }) {
                       {value}
                     </Text>}
                 />
+                :
+                <View style={styles.censoredValue}/>
               }
             </View>
 
@@ -373,6 +434,12 @@ const styles = StyleSheet.create({
   currentBalanceView: {
     justifyContent: 'center',
     marginHorizontal: 26,
+  },
+
+  censoredValue:{
+      height:25,
+      width:136,
+      backgroundColor:'rgba(247, 241, 241, 0.80)',
   },
 
   balanceTitleView: {
