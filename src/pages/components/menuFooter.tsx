@@ -18,6 +18,9 @@ export default function Footer(){
     function handleProfile(){
         navigation.navigate('Entries', { item: 'Ganhos'})
     }
+    function handleNotification(){
+        navigation.navigate('Notifications')
+    }
 
 
     return(
@@ -31,8 +34,8 @@ export default function Footer(){
             <TouchableOpacity>
                 <MaterialIcons name="analytics" size={40} color={nonActiveItemColor} />
             </TouchableOpacity>
-            <TouchableOpacity>
-                <Ionicons name="notifications" size={40} color={nonActiveItemColor} />
+            <TouchableOpacity onPress={handleNotification}>
+                <Ionicons name="notifications" size={40} color={route.name=="Notifications"?activeItemColor:nonActiveItemColor} />
             </TouchableOpacity>
         </View>
     )
@@ -54,5 +57,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.5,
         shadowRadius: 4.65,
+        bottom:0,
     },
 })
