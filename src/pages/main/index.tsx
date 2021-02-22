@@ -14,6 +14,7 @@ import BalanceValues from "./components/balanceValues"
 import NextDays from "./components/nextDays"
 import ModalContent from './components/modalContent'
 import MenuFooter from '../components/menuFooter'
+import LatestTransations from './components/latestTransactions'
 
 import {useSelectedMonthAndYear} from '../../contexts/selectMonthAndYear'
 import {useStylesStates} from '../../contexts/stylesStates'
@@ -266,6 +267,7 @@ export default function Main() {
         {/*Botões Despesas*/}
 
        
+        <LatestTransations props={props}/>
 
         {/* Nos próximos dias, aqui será mostrado os ganhos/despesas mais próximos */}
 
@@ -273,11 +275,12 @@ export default function Main() {
           <Text style={styles.nextDaysText}>Nos próximos dias...</Text>
         </View>
 
+
         <NextDays props={props}></NextDays>
+        <MenuFooter/>
 
       </View>
 
-      <MenuFooter/>
 
           <ModalContent></ModalContent>
 
