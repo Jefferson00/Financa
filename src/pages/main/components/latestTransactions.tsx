@@ -10,10 +10,10 @@ import { useResultsDB } from '../../../contexts/resultsDBStates'
 export default function LatestTransactions({ props }: { props: any }) {
     
 
-    const { mainEntries, valuesList } = useResultsDB();
+    const { entries, valuesList } = useResultsDB();
     const [seeTransactions, setSeeTransactions] = useState(true)
 
-    const latestEntries = mainEntries.slice(Math.max(mainEntries.length - 3, 0))
+    const latestEntries = entries.slice(Math.max(entries.length - 3, 0))
 
     
 
