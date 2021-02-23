@@ -6,6 +6,7 @@ import Functions from '../../../functions/index'
 import NumberFormat from 'react-number-format';
 
 import {useSelectedMonthAndYear} from "../../../contexts/selectMonthAndYear"
+import {useResultsDB} from "../../../contexts/resultsDBStates"
 
 import EntriesDB from '../../../services/entriesDB'
 import ValuesDB from '../../../services/valuesDB'
@@ -13,11 +14,23 @@ import ValuesDB from '../../../services/valuesDB'
 export default function Results() {
 
     const { selectedMonth, selectedYear} = useSelectedMonthAndYear()
+    const {nextEntries,nextMonthEntries}  = useResultsDB();
+
+
     const [entries, setEntries] = useState([])
+    const [itemSelected, setItemSelected] = useState('Ganhos')
 
     const todayDate = new Date()
     const CurrentMonth = todayDate.getMonth() + 1
     const CurrentYear = todayDate.getFullYear()
+
+    function handleEarnings(){
+        setItemSelected('Ganhos')
+    }
+
+    function handleExpanses(){
+        setItemSelected('Despesas')
+    }
 
     useEffect(() => {
         let firstDate
@@ -41,28 +54,34 @@ export default function Results() {
     return(
         <View style={styles.container}>
             <View style={styles.topSelectButtons}>
-                <TouchableOpacity style={[
-                    styles.selectButton,
-                    {backgroundColor:'#1A8289',
-                    borderTopLeftRadius:20,
-                    }
-                ]}>
-                    <Text style={[
-                        styles.titleButton,
-                        {color:'#ffffff'}
-                    ]}>
-                        Ganhos
-                    </Text>
+                <TouchableOpacity 
+                    style={[
+                        styles.selectButton,  
+                        {backgroundColor: itemSelected=='Ganhos'? '#1A8289' : '#91D4D9',
+                        borderTopLeftRadius:20,
+                        }
+                    ]}
+                    onPress={handleEarnings}
+                >
+                        <Text style={[
+                            styles.titleButton,
+                            {color: itemSelected=='Ganhos'? '#ffffff' : '#1A8289'}
+                        ]}>
+                            Ganhos
+                        </Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity style={[
-                    styles.selectButton,
-                    {backgroundColor:'#FFC8C2',
-                    borderTopRightRadius:20,
-                    }
-                ]}>
+                        styles.selectButton,
+                        {backgroundColor: itemSelected=='Despesas'? '#FF4835' : '#FFC8C2',
+                        borderTopRightRadius:20,
+                        }
+                    ]}
+                    onPress={handleExpanses}
+                >
                     <Text style={[
                         styles.titleButton,
-                        {color:'#FF4835'}
+                        {color: itemSelected=='Despesas'? '#ffffff' : '#FF4835'}
                     ]}>
                         Despesas
                     </Text>
@@ -70,28 +89,32 @@ export default function Results() {
             </View>
 
             <ScrollView>
-            <Text style={styles.titleButton}>
+            <Text style={styles.titleContainer}>
                 Atrasados
             </Text>
 
             {entries.map((entr:any,index:number)=>{
-                console.log(entr.received)
-                if (entr.received == 0){
+                //console.log(entr.received)
+                if (entr.received == 0 && entr.type == itemSelected){
+                    let colorText = ''
+                    let bgcolor = ''
+                        entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
+                        entr.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
                     return(
-                        <View style={styles.resultItem} key={index}>
+                        <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
                             <MaterialIcons 
                                 name="monetization-on" 
                                 size={40} 
-                                color={'#13585C'} />
+                                color={colorText} />
                             
                             <View>
                                 <Text numberOfLines={1} style={[
-                                    styles.earningTittleText, { color: '#13585C', width: 150 }
+                                    styles.earningTittleText, { color: colorText, width: 150 }
                                 ]}>
-                                    Sálario
+                                    {entr.title}
                                 </Text>
-                                <Text style={[styles.earningDateText, { color: '#13585C'}]}>
-                                    10/{Functions.convertDtToStringMonth(selectedMonth)}
+                                <Text style={[styles.earningDateText, { color: colorText}]}>
+                                    {entr.day}/{Functions.convertDtToStringMonth(selectedMonth)}
                                 </Text>
                             </View>
                         </View>
@@ -101,9 +124,70 @@ export default function Results() {
             })}
 
 
-            <Text style={styles.titleButton}>
+            <Text style={styles.titleContainer}>
                 Nos próximos dias...
             </Text>
+
+            {nextEntries.map((entr:any,index:number)=>{
+                //console.log(entr.received)
+                if ((entr.day >= todayDate.getDate() && entr.day <= (todayDate.getDate() + 10)) && entr.received == 0 && entr.type == itemSelected){
+                    let colorText = ''
+                    let bgcolor = ''
+                        entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
+                        entr.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
+                    return(
+                        <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
+                            <MaterialIcons 
+                                name="monetization-on" 
+                                size={40} 
+                                color={colorText} />
+                            
+                            <View>
+                                <Text numberOfLines={1} style={[
+                                    styles.earningTittleText, { color: colorText, width: 150 }
+                                ]}>
+                                    {entr.title}
+                                </Text>
+                                <Text style={[styles.earningDateText, { color: colorText}]}>
+                                    {entr.day}/{Functions.convertDtToStringMonth(selectedMonth)}
+                                </Text>
+                            </View>
+                        </View>
+                    )
+                }
+
+            })}
+
+            {todayDate.getDate() + 2 > 30 && nextMonthEntries.map((entr:any,index:number)=>{
+                //console.log(entr.received)
+                if ((entr.day >= todayDate.getDate() && entr.day <= (todayDate.getDate() + 10)) && entr.received == 0 && entr.type == itemSelected){
+                    let colorText = ''
+                    let bgcolor = ''
+                        entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
+                        entr.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
+                    return(
+                        <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
+                            <MaterialIcons 
+                                name="monetization-on" 
+                                size={40} 
+                                color={colorText} />
+                            
+                            <View>
+                                <Text numberOfLines={1} style={[
+                                    styles.earningTittleText, { color: colorText, width: 150 }
+                                ]}>
+                                    {entr.title}
+                                </Text>
+                                <Text style={[styles.earningDateText, { color: colorText}]}>
+                                    {entr.day}/{Functions.convertDtToStringMonth(selectedMonth)}
+                                </Text>
+                            </View>
+                        </View>
+                    )
+                }
+
+            })}
+
             </ScrollView>
         </View>
     )
@@ -132,15 +216,20 @@ const styles = StyleSheet.create({
             fontFamily: 'Poppins_600SemiBold',
             fontSize: 14,
         },
+        titleContainer:{
+            fontFamily: 'Poppins_600SemiBold',
+            fontSize: 14,
+            marginTop:20,
+            marginLeft:17,
+        },
 
         resultItem:{
             marginHorizontal: 11,
-            marginTop: 22,
+            marginTop: 20,
             height: 65,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-around',
-            backgroundColor: "rgba(26, 130, 137, 0.4)",
             borderRadius: 20,
         },
 
