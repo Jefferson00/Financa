@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, View, Alert } from 'react-native'
+import { StyleSheet, View, Alert, Text } from 'react-native'
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
@@ -12,6 +12,7 @@ import ModalContent from "./components/modalContent"
 import Balance from "./components/balance"
 import EntriesResults from "./components/entriesResults"
 import ButtonNewEntrie from "./components/buttonNewEntrie"
+import NoResultsView from "./components/noResultsView"
 
 import EntriesDB from '../../services/entriesDB'
 import ValuesDB from '../../services/valuesDB';
@@ -29,6 +30,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     const navigationScreen = useNavigation()
 
     const [done, setDone] = useState(false)
+    const [noResults, setNoResults] = useState(false)
 
     const { selectedMonth, selectedYear, setSelectedTotalValues } = useSelectedMonthAndYear();
     const {
@@ -286,6 +288,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             setDone(true)
         }).catch(err => {
             console.log(err)
+            setNoResults(true)
         })
         ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
             //console.log(res)
@@ -380,8 +383,10 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             <View style={styles.mainContainer}>
                 {done?
                 <EntriesResults props={props}></EntriesResults>
-                :
+                :!noResults?
                 <Loader></Loader>
+                :
+                <NoResultsView></NoResultsView>
                 }
 
                 <ButtonNewEntrie props={props}></ButtonNewEntrie>
