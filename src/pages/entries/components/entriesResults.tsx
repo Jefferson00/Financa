@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     },
    
     scrollViewContainer: {
-        minHeight: 400,
+        minHeight: 350,
         marginTop: 20,
         flex: 1,
     },

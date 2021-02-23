@@ -7,23 +7,18 @@ import { useStylesStates } from "../../../contexts/stylesStates"
 
 export default function ButtonNewEntrie({ props }: { props: any }) {
   
-    const {tittleTextColor, colorBorderFooter, colorBorderAddButton, TextAddButton} = useStylesStates()
+    const {backgroundColorButton, colorBorderAddButton, TextAddButton} = useStylesStates()
 
     return (
         <View style={{ justifyContent: 'flex-end', flex: 1 }}>
-            <LinearGradient
-                colors={['#FFFFFF', colorBorderFooter]}
-                start={{ x: -0.1, y: 0.1 }}
-                style={[styles.addNewButton, { borderColor: colorBorderAddButton }]}>
                 <TouchableOpacity
-                    style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
+                    style={[styles.addNewButton, {borderColor: colorBorderAddButton, backgroundColor: backgroundColorButton }]}
                     onPress={props.handleNavigateNovo}>
-                    <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>
+                    <Text style={styles.addNewButtonText}>
                         {TextAddButton}
                     </Text>
-                    <Feather name="plus" size={40} color={tittleTextColor} style={{ marginLeft: 10 }} />
+                    <Feather name="plus" size={40} color='#ffffff' style={{ marginLeft: 10 }} />
                 </TouchableOpacity>
-            </LinearGradient>
         </View>
     )
 }
@@ -42,7 +37,7 @@ const styles = StyleSheet.create({
         marginVertical: 25,
     },
     addNewButtonText: {
-        color: '#1A8289',
+        color: '#ffffff',
         fontSize: 18,
         fontFamily: 'Poppins_600SemiBold',
     },

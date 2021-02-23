@@ -6,7 +6,7 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
 
-import Footer from '../components/footer'
+import MenuFooter from  '../components/menuFooter'
 import Header from "../components/header"
 import ModalContent from "./components/modalContent"
 import Balance from "./components/balance"
@@ -47,7 +47,9 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         setMainColor2,
         setMainText2,
         setModalType,
-        onChangeTitle
+        onChangeTitle,
+        backgroundColorButton, 
+        setBackgroundColorButton
 
     } = useStylesStates();
 
@@ -318,6 +320,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 setTextAddButton('Adicionar Novo Ganho')
                 setTextReceived('Esse ganho já foi recebido?')
                 setTextAlert('Ganho não recebido!')
+                setBackgroundColorButton('rgba(26, 130, 137, 0.8)')
             }
 
         } else if (item === 'Despesas') {
@@ -333,6 +336,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 setTextAddButton('Adicionar Nova Despesa')
                 setTextReceived('Essa despesa já foi paga?')
                 setTextAlert('Despesa não paga!')
+                setBackgroundColorButton('rgba(255, 72, 53, 0.8)')
             }
         }
         resetValues()
@@ -383,7 +387,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
                 <ButtonNewEntrie props={props}></ButtonNewEntrie>
 
-                <Footer item={item}></Footer>
+                <MenuFooter/>
             </View>
 
 

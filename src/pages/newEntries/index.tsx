@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
 
-import Footer from '../components/footer'
+import MenuFooter from  '../components/menuFooter'
 import { ScrollView } from 'react-native-gesture-handler';
 
 import EntriesDB from '../../services/entriesDB'
@@ -50,7 +50,8 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
         valueTitle, onChangeTitle,
         setReceivedTextDate,
         setReceivedText,
-        setSubtittleTextColor
+        setSubtittleTextColor,
+        setBackgroundColorButton
     } = useStylesStates();
     const {valueFrequency, 
             setValueFrequency, 
@@ -439,6 +440,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 setSubtittleTextColor('#49B39F')
                 setReceivedText('Recebido')
                 setReceivedTextDate('Data de Recebimento')
+                setBackgroundColorButton('rgba(26, 130, 137, 0.8)')
             }
 
         } else if (item === 'Despesas') {
@@ -452,6 +454,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 setSubtittleTextColor('#FF4835')
                 setReceivedText('Pago')
                 setReceivedTextDate('Data de Pagamento')
+                setBackgroundColorButton('rgba(255, 72, 53, 0.8)')
             }
         }
 
@@ -610,7 +613,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                         <LoaderUpdate></LoaderUpdate>
                     }
 
-                    <Footer item={item}></Footer>
+                    <MenuFooter/>
                 </View>
 
                 <SuccessModal props={props}></SuccessModal>

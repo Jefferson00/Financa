@@ -88,8 +88,9 @@ export default function LatestTransactions({ props }: { props: any }) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        height:161,
         marginHorizontal: 26,
+        marginTop:28,
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#C8C8C8',

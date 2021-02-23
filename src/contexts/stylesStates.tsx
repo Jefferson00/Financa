@@ -12,6 +12,7 @@ export default function StylesStatesProvider({children}:any){
     const [colorBorderFooter, setColorBorderFooter] = useState('#ffffff') // #1A828922 ou #CC372822
     const [tittleTextColor, setTittleTextColor] = useState('#ffffff') // Cor primaria de texto e outros detalhes :#1A8289 ou #CC3728
     const [subtittleTextColor, setSubtittleTextColor] = useState('#ffffff') // Cor secundaria de texto e outros detalhes: #49B39F ou #FF4835
+    const [backgroundColorButton, setBackgroundColorButton] = useState('#ffffff')
 
     const [textModal, setTextModal] = useState('')
     const [mainText1, setMainText1] = useState('')
@@ -51,6 +52,7 @@ export default function StylesStatesProvider({children}:any){
                 valueTitle, onChangeTitle,
                 receivedTextDate, setReceivedTextDate,
                 receivedText, setReceivedText,
+                backgroundColorButton, setBackgroundColorButton,
             }}
         >
             {children}
@@ -87,6 +89,7 @@ export function useStylesStates(){
                 valueTitle, onChangeTitle,
                 receivedTextDate, setReceivedTextDate,
                 receivedText, setReceivedText,
+                backgroundColorButton, setBackgroundColorButton,
         }: any = context
     return {textModal, 
         setTextModal,
@@ -115,5 +118,6 @@ export function useStylesStates(){
         valueTitle, onChangeTitle,
         receivedTextDate, setReceivedTextDate,
         receivedText, setReceivedText,
+        backgroundColorButton, setBackgroundColorButton
     };
 }

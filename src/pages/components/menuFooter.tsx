@@ -16,7 +16,7 @@ export default function Footer(){
         navigation.navigate('Main')
     }
     function handleProfile(){
-        navigation.navigate('Entries', { item: 'Ganhos'})
+        
     }
     function handleNotification(){
         navigation.navigate('Notifications')

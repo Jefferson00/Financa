@@ -6,29 +6,24 @@ import { useStylesStates } from "../../../contexts/stylesStates"
 
 export default function ButtonSubmit({ props }: { props: any }) {
 
-    const {colorBorderAddButton , tittleTextColor} = useStylesStates()
+    const {backgroundColorButton, colorBorderAddButton , tittleTextColor} = useStylesStates()
 
     return (
         <View>
-            <LinearGradient
-                colors={['#FFFFFF', colorBorderAddButton + '22']}
-                start={{ x: -0.1, y: 0.1 }}
-                style={[styles.addNewButton, { borderColor: colorBorderAddButton }]}>
                 {props.idUpdate != null ?
                     <TouchableOpacity
-                        style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
+                        style={[styles.addNewButton, {borderColor: colorBorderAddButton , backgroundColor: backgroundColorButton}]}
                         onPress={props.handleUpdate}
                     >
-                        <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>Atualizar</Text>
+                        <Text style={styles.addNewButtonText}>Atualizar</Text>
                     </TouchableOpacity>
                     : <TouchableOpacity
-                        style={[styles.addNewButton, { width: '100%', borderColor: colorBorderAddButton }]}
+                        style={[styles.addNewButton, { borderColor: colorBorderAddButton, backgroundColor: backgroundColorButton }]}
                         onPress={props.handleCreateNew}
                     >
-                        <Text style={[styles.addNewButtonText, { color: tittleTextColor }]}>Adicionar</Text>
+                        <Text style={styles.addNewButtonText}>Adicionar</Text>
                     </TouchableOpacity>
                 }
-            </LinearGradient>
         </View>
     )
 }
@@ -47,7 +42,7 @@ const styles = StyleSheet.create({
         marginVertical: 25,
     },
     addNewButtonText: {
-        color: '#1A8289',
+        color: '#ffffff',
         fontSize: 18,
         fontFamily: 'Poppins_600SemiBold',
     },

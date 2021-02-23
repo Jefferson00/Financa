@@ -27,6 +27,16 @@ export default function ModalContent({props}:{props:any}) {
         <Modal animationType="slide" visible={modalVisible} transparent>
                 <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
+
+                        <View style={styles.headerModal}>
+                            <TouchableOpacity onPress={() => { props.handleNavigateNovoUpdate(props.selectedId) }}>
+                                <Feather name="edit-2" size={30} color={tittleTextColor} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => { setModalVisible(!modalVisible) }}>
+                                <Feather name="x" size={30} color={tittleTextColor} />
+                            </TouchableOpacity>
+                        </View>
+
                         {entries.map((entrie:EntriesValues, index:number) => {
                             if (entrie.id == props.selectedId){
                                 rec = entrie.received
@@ -40,7 +50,7 @@ export default function ModalContent({props}:{props:any}) {
                             }
                             if (entrie.id == props.selectedId) {
                                 return (
-                                    <View key={index}>
+                                    <View key={index} style={{flex:1}}>
                                         <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(26, 130, 137, 0.33)', paddingBottom: 17, marginBottom: 37 }}>
                                             <View style={styles.tittleView}>
                                                 <Text style={[styles.tittleText, { color: tittleTextColor }]}>
@@ -113,7 +123,7 @@ export default function ModalContent({props}:{props:any}) {
                         })}
 
 
-                        <View>
+                        <View style={{marginBottom:59}}>
                             {rec == 0 && selectedMonth == props.CurrentMonth && selectedYear == props.CurrentYear ?
                                 <>
                                     <View style={{ paddingHorizontal: 26 ,marginTop:32}}>
@@ -149,14 +159,7 @@ export default function ModalContent({props}:{props:any}) {
 
 
 
-                        <View style={styles.footerModal}>
-                            <TouchableOpacity onPress={() => { props.handleNavigateNovoUpdate(props.selectedId) }}>
-                                <Feather name="edit-2" size={30} color={tittleTextColor} />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setModalVisible(!modalVisible) }}>
-                                <Feather name="x" size={30} color={tittleTextColor} />
-                            </TouchableOpacity>
-                        </View>
+                        
                     </View>
                 </View>
         </Modal>
@@ -173,20 +176,19 @@ const styles = StyleSheet.create({
       modalContent: {
         backgroundColor: '#ffffff',
         height: '80%',
-        paddingTop: 30,
     },
-      footerModal: {
+      headerModal: {
         height: 75,
-        borderTopWidth: 1,
-        borderTopColor: '#1A828922',
+        borderBottomWidth: 1,
+        borderBottomColor: '#1A828922',
         width: '100%',
+        marginBottom:20,
         backgroundColor: '#ffffff',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 26,
-        position: 'absolute',
-        bottom: 0,
+        top: 0,
     },
     tittleView: {
         flexDirection: 'row',
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#C4C4C4',
         padding: 5,
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
     },
     valuesListText: {
         fontFamily: 'Poppins_500Medium',

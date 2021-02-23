@@ -11,7 +11,6 @@ import Functions from '../../functions/index'
 
 import Header from "../components/header"
 import BalanceValues from "./components/balanceValues"
-import NextDays from "./components/nextDays"
 import ModalContent from './components/modalContent'
 import MenuFooter from '../components/menuFooter'
 import LatestTransations from './components/latestTransactions'
@@ -267,16 +266,10 @@ export default function Main() {
         {/*Botões Despesas*/}
 
        
-        <LatestTransations props={props}/>
-
-        {/* Nos próximos dias, aqui será mostrado os ganhos/despesas mais próximos */}
-
-        <View style={styles.nextDaysView}>
-          <Text style={styles.nextDaysText}>Nos próximos dias...</Text>
+        <View style={{flex:1}}>
+          <LatestTransations props={props}/>
         </View>
 
-
-        <NextDays props={props}></NextDays>
         <MenuFooter/>
 
       </View>
