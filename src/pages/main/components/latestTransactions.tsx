@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Foundation } from '@expo/vector-icons'
+import { Foundation , Ionicons} from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
 import Functions from '../../../functions/index'
 
@@ -8,13 +8,12 @@ import Functions from '../../../functions/index'
 import { useResultsDB } from '../../../contexts/resultsDBStates'
 
 export default function LatestTransactions({ props }: { props: any }) {
-
-    const itemTest = 'Despesas'
     
 
-    const { entries, valuesList } = useResultsDB();
+    const { mainEntries, valuesList } = useResultsDB();
+    const [seeTransactions, setSeeTransactions] = useState(true)
 
-    const latestEntries = entries.slice(Math.max(entries.length - 3, 0))
+    const latestEntries = mainEntries.slice(Math.max(mainEntries.length - 3, 0))
 
     
 
@@ -26,6 +25,13 @@ export default function LatestTransactions({ props }: { props: any }) {
                 <Text style={styles.title}>
                     Últimas Transações
                 </Text>
+                <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> setSeeTransactions(!seeTransactions)}>
+                    {seeTransactions?
+                    <Ionicons name="eye-off" size={30} color="#d2d2d2" />
+                    :
+                    <Ionicons name="eye" size={30} color="#d2d2d2"  />
+                    }
+                </TouchableOpacity>
             </View>
 
             {latestEntries.map((entr: any, index: number) => {
@@ -42,43 +48,49 @@ export default function LatestTransactions({ props }: { props: any }) {
 
                 return (
                     <View style={styles.listView} key={index}>
-                        <Foundation 
-                            name="dollar" 
-                            size={30} 
-                            color={entr.type == 'Ganhos' ? '#136065' : '#CC3728'}/>
-                        <Text style={[
-                            styles.itemText,
-                            { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728' }
-                            ]}>
-                            {entr.title}
-                        </Text>
-                        {totalValues > 0 ?
-                      
-                        <NumberFormat
-                            value={totalValues}
-                            displayType={'text'}
-                            thousandSeparator={true}
-                            format={Functions.currencyFormatter}
-                            renderText={value => 
+                        {seeTransactions?
+                        <>
+                            <Foundation 
+                                name="dollar" 
+                                size={30} 
+                                color={entr.type == 'Ganhos' ? '#136065' : '#CC3728'}/>
+                            <Text style={[
+                                styles.itemText,
+                                { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728' }
+                                ]}>
+                                {entr.title}
+                            </Text>
+                            {totalValues > 0 ?
+                        
+                            <NumberFormat
+                                value={totalValues}
+                                displayType={'text'}
+                                thousandSeparator={true}
+                                format={Functions.currencyFormatter}
+                                renderText={value => 
+                                    <Text style={[
+                                        styles.itemText,
+                                        { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
+                                    ]}> 
+                                    {entr.type == 'Despesas'? '- ' + value: value} 
+                                    </Text>
+                                }
+                            />
+                            :
                                 <Text style={[
                                     styles.itemText,
                                     { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
                                 ]}> 
-                                {entr.type == 'Despesas'? '- ' + value: value} 
+                                R$ 0,00 
                                 </Text>
                             }
-                        />
-                        :
-                            <Text style={[
-                                styles.itemText,
-                                { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
-                            ]}> 
-                            R$ 0,00 
+                            <Text style={styles.dateText}>
+                                {entr.day}/{Functions.convertDtToStringMonth(month)}
                             </Text>
+                        </>
+                        :
+                            <View style={styles.censoredValue}/>
                         }
-                        <Text style={styles.dateText}>
-                            {entr.day}/{Functions.convertDtToStringMonth(month)}
-                        </Text>
                     </View>
                 )
             })}
@@ -99,6 +111,9 @@ const styles = StyleSheet.create({
     },
     titleView: {
         marginBottom:5,
+        flexDirection:'row',
+        justifyContent:'space-between',
+        alignItems:'center'
     },
     title: {
         color: '#1A8289',
@@ -120,5 +135,10 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins_400Regular',
         fontSize: 10,
         color: '#444444',
+    },
+    censoredValue:{
+        height:25,
+        width:'100%',
+        backgroundColor:'rgba(247, 241, 241, 0.80)',
     }
 })

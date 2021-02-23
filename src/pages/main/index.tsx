@@ -25,7 +25,7 @@ export default function Main() {
 
   const {selectedMonth, setSelectedMonth, selectedYear, setSelectedYear, setNoBalance} = useSelectedMonthAndYear();
   const {setMonthColor, primaryColor, setPrimaryColor, secondColor, setSecondColor, setModalBalance, setTextModal, setModalType} = useStylesStates();
-  const {setEntries,setBalance,setNextEntries,setNextMonthEntries,setValuesList}  = useResultsDB();
+  const {setMainEntries,setBalance,setNextEntries,setNextMonthEntries,setValuesList}  = useResultsDB();
 
   const [done, setDone] = useState(false)
 
@@ -165,7 +165,7 @@ export default function Main() {
 
       //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação
       EntriesDB.findByDate(parseInt(firstDate)).then((res: any) => {
-        setEntries(res._array)
+        setMainEntries(res._array)
         
       }).catch(err => {
         console.log(err)

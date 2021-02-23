@@ -48,7 +48,6 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
         setMainText2,
         setModalType,
         onChangeTitle,
-        backgroundColorButton, 
         setBackgroundColorButton
 
     } = useStylesStates();

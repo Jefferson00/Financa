@@ -7,6 +7,7 @@ const resultsDBStatesContext = createContext({});
 export default function ResultsDBStatesProvider({children}:any){
 
     const [entries, setEntries] = useState<EntriesValues[]>([])
+    const [mainEntries, setMainEntries] = useState<EntriesValues[]>([])
     const [nextEntries, setNextEntries] = useState<EntriesValues[]>([])
     const [nextMonthEntries, setNextMonthEntries] = useState<EntriesValues[]>([])
     const [valuesList, setValuesList] = useState<ValuesValues[]>([])
@@ -26,6 +27,7 @@ export default function ResultsDBStatesProvider({children}:any){
         <resultsDBStatesContext.Provider 
             value={{
                 entries, setEntries,
+                mainEntries, setMainEntries,
                 nextEntries, setNextEntries,
                 nextMonthEntries, setNextMonthEntries,
                 valuesList, setValuesList,
@@ -45,7 +47,9 @@ export function useResultsDB(){
     const context = useContext(resultsDBStatesContext);
     const {
          entries, 
-         setEntries, 
+         setEntries,
+         mainEntries, 
+         setMainEntries, 
          nextEntries, 
          setNextEntries,
          nextMonthEntries, 
@@ -66,6 +70,8 @@ export function useResultsDB(){
     return {
         entries, 
         setEntries, 
+        mainEntries, 
+        setMainEntries,
         nextEntries, 
         setNextEntries,
         nextMonthEntries, 
