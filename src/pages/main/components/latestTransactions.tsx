@@ -7,7 +7,7 @@ import Functions from '../../../functions/index'
 
 import { useResultsDB } from '../../../contexts/resultsDBStates'
 
-export default function LatestTransactions({ props }: { props: any }) {
+export default function LatestTransactions() {
     
 
     const { entries, valuesList } = useResultsDB();
