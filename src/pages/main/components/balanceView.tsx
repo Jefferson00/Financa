@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import  {Ionicons } from '@expo/vector-icons'
+import { MainContext } from '../../../contexts/mainContext';
 
 export default function BalanceView() {
-    const [seeBalanceValues, setSeeBalanceValues] = useState(true)
+   const {seeBalanceValues, handleSeeBalanceValues} = useContext(MainContext)
 
     return(
         <>
@@ -11,7 +12,7 @@ export default function BalanceView() {
                 <Text style={styles.currentBalanceText}>
                     Seu Saldo do mês
                 </Text>
-                <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> setSeeBalanceValues(!seeBalanceValues)}>
+                <TouchableOpacity style={{ marginLeft: 5 }} onPress={handleSeeBalanceValues}>
                     {seeBalanceValues?
                     <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
                     :

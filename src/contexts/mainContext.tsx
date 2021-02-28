@@ -4,9 +4,15 @@ interface MainContextData{
     isBalanceActive: boolean;
     isEarningsActive: boolean;
     isExpansesActive: boolean;
+    seeExpansesValues: boolean;
+    seeEarningsValues: boolean;
+    seeBalanceValues: boolean;
     activeBalanceView: () =>void;
     activeEarningsView: () =>void;
     activeExpansesView: () =>void;
+    handleSeeExpansesValues: () =>void;
+    handleSeeEarningsValues: () =>void;
+    handleSeeBalanceValues: () =>void;
 }
 
 interface MainProviderProps{
@@ -20,6 +26,10 @@ export function MainProvider({children}:MainProviderProps){
     const [isBalanceActive, setIsBalanceActive] = useState(true)
     const [isEarningsActive, setIsEarningsActive] = useState(false)
     const [isExpansesActive, setIsExpansesActive] = useState(false)
+
+    const [seeExpansesValues, setSeeExpansesValues] = useState(true)
+    const [seeEarningsValues, setSeeEarningsValues] = useState(true)
+    const [seeBalanceValues, setSeeBalanceValues] = useState(true)
 
     function activeBalanceView(){
         setIsBalanceActive(true)
@@ -38,14 +48,32 @@ export function MainProvider({children}:MainProviderProps){
         setIsExpansesActive(true)
     }
 
+    function handleSeeExpansesValues(){
+        setSeeExpansesValues(!seeExpansesValues)
+    }
+
+    function handleSeeEarningsValues(){
+        setSeeEarningsValues(!seeEarningsValues)
+    }
+
+    function handleSeeBalanceValues(){
+        setSeeBalanceValues(!seeBalanceValues)
+    }
+
     return(
         <MainContext.Provider value={{
             isBalanceActive,
             isEarningsActive,
             isExpansesActive,
+            seeExpansesValues,
+            seeEarningsValues,
+            seeBalanceValues,
             activeBalanceView,
             activeEarningsView,
             activeExpansesView,
+            handleSeeExpansesValues,
+            handleSeeEarningsValues,
+            handleSeeBalanceValues,
         }}>
             {children}
         </MainContext.Provider>

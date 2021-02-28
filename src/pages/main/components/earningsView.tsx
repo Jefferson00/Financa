@@ -1,16 +1,19 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'
 
 import ButtonsEarnings from "./buttonsEarnings"
+import { MainContext } from '../../../contexts/mainContext';
 
 export default function EarningsView() {
-  const [seeEarningsValues, setSeeEarningsValues] = useState(true)
+  
+  const {seeEarningsValues, handleSeeEarningsValues} = useContext(MainContext)
+
   return (
     <>
       <View style={styles.balanceTitleView}>
           <Text style={styles.currentBalanceText}>Seus ganhos do Mês</Text>
-          <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> setSeeEarningsValues(!seeEarningsValues)}>
+          <TouchableOpacity style={{ marginLeft: 5 }} onPress={handleSeeEarningsValues}>
               {seeEarningsValues ?
                 <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
                 :
