@@ -4,164 +4,16 @@ import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal} from 'reac
 import NumberFormat from 'react-number-format';
 import { Feather, Ionicons } from '@expo/vector-icons'
 
-import {useStylesStates} from '../../../contexts/stylesStates'
-import {useSelectedMonthAndYear} from '../../../contexts/selectMonthAndYear'
-import {useResultsDB} from '../../../contexts/resultsDBStates'
 
-import {EntriesValues} from "../../../interfaces"
-
-import Functions from '../../../functions/index'
-
-export default function ModalContent({props}:{props:any}) {
-
-    const {setModalVisible, modalVisible, tittleTextColor, colorBorderAddButton, textAlert, textReceived } = useStylesStates()
-    const {entries, valuesList} = useResultsDB()
-    const {selectedMonth, selectedYear, selectedTotalValues} = useSelectedMonthAndYear()
-
+export default function ModalContent() {
     let rec
     let atrasado = false
 
 
 
     return (
-        <Modal animationType="slide" visible={modalVisible} transparent>
-                <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-
-                        <View style={styles.headerModal}>
-                            <TouchableOpacity onPress={() => { props.handleNavigateNovoUpdate(props.selectedId) }}>
-                                <Feather name="edit-2" size={30} color={tittleTextColor} />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setModalVisible(!modalVisible) }}>
-                                <Feather name="x" size={30} color={tittleTextColor} />
-                            </TouchableOpacity>
-                        </View>
-
-                        {entries.map((entrie:EntriesValues, index:number) => {
-                            if (entrie.id == props.selectedId){
-                                rec = entrie.received
-                                //console.log('Recebido: '+rec)
-                            if (entrie.day <= props.todayDate.getDate() && !entrie.received){
-                                atrasado = true
-                            }
-                            if (selectedMonth != props.CurrentMonth || selectedYear != props.CurrentYear){
-                                atrasado = false
-                            }
-                            }
-                            if (entrie.id == props.selectedId) {
-                                return (
-                                    <View key={index} style={{flex:1}}>
-                                        <View style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(26, 130, 137, 0.33)', paddingBottom: 17, marginBottom: 37 }}>
-                                            <View style={styles.tittleView}>
-                                                <Text style={[styles.tittleText, { color: tittleTextColor }]}>
-                                                    {entrie.title}
-                                                </Text>
-                                                <TouchableOpacity onPress={() => props.removeItem(entrie.id)}>
-                                                    <Feather name="trash-2" size={20} color={tittleTextColor} />
-                                                </TouchableOpacity>
-                                            </View>
-                                            <View style={styles.tittleView}>
-                                                <NumberFormat
-                                                    value={selectedTotalValues}
-                                                    displayType={'text'}
-                                                    thousandSeparator={true}
-                                                    format={Functions.currencyFormatter}
-                                                    renderText={value => <Text style={[styles.subTittleText, { color: tittleTextColor }]}> {value} </Text>}
-                                                />
-
-                                                <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
-                                                    {entrie.day} {Functions.convertDtToStringMonth(selectedMonth)}
-                                                </Text>
-                                            </View>
-                                        </View>
-                                        <ScrollView style={{
-                                            maxHeight:200,
-                                        }}>
-                                        {valuesList.map((value:any, index:number) => {
-                                            props.currentDate.setMonth(selectedMonth - 1)
-                                            props.currentDate.setFullYear(selectedYear)
-                                            if (entrie.id == value.entries_id)
-                                                return (
-                                                    
-                                                        <View style={styles.valuesList} key={index}>
-                                                        <View style={{ flexDirection: 'row' }}>
-                                                            {value.description==''?
-                                                            <Text style={[styles.valuesListText, { color: tittleTextColor, marginRight: 5 }]}>
-                                                                {entrie.title}
-                                                            </Text>
-                                                            :
-                                                            <Text style={[styles.valuesListText, { color: tittleTextColor, marginRight: 5 }]}>
-                                                                {value.description}
-                                                            </Text>
-                                                            }
-                                                            <Text style={[styles.valuesListText, { color: colorBorderAddButton }]}>
-                                                                {value.dtEnd != 209912 ? 
-                                                                Functions.toFrequency(value.dtEnd, value.dtStart) - Functions.toFrequency(value.dtEnd, Functions.setDtStart(props.currentDate)) + 1 + "/" + (Functions.toFrequency(value.dtEnd, value.dtStart)+1)
-                                                                : null}
-                                                            </Text>
-                                                        </View>
-                                                        <View style={{ flexDirection: 'row' }}>
-                                                            <NumberFormat
-                                                                value={value.amount}
-                                                                displayType={'text'}
-                                                                thousandSeparator={true}
-                                                                format={Functions.currencyFormatter}
-                                                                renderText={value => <Text style={[styles.valuesListText, { color: tittleTextColor }]}> {value} </Text>}
-                                                            />
-                                                            <TouchableOpacity onPress={() => props.removeValue(value.id)}>
-                                                                <Feather name="trash-2" size={20} color={colorBorderAddButton} />
-                                                            </TouchableOpacity>
-                                                        </View>
-                                                        </View>
-                                                    
-                                                )
-                                        })}
-                                        </ScrollView>
-                                    </View>
-                                )
-                            }
-                        })}
-
-
-                        <View style={{marginBottom:59}}>
-                            {rec == 0 && selectedMonth == props.CurrentMonth && selectedYear == props.CurrentYear ?
-                                <>
-                                    <View style={{ paddingHorizontal: 26 ,marginTop:32}}>
-                                        {atrasado ? 
-                                            <View style={{flexDirection:'row',alignItems:'center'}}>
-                                                <Ionicons name="alert-circle" size={40} color={tittleTextColor}/>
-                                                <Text style={[styles.tittleText, { color: colorBorderAddButton , marginLeft:5}]}>
-                                                    {textAlert}
-                                                </Text> 
-                                            </View>
-                                        : null}
-                                        <Text style={[styles.subTittleText, { color: tittleTextColor , marginTop:15}]}>
-                                            {textReceived}
-                                        </Text>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                            <TouchableOpacity onPress={() => props.updateReceived(props.selectedId)}>
-                                                <Text style={[styles.tittleText, { color: colorBorderAddButton }]}>
-                                                    SIM
-                                                </Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => { setModalVisible(!modalVisible) }}>
-                                                <Text style={[styles.tittleText, { color: colorBorderAddButton }]}>
-                                                    Ainda não
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                </>
-                                :
-                                <Text></Text>
-                            }
-                        </View>
-
-
-
-                        
-                    </View>
-                </View>
+        <Modal animationType="slide" visible={false} transparent>
+               
         </Modal>
 
     )

@@ -19,9 +19,6 @@ import ValuesDB from '../../services/valuesDB';
 
 import Functions from "../../functions"
 
-import { useSelectedMonthAndYear } from '../../contexts/selectMonthAndYear'
-import { useStylesStates } from '../../contexts/stylesStates'
-import { useResultsDB } from "../../contexts/resultsDBStates"
 import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces';
 import Loader from './components/loader';
 
@@ -32,370 +29,34 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     const [done, setDone] = useState(false)
     const [noResults, setNoResults] = useState(false)
 
-    const { selectedMonth, selectedYear, setSelectedTotalValues } = useSelectedMonthAndYear();
-    const {
-        setMonthColor,
-        setModalVisible,
-        mainColor1,
-        mainColor2,
-        setColorBorderAddButton,
-        setColorBorderFooter,
-        setMainColor1,
-        setTextReceived,
-        setTittleTextColor,
-        setMainText1,
-        setTextAddButton,
-        setTextAlert,
-        setMainColor2,
-        setMainText2,
-        setModalType,
-        onChangeTitle,
-        setBackgroundColorButton
-
-    } = useStylesStates();
-
-    const { setEntries, entries, valuesList, setValuesList, setValueFrequency, setValuesArray } = useResultsDB();
-
-    const [selectedId, setSelectedId] = useState(0)
-
-    const { item } = route.params
-
-    let cont: any = []
-    let cont2: any = []
-
-    const todayDate = new Date()
-    const currentDate = new Date()
-    const CurrentMonth = todayDate.getMonth() + 1
-    const CurrentYear = todayDate.getFullYear()
-
-    function showModal(id: number, totalValues: number) {
-        setModalVisible(true);
-        setModalType("Entries")
-        setSelectedId(id)
-        setSelectedTotalValues(totalValues)
-    }
-
-    function handleNavigateNovo() {
-        navigationScreen.navigate('NewEntries', { item: item, month: selectedMonth, year: selectedYear })
-    }
-
-    function handleNavigateNovoUpdate(id: number) {
-        setModalVisible(false)
-        navigationScreen.navigate('NewEntries', { item: item, idUpdate: id, month: selectedMonth, year: selectedYear })
-    }
-
-
-    async function verifyMonthly(id: number) {
-        let isMonthly = false
-        await ValuesDB.allOrderByDate().then((res: any) => {
-            const vlr: any = res._array.filter((vl: any) => vl.id == id)
-
-            if (vlr[0].dtEnd == 209912) {
-                isMonthly = true
-            }
-        }).catch(error => {
-            console.log("Error: " + error)
-        })
-        console.log(isMonthly)
-        return isMonthly
-    }
-
-    function deleteValue(id: number) {
-        valuesList.map((value: any, index: number) => {
-            if (value.id == id) {
-                const newDate = new Date()
-                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month) - 1)
-                newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
-                let newDtEnd
-                if ((selectedMonth) < 10) {
-                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
-                } else {
-                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
-                }
-
-                let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
-
-                if (contRep > 0) {
-                    const vlObj = {
-                        description: value.description,
-                        amount: value.amount,
-                        dtStart: value.dtStart,
-                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
-                        entries_id: value.entries_id
-                    }
-                    ValuesDB.update(id, vlObj)
-                } else {
-                    ValuesDB.remove(id)
-                }
-                setValuesList(valuesList.filter((vlu: any) => vlu.id !== id))
-            }
-        })
-    }
-
-    function updateValueOfAEntrie(id: number){
-        valuesList.map((value: any) => {
-            if (value.entries_id == id) {
-                const newDate = new Date()
-                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month) - 1)
-                newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
-                let newDtEnd
-
-                if ((selectedMonth) < 10) {
-                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
-                } else {
-                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
-                }
-
-                let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
-
-                if (contRep > 0) {
-                    const vlObj = {
-                        description: value.description,
-                        amount: value.amount,
-                        dtStart: value.dtStart,
-                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
-                        entries_id: value.entries_id
-                    }
-                    ValuesDB.update(value.id, vlObj)
-                    loadResults()
-                } else {
-                    ValuesDB.remove(value.id)
-                }
-                setValuesList(valuesList.filter((vlu: any) => vlu.id !== value.id))
-            }
-        })
-    }
-
-    function deleteEntrie(id: number) {
-        entries.map((entrie: any) => {
-            if (entrie.id == id) {
-                const newDate = new Date()
-                newDate.setMonth(parseInt(Functions.toMonthAndYear(entrie.dtStart).month) - 1)
-                newDate.setFullYear(parseInt(Functions.toMonthAndYear(entrie.dtStart).year))
-                let newDtEnd
-                if ((selectedMonth) < 10) {
-                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
-                } else {
-                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
-                }
-
-                let contRep = Functions.toFrequency(parseInt(newDtEnd), entrie.dtStart)
-
-                if (contRep > 0) {
-                    const vlObj = {
-                        title: entrie.title,
-                        day: entrie.day,
-                        dtStart: entrie.dtStart,
-                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
-                        monthly: entrie.monthly,
-                        received: entrie.received,
-                        type: entrie.type
-                    }
-                    
-                    EntriesDB.update(id, vlObj)
-                    loadResults()
-                } else {
-                    EntriesDB.remove2(id).then(()=>{
-                        
-                    }).catch(err =>{
-                        console.log(err)
-                    })
-                }
-                setEntries(entries.filter((ern: EntriesValues) => ern.id !== id))
-                updateValueOfAEntrie(id)
-                setModalVisible(false)
-            }
-        })
-    }
-
-    /* Função que deleta um item (Entrie) */
-    function removeItem(id: number) {
-        Alert.alert(
-            "Remover",
-            "Deseja mesmo remover?",
-            [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                {
-                    text: "OK", onPress: () => {
-                        deleteEntrie(id)
-                    }
-                }
-            ],
-            { cancelable: false }
-        );
-    }
-
-    /* Função que deleta um valor*/
-    function removeValue(id: number) {
-        Alert.alert(
-            "Remover",
-            "Deseja mesmo remover?",
-            [
-                {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                {
-                    text: "OK", onPress: () => {
-                        deleteValue(id)
-                    }
-                }
-            ],
-            { cancelable: false }
-        );
-    }
-
-    /*Função que atualiza uma entrada como recebida/paga*/
-    function updateReceived(selectedId: number) {
-        EntriesDB.findById(selectedId).then((res: any) => {
-            let obj = {
-                title: res._array[0].title,
-                day: res._array[0].day,
-                dtStart: res._array[0].dtStart,
-                dtEnd: res._array[0].dtEnd,
-                monthly: res._array[0].monthly,
-                received: true,
-                type: res._array[0].type,
-            }
-            EntriesDB.update(selectedId, obj).then(res => {
-                alert("Pago!")
-                setModalVisible(false)
-                loadResults()
-            }).catch(err => {
-                console.log(err)
-            })
-            //console.log('Obj: '+obj.title)
-        })
-    }
-
-    function loadResults() {
-        setDone(false)
-        let firstDate
-        if (selectedMonth < 10) {
-            firstDate = selectedYear.toString() + '0' + selectedMonth.toString()
-        } else {
-            firstDate = selectedYear.toString() + selectedMonth.toString()
-        }
-        //console.log("firstDate: " + firstDate)
-
-        EntriesDB.findByDateOrderByDay(parseInt(firstDate)).then((res: any) => {
-            setEntries(res._array.filter((entrie: EntriesValues) => entrie.type == item))
-            setDone(true)
-        }).catch(err => {
-            console.log(err)
-            setNoResults(true)
-        })
-        ValuesDB.findByDate(parseInt(firstDate)).then((res: any) => {
-            //console.log(res)
-            setValuesList(res._array)
-        }).catch(err => {
-            console.log(err)
-        })
-    }
-    const isFocused = useIsFocused()
-
-    function resetValues(){
-        setEntries([])
-        onChangeTitle()
-        setValueFrequency(1)
-        let arr = [{id: 1, description: '', amount: '0', monthly: false, repeat: 1}]
-        setValuesArray(arr)
-    }
-
-    useEffect(() => {
-
-        if (item === 'Ganhos') {
-            if (navigationScreen.isFocused()) {
-                setMainColor1('#155F69')
-                setMainColor2('#F9CF3C')
-                setMainText1('Ganhos Atuais')
-                setMainText2('Ganhos Estimados')
-                setMonthColor('#FDDB63')
-                setTittleTextColor('#1A8289')
-                setColorBorderAddButton('#24DBBA')
-                setColorBorderFooter('#1A828922')
-                setTextAddButton('Adicionar Novo Ganho')
-                setTextReceived('Esse ganho já foi recebido?')
-                setTextAlert('Ganho não recebido!')
-                setBackgroundColorButton('rgba(26, 130, 137, 0.8)')
-            }
-
-        } else if (item === 'Despesas') {
-            if (navigationScreen.isFocused()) {
-                setMainColor1('#CC3728')
-                setMainColor2('#F9CF3C')
-                setMainText1('Despesas Atuais')
-                setMainText2('Despesas Estimadas')
-                setMonthColor('#FFFFFF')
-                setTittleTextColor('#CC3728')
-                setColorBorderAddButton('#FF4835')
-                setColorBorderFooter('#CC372822')
-                setTextAddButton('Adicionar Nova Despesa')
-                setTextReceived('Essa despesa já foi paga?')
-                setTextAlert('Despesa não paga!')
-                setBackgroundColorButton('rgba(255, 72, 53, 0.8)')
-            }
-        }
-        resetValues()
-        console.log('Refreshed!');
-        loadResults()
-        EntriesDB.all().then((res: any) => {
-           // console.log(res._array)
-            
-          }).catch(err => {
-            console.log(err)
-          })
-
-    }, [isFocused])
-
-    const props = {
-        item,
-        CurrentMonth,
-        CurrentYear,
-        selectedId,
-        currentDate,
-        todayDate,
-        cont,
-        cont2,
-        removeItem,
-        removeValue,
-        updateReceived,
-        handleNavigateNovoUpdate,
-        handleNavigateNovo,
-        showModal,
-    }
+  
 
     return (
         <LinearGradient
-            colors={[mainColor1, mainColor2]}
+            colors={['#d2d2d2', '#d2d2d2']}
             start={{ x: -0.4, y: 0.1 }}
             style={styles.container}>
             <StatusBar style="light" translucent />
-            <Header props={props}></Header>
+            <Header/>
 
-            <Balance props={props}></Balance>
+            <Balance/>
 
             <View style={styles.mainContainer}>
                 {done?
-                <EntriesResults props={props}></EntriesResults>
+                <EntriesResults/>
                 :!noResults?
                 <Loader></Loader>
                 :
                 <NoResultsView></NoResultsView>
                 }
 
-                <ButtonNewEntrie props={props}></ButtonNewEntrie>
+                <ButtonNewEntrie/>
 
                 <MenuFooter/>
             </View>
 
 
-            <ModalContent props={props}></ModalContent>
+            <ModalContent/>
 
 
         </LinearGradient>

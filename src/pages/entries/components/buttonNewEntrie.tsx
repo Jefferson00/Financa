@@ -1,21 +1,16 @@
 import React from "react"
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { Feather } from '@expo/vector-icons'
-import { LinearGradient } from 'expo-linear-gradient'
 
-import { useStylesStates } from "../../../contexts/stylesStates"
-
-export default function ButtonNewEntrie({ props }: { props: any }) {
-  
-    const {backgroundColorButton, colorBorderAddButton, TextAddButton} = useStylesStates()
+export default function ButtonNewEntrie() {
 
     return (
         <View style={{ justifyContent: 'flex-end', flex: 1 }}>
                 <TouchableOpacity
-                    style={[styles.addNewButton, {borderColor: colorBorderAddButton, backgroundColor: backgroundColorButton }]}
-                    onPress={props.handleNavigateNovo}>
+                    style={[styles.addNewButton]}
+                   >
                     <Text style={styles.addNewButtonText}>
-                        {TextAddButton}
+                      bbbbg
                     </Text>
                     <Feather name="plus" size={40} color='#ffffff' style={{ marginLeft: 10 }} />
                 </TouchableOpacity>

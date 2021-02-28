@@ -5,47 +5,26 @@ import { StyleSheet, Text, View } from 'react-native'
 import Functions from '../../../functions/index'
 import NumberFormat from 'react-number-format';
 
-import {useSelectedMonthAndYear} from "../../../contexts/selectMonthAndYear"
-import {useStylesStates} from "../../../contexts/stylesStates"
-import {useResultsDB} from "../../../contexts/resultsDBStates"
 
-export default function Balance({props}:{props:any}){
+export default function Balance(){
 
-    const { selectedMonth, selectedYear} = useSelectedMonthAndYear()
-    const { mainText1, mainText2} = useStylesStates()
-    const {valuesList} = useResultsDB()
-
-    valuesList.map((value: any) => {
-        if (selectedMonth == props.CurrentMonth && selectedYear == props.CurrentYear){
-            if (value.received && value.type == props.item) props.cont2.push(value.amount)
-        }
-        if (value.amount != null && value.amount != 0 && value.type == props.item) props.cont.push(value.amount)
-    })
-    
     return (
         <View style={styles.balanceView}>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.currentBalanceText}>
-                        {mainText1}
+                        Seila
                     </Text>
-                    {selectedMonth == props.CurrentMonth && selectedYear == props.CurrentYear?
-                        <NumberFormat
-                        value={props.cont2.reduce((a: any, b: any) => a + b, 0)}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        format={Functions.currencyFormatter}
-                        renderText={value => <Text style={styles.currentBalanceTextValue}> {value} </Text>}
-                        />
+
                         :
                         <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
-                    }
+        
                 </View>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.estimatedBalanceText}>
-                        {mainText2}
+                            fsdgsdgd
                     </Text>
                     <NumberFormat
-                        value={props.cont.reduce((a: any, b: any) => a + b, 0)}
+                        value={4500}
                         displayType={'text'}
                         thousandSeparator={true}
                         format={Functions.currencyFormatter}

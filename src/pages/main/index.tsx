@@ -33,18 +33,12 @@ export default function Main() {
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>
-        {/*Botões Ganhos*/}
-
        
+          <View style={{flex:1}}>
+              <LatestTransations/>
+          </View>
 
-        {/*Botões Despesas*/}
-
-       
-        <View style={{flex:1}}>
-          <LatestTransations/>
-        </View>
-
-        <MenuFooter/>
+          <MenuFooter/>
 
       </View>
 

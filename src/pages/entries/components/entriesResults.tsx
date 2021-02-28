@@ -6,111 +6,69 @@ import Functions from '../../../functions/index'
 import NumberFormat from 'react-number-format';
 
 
-import {useSelectedMonthAndYear} from "../../../contexts/selectMonthAndYear"
-import {useStylesStates} from "../../../contexts/stylesStates"
-import {useResultsDB} from "../../../contexts/resultsDBStates"
-
-import {EntriesValues, ValuesValues} from "../../../interfaces"
-
-export default function EntriesResults({props}:{props:any}){
-
-    const {entries, valuesList} = useResultsDB()
-    const { selectedMonth, selectedYear} = useSelectedMonthAndYear()
-    const {tittleTextColor} = useStylesStates()
+export default function EntriesResults(){
 
     return(
         <View style={{ flex: 1, height: '100%' }}>
         <ScrollView style={styles.scrollViewContainer}>
-            { }
-            {entries.map((entrie:EntriesValues, index: number) => {
-                var totalValues = 0
-                var opac = false
-                var atrs = false
-                var borderColor = '#ffffff'
-                if (!entrie.received || selectedMonth != props.CurrentMonth || selectedYear != props.CurrentYear) {
-                    opac = true
-                }
-                if (!entrie.received && entrie.day <= props.todayDate.getDate()) {
-                    atrs = true
-                    borderColor = tittleTextColor
-                }
-                if(selectedMonth != props.CurrentMonth || selectedYear != props.CurrentYear){
-                    atrs = false
-                    borderColor = '#ffffff'
-                }
-                return (
-                    <View key={index}>
-                    
-                    {opac?
+           
+                    <View>
                         <TouchableOpacity
-                        style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
-                        onPress={() => props.showModal(entrie.id, totalValues)}
+                        style={[styles.earningsItemView]}
                         >
-                        <MaterialIcons name="monetization-on" size={40} color={tittleTextColor+'AA'} />
-                        {valuesList.map((value:ValuesValues) => {
-                            if (entries[index].id == value.entries_id) {
-                                totalValues = totalValues + value.amount
-                            }
-                        })}
+                        <MaterialIcons name="monetization-on" size={40} color={'#d2d2d2'} />
 
                         <View style={styles.earningTextView}>
-                            <Text numberOfLines={1} style={[styles.earningTittleText, { color: tittleTextColor+'AA', width: 150 }]}>
-                                {entrie.title}
+                            <Text numberOfLines={1} style={[styles.earningTittleText]}>
+
                             </Text>
-                            <Text style={[styles.earningDateText, { color: tittleTextColor+'AA' }]}>
-                                {entrie.day}/{Functions.convertDtToStringMonth(selectedMonth)}
+                            <Text style={[styles.earningDateText]}>
+                              
                             </Text>
                         </View>
 
                         <NumberFormat
-                            value={totalValues}
+                            value={4000}
                             displayType={'text'}
                             thousandSeparator={true}
                             format={Functions.currencyFormatter}
-                            renderText={value => <Text style={[styles.earningTittleText, { color: tittleTextColor+'AA' }]}> {value} </Text>}
+                            renderText={value => <Text style={[styles.earningTittleText]}> {value} </Text>}
                         />
 
                     </TouchableOpacity>
                     :
                     <TouchableOpacity
-                        style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1 }]}
-                        onPress={() => props.showModal(entrie.id, totalValues)}
+                        style={[styles.earningsItemView]}
+
                         >
-                        <MaterialIcons name="monetization-on" size={40} color={tittleTextColor} />
-                        {valuesList.map((value:ValuesValues) => {
-                            if (entries[index].id == value.entries_id) {
-                                totalValues = totalValues + value.amount
-                                //console.log(totalValues)
-                            }
-                        })}
+                        <MaterialIcons name="monetization-on" size={40} color={"#d2d2d2"} />
 
                         
                         <View style={styles.earningTextView}>
-                            <Text numberOfLines={1} style={[styles.earningTittleText, { color: tittleTextColor, width: 150 }]}>
-                                {entrie.title}
+                            <Text numberOfLines={1} style={[styles.earningTittleText]}>
+                                 
                             </Text>
-                            <Text style={[styles.earningDateText, { color: tittleTextColor }]}>
-                                {entrie.day}/{Functions.convertDtToStringMonth(selectedMonth)}
+                            <Text style={[styles.earningDateText]}>
+                                 
                             </Text>
                         </View>
 
                         <NumberFormat
-                            value={totalValues}
+                            value={5000}
                             displayType={'text'}
                             thousandSeparator={true}
                             format={Functions.currencyFormatter}
-                            renderText={value => <Text style={[styles.earningTittleText, { color: tittleTextColor }]}> {value} </Text>}
+                            renderText={value => <Text style={[styles.earningTittleText]}> {value} </Text>}
                         />
 
                     </TouchableOpacity>
-                    }
+
                     
-                    {atrs? 
-                    <Ionicons name="alert-circle" size={40} color={tittleTextColor} style={styles.alertSign}/>
-                    :null}
+ 
+                    <Ionicons name="alert-circle" size={40} color={"#d2d2d2"} style={styles.alertSign}/>
+      
                     </View>
-                )
-            })}
+
         </ScrollView>
     </View>
     )

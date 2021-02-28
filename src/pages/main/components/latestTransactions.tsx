@@ -1,23 +1,16 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Foundation , Ionicons} from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
 import Functions from '../../../functions/index'
+import { DataBDContext } from '../../../contexts/dataBDContext';
 
-
-import { useResultsDB } from '../../../contexts/resultsDBStates'
 
 export default function LatestTransactions() {
     
-
-    const { entries, valuesList } = useResultsDB();
     const [seeTransactions, setSeeTransactions] = useState(true)
 
-    const latestEntries = entries.slice(Math.max(entries.length - 3, 0))
-
-    
-
-    console.log(latestEntries)
+    const {latestEntries } = useContext(DataBDContext)
 
     return (
         <View style={styles.container}>
@@ -35,16 +28,7 @@ export default function LatestTransactions() {
             </View>
 
             {latestEntries.map((entr: any, index: number) => {
-                let totalValues = 0
-
-                let month = parseInt(Functions.toMonthAndYear(entr.dtStart).month)
-
-                {valuesList.map((value:any) => {
-                    if (latestEntries[index].id == value.entries_id) {
-                        console.log("VALUE: "+value.amount)
-                        totalValues = totalValues + value.amount
-                    }
-                })}
+                let month = parseInt(Functions.toMonthAndYear(entr.entrieDtStart).month)
 
                 return (
                     <View style={styles.listView} key={index}>
@@ -60,10 +44,10 @@ export default function LatestTransactions() {
                                 ]}>
                                 {entr.title}
                             </Text>
-                            {totalValues > 0 ?
+                            {entr.amount > 0 ?
                         
                             <NumberFormat
-                                value={totalValues}
+                                value={entr.amount }
                                 displayType={'text'}
                                 thousandSeparator={true}
                                 format={Functions.currencyFormatter}

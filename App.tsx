@@ -3,12 +3,10 @@ import React from 'react';
 
 import {useFonts} from 'expo-font'
 import{Poppins_400Regular,Poppins_500Medium, Poppins_600SemiBold,Poppins_700Bold} from'@expo-google-fonts/poppins'
-import SelectedMonthAndYearProvider from "./src/contexts/selectMonthAndYear"
-import StylesStatesProvider from "./src/contexts/stylesStates"
-import ResultsDBStatesProvider from "./src/contexts/resultsDBStates"
 
 import Routes from './src/routes'
 import { MainProvider } from './src/contexts/mainContext';
+import { DataBDProvider } from './src/contexts/dataBDContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,13 +22,9 @@ export default function App() {
 
   return (
     <MainProvider>
-    <ResultsDBStatesProvider>
-        <StylesStatesProvider>
-          <SelectedMonthAndYearProvider>
+        <DataBDProvider>
             <Routes/>
-          </SelectedMonthAndYearProvider>
-      </StylesStatesProvider>
-    </ResultsDBStatesProvider>
+        </DataBDProvider>
     </MainProvider>
   );
 }

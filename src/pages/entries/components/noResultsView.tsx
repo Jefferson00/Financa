@@ -2,17 +2,15 @@ import React from "react"
 import { StyleSheet, Text, View } from 'react-native'
 
 import { Feather } from '@expo/vector-icons'
-import { useStylesStates } from '../../../contexts/stylesStates'
 
 export default function NoResultsView() {
 
-    const { tittleTextColor } = useStylesStates()
     return (
         <View style={styles.container}>
-            <Text style={[styles.noResultsText,{color:tittleTextColor}]}>
+            <Text style={[styles.noResultsText]}>
                 Sem resultados!
             </Text>
-            <Feather name="x-octagon" size={40} color={tittleTextColor} />
+            <Feather name="x-octagon" size={40} color={"#d2d2d2"} />
         </View>
     )
 }
