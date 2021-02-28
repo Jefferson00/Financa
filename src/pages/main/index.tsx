@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
@@ -10,20 +10,26 @@ import ButtonsSelectors from './components/buttonsSelectors';
 import BalanceView from './components/balanceView';
 import EarningsView from './components/earningsView';
 import ExpansesView from './components/expansesView';
+import { MainContext} from '../../contexts/mainContext';
 
 
 export default function Main() {
+
+  const {isBalanceActive, isExpansesActive, isEarningsActive} = useContext(MainContext);
+
   return (
     <LinearGradient colors={['#F9CF3C', '#B26A15']} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
       <Header/>
 
-      <ButtonsSelectors/>
-      <BalanceView/>
-      <EarningsView/>
-      <ExpansesView/>
-  
+          <ButtonsSelectors/>
+
+          {isBalanceActive && <BalanceView/>}
+
+          {isEarningsActive &&  <EarningsView/>}
+
+          {isExpansesActive &&  <ExpansesView/>}
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>

@@ -8,6 +8,7 @@ import StylesStatesProvider from "./src/contexts/stylesStates"
 import ResultsDBStatesProvider from "./src/contexts/resultsDBStates"
 
 import Routes from './src/routes'
+import { MainProvider } from './src/contexts/mainContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -22,6 +23,7 @@ export default function App() {
   }
 
   return (
+    <MainProvider>
     <ResultsDBStatesProvider>
         <StylesStatesProvider>
           <SelectedMonthAndYearProvider>
@@ -29,6 +31,7 @@ export default function App() {
           </SelectedMonthAndYearProvider>
       </StylesStatesProvider>
     </ResultsDBStatesProvider>
+    </MainProvider>
   );
 }
 
