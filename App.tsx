@@ -7,6 +7,7 @@ import{Poppins_400Regular,Poppins_500Medium, Poppins_600SemiBold,Poppins_700Bold
 import Routes from './src/routes'
 import { MainProvider } from './src/contexts/mainContext';
 import { DataBDProvider } from './src/contexts/dataBDContext';
+import { NewEntriesProvider } from './src/contexts/newEntriesContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -23,7 +24,9 @@ export default function App() {
   return (
     <MainProvider>
         <DataBDProvider>
+          <NewEntriesProvider>
             <Routes/>
+          </NewEntriesProvider>
         </DataBDProvider>
     </MainProvider>
   );

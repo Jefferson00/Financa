@@ -26,11 +26,35 @@ import LoaderUpdate from "./components/loaderUpdate"
 
 
 export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
-
+    const { item } = route.params
    
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
-           
+           <LinearGradient 
+            colors={["#155F69", '#F9CF3C']} 
+            start={{ x: -0.4, y: 0.1 }} 
+            style={styles.container}
+            >
+            <StatusBar style="light" translucent />  
+            <Header/>
+
+             <View style={styles.mainContainer}>
+                <View style={styles.tittleTextView}>
+                    <Text style={[styles.tittleText, { color: '#525802' }]}>
+                        Novo Ganho
+                    </Text>
+                </View>
+
+                <ScrollView style={{ maxHeight: '100%' }}>
+                    <View style={styles.formView}>
+                        <FormContent/>
+                    </View>
+                </ScrollView>
+
+                <MenuFooter/>
+             </View>  
+
+           </LinearGradient>
         </KeyboardAvoidingView>
     )
 }

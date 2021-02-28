@@ -7,6 +7,9 @@ interface MainContextData{
     seeExpansesValues: boolean;
     seeEarningsValues: boolean;
     seeBalanceValues: boolean;
+    todayDate:Date;
+    currentMonth:number;
+    currentYear:number;
     activeBalanceView: () =>void;
     activeEarningsView: () =>void;
     activeExpansesView: () =>void;
@@ -30,6 +33,10 @@ export function MainProvider({children}:MainProviderProps){
     const [seeExpansesValues, setSeeExpansesValues] = useState(true)
     const [seeEarningsValues, setSeeEarningsValues] = useState(true)
     const [seeBalanceValues, setSeeBalanceValues] = useState(true)
+
+    const [todayDate, setTodayDate] = useState(new Date())
+    const [currentMonth, setCurrentMonth] = useState(todayDate.getMonth()+1)
+    const [currentYear, setCurrentYear] = useState(todayDate.getFullYear())
 
     function activeBalanceView(){
         setIsBalanceActive(true)
@@ -68,6 +75,9 @@ export function MainProvider({children}:MainProviderProps){
             seeExpansesValues,
             seeEarningsValues,
             seeBalanceValues,
+            todayDate,
+            currentMonth,
+            currentYear,
             activeBalanceView,
             activeEarningsView,
             activeExpansesView,
