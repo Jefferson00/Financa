@@ -14,10 +14,15 @@ export default function FormContent() {
            calendarDate, 
            titleInputEntrie,
            isEnabledReceived,
+           isEnabledMonthly,
+           entrieFrequency,
            onChangeDate, 
            showDatepicker,
            setTitleInputEntrie,
            toggleSwitchReceived,
+           toggleSwitchMonthly,
+           increaseEntrieFrequency,
+           decreaseEntrieFrequency,
         } = useContext(NewEntriesContext)
 
     return (
@@ -68,44 +73,41 @@ export default function FormContent() {
             <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
                 Periodicidade
             </Text>
+
             <View style={styles.frequencyView}>
                 <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>
                     Mensal
                 </Text>
                 <Switch
                     trackColor={{ false: '#d2d2d2', true: "#d2d2d2" }}
-                    thumbColor={true ? 'd2d2d2' : "#d2d2d2"}
+                    thumbColor={isEnabledMonthly ? 'd2d2d2' : "#d2d2d2"}
                     ios_backgroundColor="#3e3e3e"
-
-                    value={false}
+                    onValueChange={toggleSwitchMonthly}
+                    value={isEnabledMonthly}
                 />
 
                 <Feather name='chevron-left' size={30}
-                    onPress={() => {
+                    onPress={decreaseEntrieFrequency} />
 
-                    }} />
-                <Text style={{ fontSize: 18 }}>0</Text>
+                <Text style={{ fontSize: 18 }}>
+                     {entrieFrequency}
+                </Text>
+
                 <Feather name='chevron-right' size={30}
-                    onPress={() => {
-
-                    }}
+                    onPress={increaseEntrieFrequency}
                 />
-
-
-
-                <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>Vezes</Text>
-            </View>
-            <View style={styles.frequencyView}>
-
+                <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>
+                    Vezes
+                </Text>
             </View>
 
             <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
                 Valor
-                            </Text>
+            </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={[styles.secondColorText, { color: "#d2d2d2", marginRight: 10, fontSize: 18 }]}>
                     R$
-                                </Text>
+                </Text>
                 <TextInput
                     keyboardType='numeric'
                     style={styles.InputTextValue}
