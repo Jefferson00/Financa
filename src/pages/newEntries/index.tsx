@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, Text, TouchableOpacity, View, Platform, KeyboardAvoidingView, Modal, Alert } from 'react-native'
@@ -22,11 +22,18 @@ import FormContent from "./components/formContent"
 import SuccessModal from "./components/modal"
 
 import LoaderUpdate from "./components/loaderUpdate"
+import { NewEntriesContext } from '../../contexts/newEntriesContext';
 
 
 
 export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const { item } = route.params
+
+    const {updateTypeOfEntrie} = useContext(NewEntriesContext)
+
+    useEffect(()=>{
+        updateTypeOfEntrie(item)
+    },[item])
    
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
@@ -48,6 +55,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 <ScrollView style={{ maxHeight: '100%' }}>
                     <View style={styles.formView}>
                         <FormContent/>
+                        <ButtonSubmit/>
                     </View>
                 </ScrollView>
 

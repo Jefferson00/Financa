@@ -1,5 +1,8 @@
 import React, {createContext, useState, ReactNode, useEffect} from 'react';
 import { Platform } from 'react-native';
+import entriesDB from '../services/entriesDB';
+
+import Functions from "../utils"
 
 interface EntriesValuesData{
     description: string,
@@ -12,6 +15,24 @@ interface EntriesValuesData{
     received: boolean,
 }
 
+interface EntriesData{
+    title: string,
+    day: number,
+    dtStart: number,
+    dtEnd: number,
+    monthly: boolean,
+    received: boolean,
+    type: string,
+}
+
+interface ValuesData{
+    description: string,
+    amount: number,
+    dtStart: number,
+    dtEnd: number,
+    entries_id: number,
+}
+
 interface NewEntriesContextData{
     calendarDate: Date;
     showCalendar:boolean;
@@ -19,6 +40,8 @@ interface NewEntriesContextData{
     isEnabledReceived: boolean,
     isEnabledMonthly: boolean,
     entrieFrequency:number,
+    entrieValuesBeforeCreate: ValuesData[];
+    typeOfEntrie:string
     onChangeDate: (event: any, selectedDate: any) => void;
     showDatepicker: () => void;
     setTitleInputEntrie: (titleInputEntrie:string) => void;
@@ -26,6 +49,9 @@ interface NewEntriesContextData{
     toggleSwitchMonthly: () => void;
     decreaseEntrieFrequency: () => void;
     increaseEntrieFrequency: () => void;
+    updateTypeOfEntrie: (type:string) => void;
+    updateEntrieValuesBeforeCreate: (subitem: string, index: number, value: any) => void;
+    handleCreateNewEntrie: ()=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -36,6 +62,12 @@ interface NewEntriesProviderProps{
 export const NewEntriesContext = createContext({} as NewEntriesContextData)
 
 export function NewEntriesProvider({children}: NewEntriesProviderProps){
+
+    const [typeOfEntrie, setTypeOfEntrie] = useState('');
+
+    function updateTypeOfEntrie(type:string){
+        setTypeOfEntrie(type)
+    }
 
     //-------------------------------//
     const [calendarDate, setCalendarDate] = useState(new Date());
@@ -78,14 +110,21 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
     //----------------------------------------------//
 
-    const [entrieValuesBeforeCreate, setEntriesValuesBeforeCreate] = useState<EntriesValuesData[]>([])
-    //parei aqui
-    function updateEntrieValuesBeforeCreate(subitem: string, index: number, value: any){
-        (e: any)=>{
-            let arrOfEntriesValues = entrieValuesBeforeCreate.map((entrieValue:EntriesValuesData, i:number)=>{
+    const initialValue: ValuesData[] = [{
+        description: '',
+        amount: 0,
+        dtStart: 0,
+        dtEnd: 0,
+        entries_id: 0,
+    }]
+
+    const [entrieValuesBeforeCreate, setEntriesValuesBeforeCreate] = useState<ValuesData[]>(initialValue)
+    
+    function updateEntrieValuesBeforeCreate(subitem: string, index: number, e: any){
+            let arrOfEntriesValues = entrieValuesBeforeCreate.map((entrieValue:ValuesData, i:number)=>{
                 if (index === i){
                     if (subitem == 'monthly') {
-                        return { ...entrieValue, [subitem]: value = !value }
+                        return { ...entrieValue, ['dtend']:'209912' }
                     }
                     else if (subitem == 'amount') {
                         var valor = e.nativeEvent.text
@@ -99,6 +138,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                         if (valor =="NaN") valor = 0
                         return { ...entrieValue, [subitem]: valor }
                     }
+                    else if (subitem == "description"){
+                        return { ...entrieValue, [subitem]: e.nativeEvent.text }
+                    }
                     else {
                         return { ...entrieValue, [subitem]: e.nativeEvent.text }
                     }
@@ -107,7 +149,29 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 }
             })
             setEntriesValuesBeforeCreate(arrOfEntriesValues)
+    }
+
+    function handleCreateNewEntrie(){
+        let dtStart = Functions.setDtStart(calendarDate)
+        let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
+
+        const EntrieObj : EntriesData = {
+            title: titleInputEntrie,
+            day: calendarDate.getDate(),
+            dtStart: dtStart,
+            dtEnd: dtEnd,
+            monthly: isEnabledMonthly,
+            received: isEnabledReceived,
+            type: typeOfEntrie,
         }
+        entriesDB.create(EntrieObj).then(()=>{
+            alert('cadastrado com sucesso!')
+        }).catch(err=>{
+            console.log(err)
+        })
+        entriesDB.all().then(res=>{
+            console.log(res)
+        })
     }
 
     return(
@@ -118,6 +182,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             isEnabledReceived,
             isEnabledMonthly,
             entrieFrequency,
+            entrieValuesBeforeCreate,
+            typeOfEntrie,
             onChangeDate,
             showDatepicker,
             setTitleInputEntrie,
@@ -125,7 +191,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             toggleSwitchMonthly,
             decreaseEntrieFrequency,
             increaseEntrieFrequency,
-
+            updateEntrieValuesBeforeCreate,
+            updateTypeOfEntrie,
+            handleCreateNewEntrie,
         }}>
             {children}
         </NewEntriesContext.Provider>

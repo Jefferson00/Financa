@@ -1,29 +1,26 @@
-import React from "react"
+import React, { useContext } from "react"
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import { LinearGradient } from 'expo-linear-gradient'
+import { NewEntriesContext } from "../../../contexts/newEntriesContext"
 
-import { useStylesStates } from "../../../contexts/stylesStates"
 
-export default function ButtonSubmit({ props }: { props: any }) {
+export default function ButtonSubmit() {
 
-    const {backgroundColorButton, colorBorderAddButton , tittleTextColor} = useStylesStates()
+    const {handleCreateNewEntrie} = useContext(NewEntriesContext)
+
+    function teste(){
+        handleCreateNewEntrie
+        console.log('pressed') 
+    }
 
     return (
         <View>
-                {props.idUpdate != null ?
-                    <TouchableOpacity
-                        style={[styles.addNewButton, {borderColor: colorBorderAddButton , backgroundColor: backgroundColorButton}]}
-                        onPress={props.handleUpdate}
-                    >
-                        <Text style={styles.addNewButtonText}>Atualizar</Text>
-                    </TouchableOpacity>
-                    : <TouchableOpacity
-                        style={[styles.addNewButton, { borderColor: colorBorderAddButton, backgroundColor: backgroundColorButton }]}
-                        onPress={props.handleCreateNew}
-                    >
-                        <Text style={styles.addNewButtonText}>Adicionar</Text>
-                    </TouchableOpacity>
-                }
+            <TouchableOpacity
+                style={[styles.addNewButton, { borderColor: "#d2d2d2", backgroundColor: "#d2d2d2" }]}
+                onPress={teste}
+            >   
+                <Text style={styles.addNewButtonText}>Adicionar</Text>
+            </TouchableOpacity>
+
         </View>
     )
 }

@@ -16,6 +16,7 @@ export default function FormContent() {
            isEnabledReceived,
            isEnabledMonthly,
            entrieFrequency,
+           entrieValuesBeforeCreate,
            onChangeDate, 
            showDatepicker,
            setTitleInputEntrie,
@@ -23,6 +24,7 @@ export default function FormContent() {
            toggleSwitchMonthly,
            increaseEntrieFrequency,
            decreaseEntrieFrequency,
+           updateEntrieValuesBeforeCreate,
         } = useContext(NewEntriesContext)
 
     return (
@@ -111,6 +113,8 @@ export default function FormContent() {
                 <TextInput
                     keyboardType='numeric'
                     style={styles.InputTextValue}
+                    onChange={e => updateEntrieValuesBeforeCreate('amount', 0 , e)}
+                    value={entrieValuesBeforeCreate[0].amount.toString()}
                 />
             </View>
 
