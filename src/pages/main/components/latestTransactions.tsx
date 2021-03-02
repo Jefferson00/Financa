@@ -46,21 +46,21 @@ export default function LatestTransactions() {
                             </Text>
                             {entr.amount > 0 ?
                         
-                            <NumberFormat
-                                value={entr.amount }
-                                displayType={'text'}
-                                thousandSeparator={true}
-                                format={Functions.currencyFormatter}
-                                renderText={value => 
-                                    <Text style={[
-                                        styles.itemText,
-                                        { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
-                                    ]}> 
-                                    {entr.type == 'Despesas'? '- ' + value: value} 
-                                    </Text>
-                                }
-                            />
-                            :
+                                <NumberFormat
+                                    value={entr.amount }
+                                    displayType={'text'}
+                                    thousandSeparator={true}
+                                    format={Functions.currencyFormatter}
+                                    renderText={value => 
+                                        <Text style={[
+                                            styles.itemText,
+                                            { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
+                                        ]}> 
+                                        {entr.type == 'Despesas'? '- ' + value: value} 
+                                        </Text>
+                                    }
+                                />
+                                :
                                 <Text style={[
                                     styles.itemText,
                                     { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}

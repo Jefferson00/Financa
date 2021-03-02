@@ -1,8 +1,10 @@
-import React, {createContext, useState, ReactNode, useEffect} from 'react';
+import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
 import { Platform } from 'react-native';
 import entriesDB from '../services/entriesDB';
+import valuesDB from '../services/valuesDB';
 
 import Functions from "../utils"
+import { DataBDContext } from './dataBDContext';
 
 interface EntriesValuesData{
     description: string,
@@ -63,10 +65,13 @@ export const NewEntriesContext = createContext({} as NewEntriesContextData)
 
 export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
+    const {updateLoadAction} = useContext(DataBDContext)
+
     const [typeOfEntrie, setTypeOfEntrie] = useState('');
 
     function updateTypeOfEntrie(type:string){
         setTypeOfEntrie(type)
+        console.log("Atualizou o tipo da entrada")
     }
 
     //-------------------------------//
@@ -77,6 +82,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         const currentDate = selectedDate || calendarDate;
         setShowCalendar(Platform.OS === 'ios');
         setCalendarDate(currentDate);
+        console.log("Atualizou a data do calendario")
     };
 
     const showDatepicker = () => {
@@ -93,6 +99,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     const toggleSwitchMonthly = () => {
         //seta o switch mensal como true ou false
         setIsEnabledMonthly(previousState => !previousState)
+        console.log("Mudou o switch mensal")
     };
 
     //-------------------------------------//
@@ -154,6 +161,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     function handleCreateNewEntrie(){
         let dtStart = Functions.setDtStart(calendarDate)
         let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
+        console.log("******CADASTRO********** ")
+        console.log("data inicial: "+dtStart)
+        console.log("data final: "+dtEnd)
 
         const EntrieObj : EntriesData = {
             title: titleInputEntrie,
@@ -164,13 +174,43 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             received: isEnabledReceived,
             type: typeOfEntrie,
         }
+
+        console.log("Objeto: "+EntrieObj)
+
         entriesDB.create(EntrieObj).then(()=>{
+            console.log("Create!")
             alert('cadastrado com sucesso!')
+            updateLoadAction()
         }).catch(err=>{
             console.log(err)
         })
-        entriesDB.all().then(res=>{
-            console.log(res)
+        entriesDB.all().then((res:any)=>{
+            //console.log(res)
+
+            console.log("All!")
+            entrieValuesBeforeCreate.map((value: ValuesData) =>{
+                let EntrieId = res._array.slice(-1)[0].id
+                let amount = String(value.amount)
+                amount = amount.replace(/[.]/g, '')
+                amount = amount.replace(/[,]/g, '')
+                const ValueObj:ValuesData = {
+                    description: value.description,
+                    amount: Number(amount),
+                    dtStart: dtStart,
+                    dtEnd: dtEnd, ///mudar depois
+                    entries_id: EntrieId
+                }
+                valuesDB.create(ValueObj).then(()=>{
+                    console.log("Create!")
+                    alert('valor cadastrado com sucesso!')
+                    updateLoadAction()
+                }).catch(err => {
+                    console.log(err)
+                })
+            })
+            updateLoadAction()
+        }).catch(err => {
+            console.log(err)
         })
     }
 

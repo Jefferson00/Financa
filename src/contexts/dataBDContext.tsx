@@ -1,4 +1,4 @@
-import React, {createContext, useState, ReactNode, useEffect} from 'react';
+import React, {createContext, useState, ReactNode, useEffect, useRef} from 'react';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
 
@@ -39,6 +39,8 @@ interface DataBDContextData{
     latestEntries: LatestEntries[];
     loadAllEntriesResults: () => void;
     loadAllEntriesValuesResults: () => void;
+    updateLoadAction: () => void;
+
 }
 
 interface DataBDProviderProps{
@@ -50,14 +52,27 @@ export const DataBDContext = createContext({} as DataBDContextData)
 
 export function DataBDProvider({children}: DataBDProviderProps){
 
+    const [isValuesUpdated, setIsValuesUpdated] = useState(false)
+
+    function updateLoadAction(){
+        setIsValuesUpdated(!isValuesUpdated)
+    }
+    
+
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
     const [allEntriesValues, setAllEntriesValues] = useState<EntriesValuesData[]>([])
 
     const [latestEntries, setLatestEntries] = useState<LatestEntries[]>([])
 
     function loadAllEntriesResults(){
+        
+        
         entriesDB.all().then((res:any)=>{
             setAllEntries(res._array)
+            if(res._array.length > allEntries.length){
+                setIsValuesUpdated(!isValuesUpdated)
+                console.log("Carregou todas as entradas")
+            }
         }).catch(err=>{
             console.log(err)
         })
@@ -66,6 +81,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadAllEntriesValuesResults(){
         valuesDB.all().then((res:any)=>{
             setAllEntriesValues(res._array)
+            if(res._array.length > allEntriesValues.length){
+                setIsValuesUpdated(!isValuesUpdated)
+                console.log("carregou todos os valores")
+            }
         }).catch(err=>{
             console.log(err)
         })
@@ -76,7 +95,9 @@ export function DataBDProvider({children}: DataBDProviderProps){
         let ltsEntriesArray : LatestEntries[] = [] 
         ltsEntries.map((entr: EntriesData, index: number) => {
             let totalValues = 0
+            console.log("All entrieValues: "+allEntriesValues)
             allEntriesValues.map((value:EntriesValuesData) => {
+                console.log("Valor: "+totalValues)
                 if (ltsEntries[index].id === value.entries_id){
                     totalValues = totalValues + value.amount
                 }
@@ -89,17 +110,31 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 type: entr.type,
                 amount: totalValues,
             }
+            /*console.log("Valor: "+totalValues)
+            console.log("day: "+entr.day)
+            console.log("entrieDtStart: "+entr.dtStart)
+            console.log("entrieDtEnd: "+entr.dtEnd)
+            console.log("type: "+entr.type)*/
             ltsEntriesArray.push(ltsEntriesObj)
         })
-
+        //setIsValuesUpdated(!isValuesUpdated)
+      
+        
+        console.log("carregou as ultimas transações")
         setLatestEntries(ltsEntriesArray)
+       
     }
 
+    
+
+
     useEffect(()=>{
+        
         loadAllEntriesResults()
         loadAllEntriesValuesResults()
         setLatestTransations()
-    },[allEntries, allEntriesValues])
+        console.log("CU: "+isValuesUpdated)
+    },[isValuesUpdated])
 
     return(
         <DataBDContext.Provider value={{
@@ -108,6 +143,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             latestEntries,
             loadAllEntriesResults,
             loadAllEntriesValuesResults,
+            updateLoadAction,
         }}>
             {children}
         </DataBDContext.Provider>

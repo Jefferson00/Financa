@@ -8,7 +8,7 @@ export default function ButtonSubmit() {
     const {handleCreateNewEntrie} = useContext(NewEntriesContext)
 
     function teste(){
-        handleCreateNewEntrie
+        handleCreateNewEntrie()
         console.log('pressed') 
     }
 
