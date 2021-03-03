@@ -1,46 +1,51 @@
-import React from "react"
+import React, { useContext } from "react"
 import { StyleSheet, Text, View, TextInput, Switch } from 'react-native'
+import { NewEntriesContext } from "../../../contexts/newEntriesContext"
 
+interface ValuesData{
+    description: string,
+    amount: number,
+    dtStart: number,
+    dtEnd: number,
+    entries_id: number,
+}
 
-import { useStylesStates } from "../../../contexts/stylesStates"
-import { useResultsDB } from "../../../contexts/resultsDBStates"
+export default function FormContentCreate() {
 
-import {ValuesItem} from "../../../interfaces"
-
-export default function FormContentCreate({ props }: { props: any }) {
-
-    const {tittleTextColor, subtittleTextColor } = useStylesStates()
-    const {valuesArray} = useResultsDB()
+    const {entrieValuesBeforeCreate, 
+           updateEntrieValuesBeforeCreate,
+           isEnabledMonthly,
+        } = useContext(NewEntriesContext)
     
     return(
-        props.idUpdate == null && valuesArray.map((values:ValuesItem, index:number) => {
-            if (props.showValues)
+        <>
+         {entrieValuesBeforeCreate.map((values:ValuesData, index:number) => {
                 return (
                     <View style={styles.valuesViewItem} key={index}>
                         <View style={styles.valuesView}>
-                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
                                 Descrição
                             </Text>
-                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
                                 Valor
                             </Text>
                         </View>
                         <View style={styles.valuesView}>
     
                             <TextInput
-                                onChange={props.updateValues('description', index, false)}
+                                onChange={e => updateEntrieValuesBeforeCreate('description', index, e)}
                                 value={values.description}
                                 style={[styles.InputText, { width: 150 }]}
                                 multiline={true}
                             />
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:10}}>
-                                <Text style={[styles.secondColorText, { color: subtittleTextColor, marginRight: 10, fontSize: 18 }]}>
+                                <Text style={[styles.secondColorText, { color: "#d2d2d2", marginRight: 10, fontSize: 18 }]}>
                                     R$
                                 </Text>
                                 <TextInput
                                     keyboardType='numeric'
                                     placeholder='R$ 0,00'
-                                    onChange={props.updateValues('amount', index, false)}
+                                    onChange={e => updateEntrieValuesBeforeCreate('amount', index, e)}
                                     value={values.amount.toString()}
                                     style={styles.InputTextValue}
                                     maxLength={10}
@@ -49,33 +54,34 @@ export default function FormContentCreate({ props }: { props: any }) {
     
                         </View>
                         <View style={styles.valuesView}>
-                            <Text style={[styles.subTittleText, { color: tittleTextColor }]}>
+                            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
                                 Periodicidade
                             </Text>
                         </View>
                         <View style={styles.frequencyView}>
-                            <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Mensal</Text>
+                            <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>Mensal</Text>
                             <Switch
-                                trackColor={{ false: '#d2d2d2', true: tittleTextColor }}
-                                thumbColor={props.isEnabled ? 'd2d2d2' : tittleTextColor}
+                                trackColor={{ false: '#d2d2d2', true: "#d2d2d2" }}
+                                thumbColor={isEnabledMonthly ? 'd2d2d2' : "#d2d2d2"}
                                 ios_backgroundColor="#3e3e3e"
-                                onValueChange={props.updateValues('monthly', index, values.monthly)}
-                                value={values.monthly}
+                                onValueChange={e=> updateEntrieValuesBeforeCreate('monthly', index, e)}
+                                value={isEnabledMonthly}
                             />
     
                             <TextInput
-                                onChange={props.updateValues('repeat', index, false)}
-                                value={values.repeat.toString()}
+                                
+        
                                 style={styles.InputText}
                                 keyboardType='numeric'
                                 maxLength={2}
                             />
     
-                            <Text style={[styles.secondColorText, { color: subtittleTextColor }]}>Vezes</Text>
+                            <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>Vezes</Text>
                         </View>
                     </View>
                 )
-        })
+            })}
+            </>
     )
     
 }

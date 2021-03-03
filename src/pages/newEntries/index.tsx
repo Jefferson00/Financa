@@ -55,9 +55,10 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 <ScrollView style={{ maxHeight: '100%' }}>
                     <View style={styles.formView}>
                         <FormContent/>
-                        <ButtonSubmit/>
+                        <FormContentCreate/>
                     </View>
                 </ScrollView>
+                        <ButtonSubmit/>
 
                 <MenuFooter/>
              </View>  

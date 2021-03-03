@@ -95,11 +95,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
         let ltsEntriesArray : LatestEntries[] = [] 
         ltsEntries.map((entr: EntriesData, index: number) => {
             let totalValues = 0
-            console.log("All entrieValues: "+allEntriesValues)
             allEntriesValues.map((value:EntriesValuesData) => {
-                console.log("Valor: "+totalValues)
                 if (ltsEntries[index].id === value.entries_id){
                     totalValues = totalValues + value.amount
+                    console.log("Valor: "+totalValues)
                 }
             })
             let ltsEntriesObj = {
@@ -110,30 +109,18 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 type: entr.type,
                 amount: totalValues,
             }
-            /*console.log("Valor: "+totalValues)
-            console.log("day: "+entr.day)
-            console.log("entrieDtStart: "+entr.dtStart)
-            console.log("entrieDtEnd: "+entr.dtEnd)
-            console.log("type: "+entr.type)*/
             ltsEntriesArray.push(ltsEntriesObj)
         })
-        //setIsValuesUpdated(!isValuesUpdated)
-      
-        
         console.log("carregou as ultimas transações")
         setLatestEntries(ltsEntriesArray)
-       
     }
-
-    
 
 
     useEffect(()=>{
-        
         loadAllEntriesResults()
         loadAllEntriesValuesResults()
         setLatestTransations()
-        console.log("CU: "+isValuesUpdated)
+        console.log("isValuesUpdated: "+isValuesUpdated)
     },[isValuesUpdated])
 
     return(

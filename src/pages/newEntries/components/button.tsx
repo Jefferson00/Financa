@@ -7,16 +7,11 @@ export default function ButtonSubmit() {
 
     const {handleCreateNewEntrie} = useContext(NewEntriesContext)
 
-    function teste(){
-        handleCreateNewEntrie()
-        console.log('pressed') 
-    }
-
     return (
         <View>
             <TouchableOpacity
                 style={[styles.addNewButton, { borderColor: "#d2d2d2", backgroundColor: "#d2d2d2" }]}
-                onPress={teste}
+                onPress={handleCreateNewEntrie}
             >   
                 <Text style={styles.addNewButtonText}>Adicionar</Text>
             </TouchableOpacity>
