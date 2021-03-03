@@ -38,6 +38,7 @@ interface DataBDContextData{
     allEntriesValues: EntriesValuesData[];
     latestEntries: LatestEntries[];
     entriesValuesByDate: EntriesValuesData[];
+    entriesByDate: EntriesData[];
     loadAllEntriesResults: () => void;
     loadAllEntriesValuesResults: () => void;
     updateLoadAction: () => void;
@@ -61,6 +62,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     
 
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
+    const [entriesByDate, setEntriesByDate] = useState<EntriesData[]>([])
     const [entriesValuesByDate, setEntriesValuesByDate] = useState<EntriesValuesData[]>([])
     const [allEntriesValues, setAllEntriesValues] = useState<EntriesValuesData[]>([])
 
@@ -81,6 +83,14 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadEntriesValuesByDate(){
         valuesDB.findByDate(202103).then((res:any)=>{
             setEntriesValuesByDate(res._array)
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+
+    function loadEntriesByDate(){
+        entriesDB.findByDate(202103).then((res:any)=>{
+            setEntriesByDate(res._array)
         }).catch(err=>{
             console.log(err)
         })
@@ -130,6 +140,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         loadAllEntriesResults()
         loadAllEntriesValuesResults()
         loadEntriesValuesByDate()
+        loadEntriesByDate()
         setLatestTransations()
         console.log("isValuesUpdated: "+isValuesUpdated)
     },[isValuesUpdated])
@@ -140,6 +151,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             allEntriesValues,
             latestEntries,
             entriesValuesByDate,
+            entriesByDate,
             loadAllEntriesResults,
             loadAllEntriesValuesResults,
             updateLoadAction,

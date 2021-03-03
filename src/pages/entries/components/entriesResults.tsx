@@ -1,94 +1,88 @@
-import React from "react"
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native'
-import { MaterialIcons,  Ionicons } from '@expo/vector-icons'
+import React, { useContext } from "react"
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native'
+import { MaterialIcons, Ionicons } from '@expo/vector-icons'
 
 import Functions from '../../../functions/index'
 import NumberFormat from 'react-number-format';
+import { DataBDContext } from "../../../contexts/dataBDContext";
+import { NewEntriesContext } from "../../../contexts/newEntriesContext";
 
+interface EntriesData {
+    id: number,
+    title: string,
+    day: number,
+    dtStart: number,
+    dtEnd: number,
+    monthly: boolean,
+    received: boolean,
+    type: string,
+}
 
-export default function EntriesResults(){
+export default function EntriesResults() {
 
-    return(
+    const { entriesByDate } = useContext(DataBDContext)
+    const {typeOfEntrie} = useContext(NewEntriesContext)
+
+    const entriesByDateByType = entriesByDate.filter(entrie => entrie.type == typeOfEntrie)
+
+    return (
         <View style={{ flex: 1, height: '100%' }}>
-        <ScrollView style={styles.scrollViewContainer}>
-           
-                    <View>
-                        <TouchableOpacity
-                        style={[styles.earningsItemView]}
-                        >
-                        <MaterialIcons name="monetization-on" size={40} color={'#d2d2d2'} />
+            <ScrollView style={styles.scrollViewContainer}>
+                {entriesByDateByType.map((entrie: EntriesData, index: number) => {
 
-                        <View style={styles.earningTextView}>
-                            <Text numberOfLines={1} style={[styles.earningTittleText]}>
-fgh
-                            </Text>
-                            <Text style={[styles.earningDateText]}>
-                              fgh
-                            </Text>
+                    return (
+                        <View key={index}>
+                            <TouchableOpacity
+                                style={[styles.earningsItemView]}
+                            >
+                                <MaterialIcons name="monetization-on" size={40} color={'#d2d2d2'} />
+
+                                <View style={styles.earningTextView}>
+                                    <Text numberOfLines={1} style={[styles.earningTittleText]}>
+                                        {entrie.title}
+                                    </Text>
+                                    <Text style={[styles.earningDateText]}>
+                                        fgh
+                                    </Text>
+                                </View>
+
+                                <NumberFormat
+                                    value={4000}
+                                    displayType={'text'}
+                                    thousandSeparator={true}
+                                    format={Functions.currencyFormatter}
+                                    renderText={value => <Text style={[styles.earningTittleText]}> {value} </Text>}
+                                />
+
+                            </TouchableOpacity>
+
+                            <Ionicons name="alert-circle" size={40} color={"#d2d2d2"} style={styles.alertSign} />
+
                         </View>
+                    )
+                })}
 
-                        <NumberFormat
-                            value={4000}
-                            displayType={'text'}
-                            thousandSeparator={true}
-                            format={Functions.currencyFormatter}
-                            renderText={value => <Text style={[styles.earningTittleText]}> {value} </Text>}
-                        />
 
-                    </TouchableOpacity>
-              
-                    <TouchableOpacity
-                        style={[styles.earningsItemView]}
-
-                        >
-                        <MaterialIcons name="monetization-on" size={40} color={"#d2d2d2"} />
-
-                        
-                        <View style={styles.earningTextView}>
-                            <Text numberOfLines={1} style={[styles.earningTittleText]}>
-                                 fghf
-                            </Text>
-                            <Text style={[styles.earningDateText]}>
-                                 hgh
-                            </Text>
-                        </View>
-
-                        <NumberFormat
-                            value={5000}
-                            displayType={'text'}
-                            thousandSeparator={true}
-                            format={Functions.currencyFormatter}
-                            renderText={value => <Text style={[styles.earningTittleText]}> {value} </Text>}
-                        />
-
-                    </TouchableOpacity>
-
-                    
- 
-                    <Ionicons name="alert-circle" size={40} color={"#d2d2d2"} style={styles.alertSign}/>
-      
-                    </View>
-
-        </ScrollView>
-    </View>
+            </ScrollView>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
-    alertSign:{
-        position:'absolute',
-        right:0,
-        marginRight:46,
-        elevation:7,
-        zIndex:5,
+    alertSign: {
+        position: 'absolute',
+        right: 0,
+        marginRight: 46,
+        elevation: 7,
+        zIndex: 5,
     },
-   
+
     scrollViewContainer: {
         minHeight: 350,
         marginTop: 20,
         flex: 1,
     },
-   
+
 
     earningsItemView: {
         marginHorizontal: 24,
@@ -104,7 +98,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4.65,
         backgroundColor: "#ffffff",
         borderRadius: 20,
-        zIndex:0,
+        zIndex: 0,
     },
     earningsItemViewOpacity: {
         opacity: 0.8,
@@ -122,5 +116,5 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: 'Poppins_400Regular',
     },
-  
+
 })
