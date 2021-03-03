@@ -1,21 +1,22 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons'
+import { StylesContext } from '../../contexts/stylesContext';
 
 export default function Header() {
 
-
+  const {monthColor} = useContext(StylesContext)
 
   return (
     <View style={styles.monthView}>
       <TouchableOpacity>
-        <Feather name="chevron-left" size={40} color={'#1A8289'} />
+        <Feather name="chevron-left" size={40} color={monthColor} />
       </TouchableOpacity>
-      <Text style={[styles.monthText, { color: '#1A8289' }]}>
+      <Text style={[styles.monthText, { color: monthColor }]}>
           Nov 2020
       </Text>
       <TouchableOpacity>
-        <Feather name="chevron-right" size={40} color={'#1A8289'} />
+        <Feather name="chevron-right" size={40} color={monthColor} />
       </TouchableOpacity>
     </View>
   )

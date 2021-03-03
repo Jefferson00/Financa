@@ -6,6 +6,7 @@ import Functions from '../../../functions/index'
 import NumberFormat from 'react-number-format';
 import { DataBDContext } from "../../../contexts/dataBDContext";
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
+import { MainContext } from "../../../contexts/mainContext";
 
 interface EntriesData {
     id: number,
@@ -20,7 +21,8 @@ interface EntriesData {
 
 export default function EntriesResults() {
 
-    const { entriesByDate } = useContext(DataBDContext)
+    const { entriesByDate, entriesValuesByDate } = useContext(DataBDContext)
+    const {} = useContext(MainContext)
     const {typeOfEntrie} = useContext(NewEntriesContext)
 
     const entriesByDateByType = entriesByDate.filter(entrie => entrie.type == typeOfEntrie)
@@ -29,7 +31,12 @@ export default function EntriesResults() {
         <View style={{ flex: 1, height: '100%' }}>
             <ScrollView style={styles.scrollViewContainer}>
                 {entriesByDateByType.map((entrie: EntriesData, index: number) => {
-
+                    let totalValues = 0
+                    entriesValuesByDate.map((value)=>{
+                        if (entriesByDateByType[index].id == value.entries_id){
+                            totalValues = totalValues + value.amount
+                        }
+                    })
                     return (
                         <View key={index}>
                             <TouchableOpacity
@@ -42,12 +49,12 @@ export default function EntriesResults() {
                                         {entrie.title}
                                     </Text>
                                     <Text style={[styles.earningDateText]}>
-                                        fgh
+                                        {entrie.day}/{Functions.convertDtToStringMonth(3)}
                                     </Text>
                                 </View>
 
                                 <NumberFormat
-                                    value={4000}
+                                    value={totalValues}
                                     displayType={'text'}
                                     thousandSeparator={true}
                                     format={Functions.currencyFormatter}

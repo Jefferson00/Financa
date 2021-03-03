@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
@@ -11,11 +11,22 @@ import BalanceView from './components/balanceView';
 import EarningsView from './components/earningsView';
 import ExpansesView from './components/expansesView';
 import { MainContext} from '../../contexts/mainContext';
+import { NewEntriesContext } from '../../contexts/newEntriesContext';
+import {useIsFocused, useRoute} from '@react-navigation/native'
+import { StylesContext } from '../../contexts/stylesContext';
 
 
 export default function Main() {
 
   const {isBalanceActive, isExpansesActive, isEarningsActive} = useContext(MainContext);
+
+  const {updateMonthColorMainScreen} = useContext(StylesContext)
+
+  //const isFocused = useIsFocused()
+
+  useEffect(()=>{
+    updateMonthColorMainScreen()
+  },[])
 
   return (
     <LinearGradient colors={['#F9CF3C', '#B26A15']} start={{ x: -0.8, y: 0.1 }} style={styles.container}>

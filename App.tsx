@@ -8,6 +8,7 @@ import Routes from './src/routes'
 import { MainProvider } from './src/contexts/mainContext';
 import { DataBDProvider } from './src/contexts/dataBDContext';
 import { NewEntriesProvider } from './src/contexts/newEntriesContext';
+import { StylesProvider } from './src/contexts/stylesContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -25,7 +26,9 @@ export default function App() {
     <MainProvider>
         <DataBDProvider>
           <NewEntriesProvider>
+            <StylesProvider>
             <Routes/>
+            </StylesProvider>
           </NewEntriesProvider>
         </DataBDProvider>
     </MainProvider>

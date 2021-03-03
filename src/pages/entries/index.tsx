@@ -22,13 +22,16 @@ import Functions from "../../functions"
 import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces';
 import Loader from './components/loader';
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
+import { StylesContext } from '../../contexts/stylesContext';
 
 
 export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigationScreen = useNavigation()
     const { item } = route.params
+    const isFocused = useIsFocused()
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
+    const {firstGradientColor, secondGradientColor} = useContext(StylesContext)
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
@@ -38,7 +41,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     return (
         <LinearGradient
-            colors={['#d2d2d2', '#d2d2d2']}
+            colors={[firstGradientColor, secondGradientColor]}
             start={{ x: -0.4, y: 0.1 }}
             style={styles.container}>
             <StatusBar style="light" translucent />

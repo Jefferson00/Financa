@@ -1,4 +1,4 @@
-import React, {createContext, useState, ReactNode, useEffect, useRef} from 'react';
+import React, {createContext, useState, ReactNode, useEffect} from 'react';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
 
