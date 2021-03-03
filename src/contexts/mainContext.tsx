@@ -1,4 +1,4 @@
-import React, {createContext, useState, ReactNode} from 'react';
+import React, {createContext, useState, ReactNode, useEffect} from 'react';
 
 interface MainContextData{
     isBalanceActive: boolean;
@@ -10,6 +10,9 @@ interface MainContextData{
     todayDate:Date;
     currentMonth:number;
     currentYear:number;
+    initialDate:string;
+    selectedMonth:number;
+    selectedYear:number;
     activeBalanceView: () =>void;
     activeEarningsView: () =>void;
     activeExpansesView: () =>void;
@@ -37,6 +40,22 @@ export function MainProvider({children}:MainProviderProps){
     const [todayDate, setTodayDate] = useState(new Date())
     const [currentMonth, setCurrentMonth] = useState(todayDate.getMonth()+1)
     const [currentYear, setCurrentYear] = useState(todayDate.getFullYear())
+    const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+    const [selectedYear, setSelectedYear] = useState(currentYear)
+    const [initialDate, setInitialDate] = useState('202103')
+    
+    function updateInitialDate(){
+        if (selectedMonth < 10) {
+            setInitialDate(selectedYear.toString() + '0' + selectedMonth.toString())
+        } else {
+            setInitialDate(selectedYear.toString() + selectedMonth.toString())
+        }
+    }
+
+    useEffect(()=>{
+        updateInitialDate()
+        console.log("dta inicial: "+initialDate)
+    },[])
 
     function activeBalanceView(){
         setIsBalanceActive(true)
@@ -78,6 +97,9 @@ export function MainProvider({children}:MainProviderProps){
             todayDate,
             currentMonth,
             currentYear,
+            initialDate,
+            selectedMonth,
+            selectedYear,
             activeBalanceView,
             activeEarningsView,
             activeExpansesView,

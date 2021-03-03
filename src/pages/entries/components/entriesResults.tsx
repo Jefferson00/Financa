@@ -20,10 +20,10 @@ export default function EntriesResults(){
 
                         <View style={styles.earningTextView}>
                             <Text numberOfLines={1} style={[styles.earningTittleText]}>
-
+fgh
                             </Text>
                             <Text style={[styles.earningDateText]}>
-                              
+                              fgh
                             </Text>
                         </View>
 
@@ -36,7 +36,7 @@ export default function EntriesResults(){
                         />
 
                     </TouchableOpacity>
-                    :
+              
                     <TouchableOpacity
                         style={[styles.earningsItemView]}
 
@@ -46,10 +46,10 @@ export default function EntriesResults(){
                         
                         <View style={styles.earningTextView}>
                             <Text numberOfLines={1} style={[styles.earningTittleText]}>
-                                 
+                                 fghf
                             </Text>
                             <Text style={[styles.earningDateText]}>
-                                 
+                                 hgh
                             </Text>
                         </View>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, View, Alert, Text } from 'react-native'
@@ -21,14 +21,19 @@ import Functions from "../../functions"
 
 import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces';
 import Loader from './components/loader';
+import { NewEntriesContext } from '../../contexts/newEntriesContext';
 
 
 export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const navigationScreen = useNavigation()
+    const { item } = route.params
 
-    const [done, setDone] = useState(false)
-    const [noResults, setNoResults] = useState(false)
+    const {updateTypeOfEntrie} = useContext(NewEntriesContext)
 
+    useEffect(()=>{
+        updateTypeOfEntrie(item)
+    },[item])
+   
   
 
     return (
@@ -42,13 +47,11 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             <Balance/>
 
             <View style={styles.mainContainer}>
-                {done?
+            
                 <EntriesResults/>
-                :!noResults?
-                <Loader></Loader>
-                :
-                <NoResultsView></NoResultsView>
-                }
+           
+               
+            
 
                 <ButtonNewEntrie/>
 
@@ -56,8 +59,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             </View>
 
 
-            <ModalContent/>
-
+            
 
         </LinearGradient>
     )

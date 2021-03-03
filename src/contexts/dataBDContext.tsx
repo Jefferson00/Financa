@@ -37,6 +37,7 @@ interface DataBDContextData{
     allEntries: EntriesData[];
     allEntriesValues: EntriesValuesData[];
     latestEntries: LatestEntries[];
+    entriesValuesByDate: EntriesValuesData[];
     loadAllEntriesResults: () => void;
     loadAllEntriesValuesResults: () => void;
     updateLoadAction: () => void;
@@ -60,13 +61,12 @@ export function DataBDProvider({children}: DataBDProviderProps){
     
 
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
+    const [entriesValuesByDate, setEntriesValuesByDate] = useState<EntriesValuesData[]>([])
     const [allEntriesValues, setAllEntriesValues] = useState<EntriesValuesData[]>([])
 
     const [latestEntries, setLatestEntries] = useState<LatestEntries[]>([])
 
-    function loadAllEntriesResults(){
-        
-        
+    function loadAllEntriesResults(){ 
         entriesDB.all().then((res:any)=>{
             setAllEntries(res._array)
             if(res._array.length > allEntries.length){
@@ -78,12 +78,22 @@ export function DataBDProvider({children}: DataBDProviderProps){
         })
     }
 
+    function loadEntriesValuesByDate(){
+        valuesDB.findByDate(202103).then((res:any)=>{
+            setEntriesValuesByDate(res._array)
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+
     function loadAllEntriesValuesResults(){
         valuesDB.all().then((res:any)=>{
             setAllEntriesValues(res._array)
             if(res._array.length > allEntriesValues.length){
                 setIsValuesUpdated(!isValuesUpdated)
                 console.log("carregou todos os valores")
+                console.log("    "+res._array[0].type)
+                console.log("    "+res._array[0].received)
             }
         }).catch(err=>{
             console.log(err)
@@ -119,6 +129,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     useEffect(()=>{
         loadAllEntriesResults()
         loadAllEntriesValuesResults()
+        loadEntriesValuesByDate()
         setLatestTransations()
         console.log("isValuesUpdated: "+isValuesUpdated)
     },[isValuesUpdated])
@@ -128,6 +139,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             allEntries,
             allEntriesValues,
             latestEntries,
+            entriesValuesByDate,
             loadAllEntriesResults,
             loadAllEntriesValuesResults,
             updateLoadAction,
