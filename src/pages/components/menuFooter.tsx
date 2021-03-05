@@ -6,8 +6,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function Footer(){
 
-    const activeItemColor = '#1A8289'
-    const nonActiveItemColor = 'rgba(26, 130, 137, 0.5)'
+    const activeItemColor = '#3C93F9'
+    const nonActiveItemColor = 'rgba(60, 147, 249, 0.5)'
 
     const navigation = useNavigation()
     const route = useRoute()

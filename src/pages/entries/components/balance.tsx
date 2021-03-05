@@ -49,7 +49,7 @@ export default function Balance(){
         <View style={styles.balanceView}>
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.currentBalanceText}>
-                        Seila
+                        Atual
                     </Text>
                     {selectedMonth == currentMonth && selectedYear == currentYear?
                         <NumberFormat
@@ -66,7 +66,7 @@ export default function Balance(){
 
                 <View style={styles.currentBalanceView}>
                     <Text style={styles.estimatedBalanceText}>
-                            fsdgsdgd
+                            Estimado
                     </Text>
                     <NumberFormat
                         value={SumOfAmountsArray2.reduce((a: any, b: any) => a + b, 0)}

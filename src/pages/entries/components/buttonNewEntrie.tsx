@@ -1,16 +1,19 @@
-import React from "react"
+import React, { useContext } from "react"
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { Feather } from '@expo/vector-icons'
+import { StylesContext } from "../../../contexts/stylesContext"
 
 export default function ButtonNewEntrie() {
+
+    const {entrieButtonBackground, entrieButtonBorder} = useContext(StylesContext)
 
     return (
         <View style={{ justifyContent: 'flex-end', flex: 1 }}>
                 <TouchableOpacity
-                    style={[styles.addNewButton]}
+                    style={[styles.addNewButton,{borderColor:entrieButtonBorder, backgroundColor:entrieButtonBackground}]}
                    >
                     <Text style={styles.addNewButtonText}>
-                      bbbbg
+                      Adicionar Novo
                     </Text>
                     <Feather name="plus" size={40} color='#ffffff' style={{ marginLeft: 10 }} />
                 </TouchableOpacity>
@@ -22,7 +25,6 @@ const styles = StyleSheet.create({
     addNewButton: {
         borderStyle: 'solid',
         borderRadius: 20,
-        borderColor: '#24DBBA',
         borderWidth: 1,
         height: 83,
         flexDirection: 'row',

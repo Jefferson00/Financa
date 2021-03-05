@@ -7,6 +7,7 @@ import NumberFormat from 'react-number-format';
 import { DataBDContext } from "../../../contexts/dataBDContext";
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
 import { MainContext } from "../../../contexts/mainContext";
+import { StylesContext } from "../../../contexts/stylesContext";
 
 interface EntriesData {
     id: number,
@@ -22,8 +23,9 @@ interface EntriesData {
 export default function EntriesResults() {
 
     const { entriesByDate, entriesValuesByDate } = useContext(DataBDContext)
-    const {} = useContext(MainContext)
+    const {todayDate} = useContext(MainContext)
     const {typeOfEntrie} = useContext(NewEntriesContext)
+    const {entriePrimaryColor, showEntrieModal} = useContext(StylesContext)
 
     const entriesByDateByType = entriesByDate.filter(entrie => entrie.type == typeOfEntrie)
 
@@ -32,23 +34,42 @@ export default function EntriesResults() {
             <ScrollView style={styles.scrollViewContainer}>
                 {entriesByDateByType.map((entrie: EntriesData, index: number) => {
                     let totalValues = 0
+                    let notReceived = false
+                    let isLate = false
+                    let borderColor = "#ffffff"
+                    let opacColor = "#ffffffAA"
                     entriesValuesByDate.map((value)=>{
                         if (entriesByDateByType[index].id == value.entries_id){
                             totalValues = totalValues + value.amount
                         }
                     })
+
+                    if (!entrie.received) notReceived = true
+                    if(!entrie.received && entrie.day <= todayDate.getDate()){
+                        isLate = true
+                        borderColor = entriePrimaryColor
+                    }
+
+                    if (notReceived) {
+                        opacColor = entriePrimaryColor+"AA"
+                    }else{
+                        opacColor = entriePrimaryColor
+                    }
+
                     return (
                         <View key={index}>
                             <TouchableOpacity
-                                style={[styles.earningsItemView]}
+                                style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
+                                onPress={()=> showEntrieModal(entrie.id, totalValues)}
                             >
-                                <MaterialIcons name="monetization-on" size={40} color={'#d2d2d2'} />
+                                <MaterialIcons name="monetization-on" size={40} color={opacColor} />
 
                                 <View style={styles.earningTextView}>
-                                    <Text numberOfLines={1} style={[styles.earningTittleText]}>
+                                    <Text numberOfLines={1} 
+                                          style={[styles.earningTittleText, {color:opacColor, width:150}]}>
                                         {entrie.title}
                                     </Text>
-                                    <Text style={[styles.earningDateText]}>
+                                    <Text style={[styles.earningDateText, {color:opacColor}]}>
                                         {entrie.day}/{Functions.convertDtToStringMonth(3)}
                                     </Text>
                                 </View>
@@ -58,12 +79,17 @@ export default function EntriesResults() {
                                     displayType={'text'}
                                     thousandSeparator={true}
                                     format={Functions.currencyFormatter}
-                                    renderText={value => <Text style={[styles.earningTittleText]}> {value} </Text>}
+                                    renderText={value => 
+                                        <Text style={[styles.earningTittleText,{color:opacColor}]}> 
+                                            {value} 
+                                        </Text>
+                                    }
                                 />
-
                             </TouchableOpacity>
 
-                            <Ionicons name="alert-circle" size={40} color={"#d2d2d2"} style={styles.alertSign} />
+                            {isLate &&
+                            <Ionicons name="alert-circle" size={40} color={entriePrimaryColor} style={styles.alertSign} />
+                            }
 
                         </View>
                     )

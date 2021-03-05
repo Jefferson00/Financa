@@ -1,19 +1,133 @@
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal} from 'react-native';
 import NumberFormat from 'react-number-format';
 import { Feather, Ionicons } from '@expo/vector-icons'
+import { StylesContext } from '../../../contexts/stylesContext';
+import { DataBDContext } from '../../../contexts/dataBDContext';
+import { MainContext } from '../../../contexts/mainContext';
+
+import Functions from "../../../utils"
+
+interface EntriesValuesData{
+    description: string,
+    amount: number,
+    dtStart: number,
+    dtEnd: number,
+    entries_id: number,
+    day: number,
+    type: string,
+    received: boolean,
+}
 
 
 export default function ModalContent() {
     let rec
-    let atrasado = false
+    let isLate = false
 
+    const {
+        isEntriesModalVisible,
+        entriePrimaryColor, 
+        selectedEntrieId, 
+        selectedEntrieTotalValues,
+        entrieSecondaryColor,
+        updateEntriesModalVisible
+    } = useContext(StylesContext)
+    const {entriesByDate, entriesValuesByDate} = useContext(DataBDContext)
+    const {todayDate, selectedMonth} = useContext(MainContext)
 
+    const entrieModal = entriesByDate.filter(entrie => entrie.id == selectedEntrieId)
+
+    if(entrieModal !=undefined){
+        if (entrieModal[0].day <= todayDate.getDate() && !entrieModal[0].received){
+            isLate = true 
+        }
+    }
+
+    function frequencyController(dtEnd: number, dtStart: number){
+        //mudar todayDate para currentDate
+        return Functions.toFrequency(dtEnd, dtStart) - Functions.toFrequency(dtEnd, Functions.setDtStart(todayDate)) + 1 + "/" + (Functions.toFrequency(dtEnd, dtStart)+1)
+    }
 
     return (
-        <Modal animationType="slide" visible={false} transparent>
-               
+        <Modal animationType="slide" visible={isEntriesModalVisible} transparent>
+            <View style={styles.modalContainer}>
+               <View style={styles.modalContent}>
+                    <View style={styles.headerModal}>
+                        <TouchableOpacity>
+                            <Feather name="edit-2" size={30} color={entriePrimaryColor} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={updateEntriesModalVisible}>
+                            <Feather name="x" size={30} color={entriePrimaryColor} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{flex:1}}>
+                        <View style={styles.something}>
+                            <View style={styles.tittleView}>
+                                <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
+                                    {entrieModal[0].title}
+                                </Text>
+                                <TouchableOpacity>
+                                    <Feather name="trash-2" size={20} color={entriePrimaryColor} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.tittleView}>
+                                <NumberFormat
+                                    value={selectedEntrieTotalValues}
+                                    displayType={'text'}
+                                    thousandSeparator={true}
+                                    format={Functions.currencyFormatter}
+                                    renderText={value => 
+                                        <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                                             {value} 
+                                        </Text>}
+                                />
+                                <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                                    {entrieModal[0].day} {Functions.convertDtToStringMonth(selectedMonth)}
+                                </Text>
+                            </View>
+
+                        </View>
+
+                        <ScrollView style={{maxHeight:200}}>
+                             {entriesValuesByDate.map((value:EntriesValuesData, index:number) =>{
+                                 if (value.entries_id == selectedEntrieId){
+                                     return (
+                                        <View style={styles.valuesList} key={index}>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <Text style={[styles.valuesListText, { color: entriePrimaryColor, marginRight: 5 }]}>
+                                                     {value.description == '' ? entrieModal[0].title : value.description}
+                                                </Text>
+                                                <Text style={[styles.valuesListText, { color: entrieSecondaryColor }]}>
+                                                    {value.dtEnd != 209912 && frequencyController(value.dtEnd, value.dtStart)}
+                                                </Text>
+                                            </View>
+
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <NumberFormat
+                                                    value={value.amount}
+                                                    displayType={'text'}
+                                                    thousandSeparator={true}
+                                                    format={Functions.currencyFormatter}
+                                                    renderText={value => 
+                                                        <Text style={[styles.valuesListText, { color: entriePrimaryColor }]}> 
+                                                            {value} 
+                                                        </Text>}
+                                                />
+                                                <TouchableOpacity>
+                                                    <Feather name="trash-2" size={20} color={entrieSecondaryColor} />
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                     )
+                                 }
+                             })}           
+                        </ScrollView>
+
+                    </View>
+               </View>
+            </View>
         </Modal>
 
     )
@@ -68,4 +182,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins_500Medium',
         fontSize: 14,
     },
+    something:{
+        borderBottomWidth: 1, borderBottomColor: 'rgba(26, 130, 137, 0.33)', paddingBottom: 17, marginBottom: 37 
+    }
 })

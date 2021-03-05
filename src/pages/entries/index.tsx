@@ -31,7 +31,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     const isFocused = useIsFocused()
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
-    const {firstGradientColor, secondGradientColor} = useContext(StylesContext)
+    const {firstGradientColor, secondGradientColor, selectedEntrieId} = useContext(StylesContext)
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
@@ -60,9 +60,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
                 <MenuFooter/>
             </View>
-
-
-            
+            {selectedEntrieId != 0 && <ModalContent/>}
 
         </LinearGradient>
     )
