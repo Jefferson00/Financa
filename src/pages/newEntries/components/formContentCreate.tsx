@@ -1,6 +1,7 @@
 import React, { useContext } from "react"
 import { StyleSheet, Text, View, TextInput, Switch } from 'react-native'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext"
+import { StylesContext } from "../../../contexts/stylesContext"
 
 interface ValuesData{
     description: string,
@@ -16,6 +17,8 @@ export default function FormContentCreate() {
            updateEntrieValuesBeforeCreate,
            isEnabledMonthly,
         } = useContext(NewEntriesContext)
+
+    const {entriePrimaryColor, entrieSecondaryColor} = useContext(StylesContext)
     
     return(
         <>
@@ -23,10 +26,10 @@ export default function FormContentCreate() {
                 return (
                     <View style={styles.valuesViewItem} key={index}>
                         <View style={styles.valuesView}>
-                            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                                 Descrição
                             </Text>
-                            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor}]}>
                                 Valor
                             </Text>
                         </View>
@@ -39,7 +42,7 @@ export default function FormContentCreate() {
                                 multiline={true}
                             />
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:10}}>
-                                <Text style={[styles.secondColorText, { color: "#d2d2d2", marginRight: 10, fontSize: 18 }]}>
+                                <Text style={[styles.secondColorText, { color: entrieSecondaryColor, marginRight: 10, fontSize: 18 }]}>
                                     R$
                                 </Text>
                                 <TextInput
@@ -54,15 +57,15 @@ export default function FormContentCreate() {
     
                         </View>
                         <View style={styles.valuesView}>
-                            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                                 Periodicidade
                             </Text>
                         </View>
                         <View style={styles.frequencyView}>
-                            <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>Mensal</Text>
+                            <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>Mensal</Text>
                             <Switch
-                                trackColor={{ false: '#d2d2d2', true: "#d2d2d2" }}
-                                thumbColor={isEnabledMonthly ? 'd2d2d2' : "#d2d2d2"}
+                                trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
+                                thumbColor={isEnabledMonthly ? 'd2d2d2' : entriePrimaryColor}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={e=> updateEntrieValuesBeforeCreate('monthly', index, e)}
                                 value={isEnabledMonthly}
@@ -76,7 +79,7 @@ export default function FormContentCreate() {
                                 maxLength={2}
                             />
     
-                            <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>Vezes</Text>
+                            <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>Vezes</Text>
                         </View>
                     </View>
                 )

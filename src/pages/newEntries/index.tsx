@@ -23,6 +23,7 @@ import SuccessModal from "./components/modal"
 
 import LoaderUpdate from "./components/loaderUpdate"
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
+import { StylesContext } from '../../contexts/stylesContext';
 
 
 
@@ -30,6 +31,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     const { item } = route.params
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
+    const {entriePrimaryColor} = useContext(StylesContext)
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
@@ -38,7 +40,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
            <LinearGradient 
-            colors={["#155F69", '#F9CF3C']} 
+            colors={[entriePrimaryColor, '#F9CF3C']} 
             start={{ x: -0.4, y: 0.1 }} 
             style={styles.container}
             >
@@ -47,7 +49,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
 
              <View style={styles.mainContainer}>
                 <View style={styles.tittleTextView}>
-                    <Text style={[styles.tittleText, { color: '#525802' }]}>
+                    <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
                         Novo Ganho
                     </Text>
                 </View>

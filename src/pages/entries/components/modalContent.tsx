@@ -34,7 +34,7 @@ export default function ModalContent() {
         updateEntriesModalVisible
     } = useContext(StylesContext)
     const {entriesByDate, entriesValuesByDate} = useContext(DataBDContext)
-    const {todayDate, selectedMonth} = useContext(MainContext)
+    const {todayDate, selectedMonth, currentMonth, selectedYear, currentYear} = useContext(MainContext)
 
     const entrieModal = entriesByDate.filter(entrie => entrie.id == selectedEntrieId)
 
@@ -124,7 +124,34 @@ export default function ModalContent() {
                                  }
                              })}           
                         </ScrollView>
+                    </View>
 
+                    <View style={{marginBottom:59}}>
+                        {!entrieModal[0].received && selectedMonth == currentMonth && selectedYear == currentYear &&
+                        <>
+                            <View style={{ paddingHorizontal: 26 ,marginTop:32}}>
+                                {isLate &&
+                                    <View style={{flexDirection:'row',alignItems:'center'}}>
+                                        <Ionicons name="alert-circle" size={40} color={entriePrimaryColor}/>
+                                        <Text style={[styles.tittleText, { color: entrieSecondaryColor , marginLeft:5}]}>
+                                            Texto de Alerta
+                                        </Text>
+                                    </View>
+                                }
+                                    <Text style={[styles.subTittleText, { color: entriePrimaryColor , marginTop:15}]}>
+                                          Texto 
+                                    </Text>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                                        <TouchableOpacity>
+                                            <Text style={[styles.tittleText, { color: entrieSecondaryColor }]}>SIM</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={updateEntriesModalVisible}>
+                                            <Text style={[styles.tittleText, { color: entrieSecondaryColor }]}>Ainda não</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                            </View>
+                        </>
+                        }
                     </View>
                </View>
             </View>

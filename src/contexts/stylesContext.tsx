@@ -34,6 +34,7 @@ export function StylesProvider({children}: StylesProviderProps){
     const [entrieButtonBorder, setEntrieButtonBorder] = useState('#ffffff')
     const [entriePrimaryColor, setEntriePrimaryColor] = useState('#ffffff')
     const [entrieSecondaryColor, setEntrieSecondaryColor] = useState('#ffffff')
+    const [monthColor, setMonthColor] = useState('#3C93F9')
 
     const [isEntriesModalVisible, setIsEntriesModalVisible] = useState(false)
     const [selectedEntrieId, setSelectedEntrieId] = useState(0)
@@ -50,7 +51,6 @@ export function StylesProvider({children}: StylesProviderProps){
         setSelectedEntrieTotalValues(totalValues)
     }
 
-    const [monthColor, setMonthColor] = useState('#3C93F9')
 
     //const route = useRoute()
 

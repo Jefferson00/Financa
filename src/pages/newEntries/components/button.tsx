@@ -1,16 +1,18 @@
 import React, { useContext } from "react"
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext"
+import { StylesContext } from "../../../contexts/stylesContext"
 
 
 export default function ButtonSubmit() {
 
     const {handleCreateNewEntrie} = useContext(NewEntriesContext)
+    const {entrieButtonBorder, entrieButtonBackground} = useContext(StylesContext)
 
     return (
         <View>
             <TouchableOpacity
-                style={[styles.addNewButton, { borderColor: "#d2d2d2", backgroundColor: "#d2d2d2" }]}
+                style={[styles.addNewButton, { borderColor: entrieButtonBorder, backgroundColor: entrieButtonBackground }]}
                 onPress={handleCreateNewEntrie}
             >   
                 <Text style={styles.addNewButtonText}>Adicionar</Text>

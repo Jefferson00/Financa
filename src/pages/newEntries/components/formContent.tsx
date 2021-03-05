@@ -6,6 +6,7 @@ import Functions from '../../../functions'
 
 import { Feather } from '@expo/vector-icons'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
+import { StylesContext } from "../../../contexts/stylesContext";
 
 
 export default function FormContent() {
@@ -27,9 +28,11 @@ export default function FormContent() {
            updateEntrieValuesBeforeCreate,
         } = useContext(NewEntriesContext)
 
+        const {entriePrimaryColor, entrieSecondaryColor } = useContext(StylesContext)
+
     return (
         <>
-            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                 Título
             </Text>
             <TextInput
@@ -40,22 +43,22 @@ export default function FormContent() {
             />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View>
-                    <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                         Data de recebimento
                     </Text>
                     <View style={styles.dateView}>
-                        <Text style={[styles.subTittleText, { color: "#d2d2d2" }]} onPress={showDatepicker}>
+                        <Text style={[styles.subTittleText, { color: entrieSecondaryColor }]} onPress={showDatepicker}>
                             {calendarDate.getDate()} / {Functions.convertDtToStringMonth(calendarDate.getMonth() + 1)}
                         </Text>
                     </View>
                 </View>
                 <View>
-                    <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                         Recebido
                     </Text>
                     <Switch
-                        trackColor={{ false: '#d2d2d2', true: "#d2d2d2" }}
-                        thumbColor={isEnabledReceived ? 'd2d2d2' : "#d2d2d2"}
+                        trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
+                        thumbColor={isEnabledReceived ? 'd2d2d2' : entriePrimaryColor}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={toggleSwitchReceived}
                         value={isEnabledReceived}
@@ -72,17 +75,17 @@ export default function FormContent() {
                 />
             }
 
-            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                 Periodicidade
             </Text>
 
             <View style={styles.frequencyView}>
-                <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>
+                <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>
                     Mensal
                 </Text>
                 <Switch
-                    trackColor={{ false: '#d2d2d2', true: "#d2d2d2" }}
-                    thumbColor={isEnabledMonthly ? 'd2d2d2' : "#d2d2d2"}
+                    trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
+                    thumbColor={isEnabledMonthly ? 'd2d2d2' : entriePrimaryColor}
                     ios_backgroundColor="#3e3e3e"
                     onValueChange={toggleSwitchMonthly}
                     value={isEnabledMonthly}
@@ -98,16 +101,16 @@ export default function FormContent() {
                 <Feather name='chevron-right' size={30}
                     onPress={increaseEntrieFrequency}
                 />
-                <Text style={[styles.secondColorText, { color: "#d2d2d2" }]}>
+                <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>
                     Vezes
                 </Text>
             </View>
 
-            <Text style={[styles.subTittleText, { color: "#d2d2d2" }]}>
+            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                 Valor
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={[styles.secondColorText, { color: "#d2d2d2", marginRight: 10, fontSize: 18 }]}>
+                <Text style={[styles.secondColorText, { color: entrieSecondaryColor, marginRight: 10, fontSize: 18 }]}>
                     R$
                 </Text>
                 <TextInput
