@@ -31,7 +31,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     const { item } = route.params
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
-    const {entriePrimaryColor} = useContext(StylesContext)
+    const {entriePrimaryColor, isValuesFormVisible} = useContext(StylesContext)
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
@@ -57,7 +57,10 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 <ScrollView style={{ maxHeight: '100%' }}>
                     <View style={styles.formView}>
                         <FormContent/>
-                        <FormContentCreate/>
+
+                        {isValuesFormVisible && <FormContentCreate/>}
+                        
+                        <ButtonNewValue/>
                     </View>
                 </ScrollView>
                         <ButtonSubmit/>

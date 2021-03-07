@@ -71,6 +71,7 @@ interface NewEntriesContextData{
     handleDeleteEntrie: (entrieId:number)=> void;
     handleDeleteEntrieValues: (entrieId:number, valueId:number)=> void;
     updateEntrieReceived: (selectedId:number)=> void;
+    addNewValueBeforeCreate: (newValue : ValuesData)=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -145,6 +146,18 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     }]
 
     const [entrieValuesBeforeCreate, setEntriesValuesBeforeCreate] = useState<ValuesData[]>(initialValue)
+
+    function addNewValueBeforeCreate(newValue : ValuesData){
+        setEntriesValuesBeforeCreate([...entrieValuesBeforeCreate, newValue])
+    }
+
+    function resetValues(){
+        setEntriesValuesBeforeCreate(initialValue)
+        setEntrieFrequency(1)
+        setTitleInputEntrie('')
+        setIsEnabledMonthly(false)
+        setIsEnabledReceived(false)
+    }
     
     function updateEntrieValuesBeforeCreate(subitem: string, index: number, e: any){
             let arrOfEntriesValues = entrieValuesBeforeCreate.map((entrieValue:ValuesData, i:number)=>{
@@ -223,6 +236,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     console.log("Create!")
                     alert('valor cadastrado com sucesso!')
                     updateLoadAction()
+                    resetValues()
                 }).catch(err => {
                     console.log(err)
                 })
@@ -351,6 +365,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             handleDeleteEntrie,
             handleDeleteEntrieValues,
             updateEntrieReceived,
+            addNewValueBeforeCreate,
         }}>
             {children}
         </NewEntriesContext.Provider>

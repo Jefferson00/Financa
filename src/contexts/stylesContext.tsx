@@ -13,10 +13,13 @@ interface StylesContextData{
     isEntriesModalVisible:boolean;
     selectedEntrieId:number;
     selectedEntrieTotalValues:number;
+    isValuesFormVisible:boolean;
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
     resetSelectedEntrieId: ()=> void;
+    showValuesForm: ()=> void;
+    resetValuesForm: ()=> void;
 }
 
 interface StylesProviderProps{
@@ -40,9 +43,20 @@ export function StylesProvider({children}: StylesProviderProps){
     const [isEntriesModalVisible, setIsEntriesModalVisible] = useState(false)
     const [selectedEntrieId, setSelectedEntrieId] = useState(0)
     const [selectedEntrieTotalValues, setSelectedEntrieTotalValues] = useState(0)
+    
+    const [isValuesFormVisible, setIsValuesFormVisible] = useState(false)
+
 
     function updateEntriesModalVisible(){
         setIsEntriesModalVisible(!isEntriesModalVisible)
+    }
+
+    function showValuesForm(){
+        setIsValuesFormVisible(true)
+    }
+
+    function resetValuesForm(){
+        setIsValuesFormVisible(false)
     }
 
 
@@ -104,10 +118,13 @@ export function StylesProvider({children}: StylesProviderProps){
             isEntriesModalVisible,
             selectedEntrieId,
             selectedEntrieTotalValues,
+            isValuesFormVisible,
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,
             resetSelectedEntrieId,
+            showValuesForm,
+            resetValuesForm,
         }}>
             {children}
         </StylesContext.Provider>

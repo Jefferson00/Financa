@@ -7,13 +7,18 @@ import { StylesContext } from "../../../contexts/stylesContext"
 export default function ButtonSubmit() {
 
     const {handleCreateNewEntrie} = useContext(NewEntriesContext)
-    const {entrieButtonBorder, entrieButtonBackground} = useContext(StylesContext)
+    const {entrieButtonBorder, entrieButtonBackground,resetValuesForm} = useContext(StylesContext)
+
+    function handleCreateNew(){
+        handleCreateNewEntrie()
+        resetValuesForm()
+    }
 
     return (
         <View>
             <TouchableOpacity
                 style={[styles.addNewButton, { borderColor: entrieButtonBorder, backgroundColor: entrieButtonBackground }]}
-                onPress={handleCreateNewEntrie}
+                onPress={handleCreateNew}
             >   
                 <Text style={styles.addNewButtonText}>Adicionar</Text>
             </TouchableOpacity>

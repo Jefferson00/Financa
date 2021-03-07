@@ -1,57 +1,66 @@
-import React, {useState} from "react"
+import React, {useContext, useState} from "react"
 import { StyleSheet, Text, View, TextInput, Switch, TouchableOpacity } from 'react-native'
 
 import Functions from '../../../functions'
 
 import { Feather } from '@expo/vector-icons'
 
-import { useStylesStates } from "../../../contexts/stylesStates"
-import { useResultsDB } from "../../../contexts/resultsDBStates"
-import { useSelectedMonthAndYear } from "../../../contexts/selectMonthAndYear"
 
 import ValuesDB from '../../../services/valuesDB'
+import { StylesContext } from "../../../contexts/stylesContext"
+import { NewEntriesContext } from "../../../contexts/newEntriesContext"
+
+interface ValuesData{
+    description: string,
+    amount: number,
+    dtStart: number,
+    dtEnd: number,
+    entries_id: number,
+}
 
 
-export default function ButtonNewValue({ props }: { props: any }) {
+export default function ButtonNewValue() {
 
     
     const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
     const [idValues, setIdValues] = useState(0)
 
-    const {tittleTextColor, colorBorderAddButton } = useStylesStates()
-    const {setValuesArray, valuesArray} = useResultsDB()
-    const {selectedMonth, selectedYear} = useSelectedMonthAndYear()
+    const {entriePrimaryColor, entrieSecondaryColor, showValuesForm, isValuesFormVisible} = useContext(StylesContext)
+    const {addNewValueBeforeCreate} = useContext(NewEntriesContext)
+
+    const newValue: ValuesData = {
+        description: '',
+        amount: 0,
+        dtStart: 0,
+        dtEnd: 0,
+        entries_id: 0,
+    }
 
     return (
         <View style={styles.newValuesView}>
-            <Text style={[styles.newValuesText, { color: tittleTextColor }]}>
-                Adcionar Novos Valores
-            </Text>
-            <TouchableOpacity style={[styles.plusButtonModal, { borderColor: colorBorderAddButton }]}
+            {isValuesFormVisible ?
+                <Text style={[styles.newValuesText, { color: entriePrimaryColor }]}>
+                    Adcionar Novos Valores
+                </Text>
+            :
+                <Text style={[styles.newValuesText, { color: entriePrimaryColor }]}>
+                   Detalhes
+                </Text>
+            }
+            <TouchableOpacity style={[styles.plusButtonModal, { borderColor: entrieSecondaryColor }]}
                 onPress={() => {
-                    props.setShowValues(true)
+                    showValuesForm()
                     setContPlusButtonPressed(contPlusButtonPressed + 1)
-                    if (contPlusButtonPressed > 0) {
-
-                        setIdValues(idValues + 1)
-                        setValuesArray([...valuesArray, { id: idValues, description: '', amount: '0', monthly: false, repeat: 1 }])
-                    }
-                    if ( props.idUpdate != null) {
-                        props.selectedDate.setMonth(selectedMonth - 1)
-                        props.selectedDate.setFullYear(selectedYear)
-                        const newValueObj = {
-                            description: '',
-                            amount: '0',
-                            dtStart: Functions.setDtStart( props.selectedDate),
-                            dtEnd: Functions.setDtEnd(false, 0,  props.selectedDate),
-                            entries_id:  props.idUpdate
-                        }
-                        ValuesDB.create(newValueObj)
-                        props.updateValuesList()
-
+                    if (contPlusButtonPressed > 0){
+                        
+                        addNewValueBeforeCreate(newValue)
                     }
                 }}>
-                <Feather name='plus' size={40} color={tittleTextColor} />
+                {isValuesFormVisible ?
+                    <Feather name='plus' size={40} color={entriePrimaryColor} />
+                    :
+                    <Feather name='chevron-up' size={40} color={entriePrimaryColor} />
+                }
             </TouchableOpacity>
         </View>
     )
