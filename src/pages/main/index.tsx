@@ -14,7 +14,34 @@ import { MainContext} from '../../contexts/mainContext';
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native'
 import { StylesContext } from '../../contexts/stylesContext';
+import { DataBDContext } from '../../contexts/dataBDContext';
 
+interface EntriesValuesData{
+  id:number,
+  description: string,
+  amount: number,
+  dtStart: number,
+  dtEnd: number,
+  entries_id: number,
+  day: number,
+  type: string,
+  received: boolean,
+}
+
+interface BalanceValues{
+  currentBalance:number,
+  estimatedBalance:number
+}
+
+interface EarningsValues{
+  currentEarnings:number,
+  estimatedEarnings:number
+}
+
+interface ExpansesValues{
+  currentExpanses:number,
+  estimatedExpanses:number
+}
 
 export default function Main() {
   const navigation = useNavigation()
@@ -32,6 +59,34 @@ export default function Main() {
     }
   },[isFocused])
 
+  const {entriesValuesByDate} = useContext(DataBDContext)
+
+  let earningsValuesArrays : Array<number> = []
+  let expansesValuesArrays : Array<number> = []
+  let estimatedEarningsArrays : Array<number> = []
+  let estimatedExpansesArrays : Array<number> = []
+
+  entriesValuesByDate.map((value:EntriesValuesData)=>{
+    if(value.amount !=0 && value.received){
+      value.type == 'Ganhos' ? earningsValuesArrays.push(value.amount) : expansesValuesArrays.push(value.amount)  
+    }
+    if(value.amount !=0){
+      value.type == 'Ganhos' ? estimatedEarningsArrays.push(value.amount) : estimatedExpansesArrays.push(value.amount)  
+    }
+  })
+
+  let currentEarnings = earningsValuesArrays.reduce((a: any, b: any) => a + b, 0) 
+  let currentExpanses =  expansesValuesArrays.reduce((a: any, b: any) => a + b, 0)
+  let currentBalance = currentEarnings - currentExpanses
+  
+  let estimatedEarnings = estimatedEarningsArrays.reduce((a: any, b: any) => a + b, 0)
+  let estimatedExpanses = estimatedExpansesArrays.reduce((a: any, b: any) => a + b, 0)
+  let estimatedBalance = estimatedEarnings - estimatedExpanses
+
+  let balanceValuesProps: BalanceValues = {currentBalance,estimatedBalance}
+  let earningsValuesProps: EarningsValues= {currentEarnings,estimatedEarnings}
+  let expansesValuesProps: ExpansesValues= {currentExpanses, estimatedExpanses}
+
   return (
     <LinearGradient colors={['#F9CF3C', '#B26A15']} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
@@ -40,11 +95,11 @@ export default function Main() {
 
           <ButtonsSelectors/>
 
-          {isBalanceActive && <BalanceView/>}
+          {isBalanceActive && <BalanceView values={balanceValuesProps}/>}
 
-          {isEarningsActive &&  <EarningsView/>}
+          {isEarningsActive &&  <EarningsView values={earningsValuesProps}/>}
 
-          {isExpansesActive &&  <ExpansesView/>}
+          {isExpansesActive &&  <ExpansesView values={expansesValuesProps}/>}
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>

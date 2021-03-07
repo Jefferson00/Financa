@@ -4,8 +4,19 @@ import { Ionicons } from '@expo/vector-icons'
 
 import ButtonsExpanses from "./buttonsExpanses"
 import { MainContext } from '../../../contexts/mainContext';
+import NumberFormat from 'react-number-format';
+import Functions from '../../../utils'
 
-export default function ExpansesView() {
+interface ExpansesValues{
+  currentExpanses:number,
+  estimatedExpanses:number
+}
+
+interface ExpansesProps{
+    values: ExpansesValues,
+}
+
+export default function ExpansesView(props:ExpansesProps) {
 
   const {seeExpansesValues, handleSeeExpansesValues} = useContext(MainContext)
 
@@ -30,9 +41,18 @@ export default function ExpansesView() {
               </View>
               {
                 seeExpansesValues ?
-                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                      <Text style={styles.expensesTextValue}>R$ 0,00</Text>
-                  </View>
+                  props.values.currentExpanses == 0 ?
+                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <Text style={styles.expensesTextValue}>R$ 0,00</Text>
+                    </View>
+                  :
+                     <NumberFormat
+                      value={props.values.currentExpanses}
+                      displayType={'text'}
+                      thousandSeparator={true}
+                      format={Functions.currencyFormatter}
+                      renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
+                    />
                   :
                   <View style={styles.censoredValue} />
               }
@@ -44,9 +64,21 @@ export default function ExpansesView() {
               </View>
               {
                 seeExpansesValues ?
-                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                      <Text style={styles.expensesTextValue}>R$ 0,00</Text>
-                  </View>
+                  props.values.estimatedExpanses == 0 ?
+                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <Text style={styles.expensesTextValue}>R$ 0,00</Text>
+                    </View>
+                  :
+                      <NumberFormat
+                      value={props.values.estimatedExpanses}
+                      displayType={'text'}
+                      thousandSeparator={true}
+                      format={Functions.currencyFormatter}
+                      renderText={value => 
+                          <Text style={[styles.expensesTextValue, {color: 'rgba(204, 55, 40, 0.6)'} ]}> 
+                            {value} 
+                          </Text>}
+                    />
                   :
                   <View style={styles.censoredValue} />
               }

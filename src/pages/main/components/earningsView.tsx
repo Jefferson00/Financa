@@ -4,8 +4,20 @@ import { Ionicons } from '@expo/vector-icons'
 
 import ButtonsEarnings from "./buttonsEarnings"
 import { MainContext } from '../../../contexts/mainContext';
+import NumberFormat from 'react-number-format';
+import Functions from '../../../utils'
 
-export default function EarningsView() {
+interface EarningsValues{
+  currentEarnings:number,
+  estimatedEarnings:number
+}
+
+interface EarningProps{
+    values: EarningsValues,
+}
+
+
+export default function EarningsView(props:EarningProps) {
   
   const {seeEarningsValues, handleSeeEarningsValues} = useContext(MainContext)
 
@@ -29,7 +41,16 @@ export default function EarningsView() {
                   <Text style={styles.earningsText}>Recebido</Text>
               </View>
               {seeEarningsValues ?
-                <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+                props.values.currentEarnings == 0 ?
+                    <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+                :
+                    <NumberFormat
+                    value={props.values.currentEarnings}
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    format={Functions.currencyFormatter}
+                    renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                    />
                 :
                 <View style={styles.censoredValue} />
               }
@@ -41,9 +62,21 @@ export default function EarningsView() {
               </View>
               {
               seeEarningsValues ?
-                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                      <Text style={styles.earningsTextValue}>R$ 0,00</Text>
-                  </View>
+                  props.values.estimatedEarnings == 0 ?
+                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+                    </View>
+                  :
+                     <NumberFormat
+                      value={props.values.estimatedEarnings}
+                      displayType={'text'}
+                      thousandSeparator={true}
+                      format={Functions.currencyFormatter}
+                      renderText={value => 
+                          <Text style={[styles.earningsTextValue, {color: 'rgba(26, 130, 137, 0.6)'}]}> 
+                            {value} 
+                          </Text>}
+                      />
                   :
                   <View style={styles.censoredValue} />
               }

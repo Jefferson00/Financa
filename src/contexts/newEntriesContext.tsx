@@ -6,6 +6,7 @@ import valuesDB from '../services/valuesDB';
 import Functions from "../utils"
 import { DataBDContext } from './dataBDContext';
 import { MainContext } from './mainContext';
+import { StylesContext } from './stylesContext';
 
 interface EntriesByDateData{
     id: number,
@@ -69,6 +70,7 @@ interface NewEntriesContextData{
     handleCreateNewEntrie: ()=> void;
     handleDeleteEntrie: (entrieId:number)=> void;
     handleDeleteEntrieValues: (entrieId:number, valueId:number)=> void;
+    updateEntrieReceived: (selectedId:number)=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -82,6 +84,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
     const {entriesByDate, entriesValuesByDate , updateLoadAction} = useContext(DataBDContext)
     const {selectedYear, selectedMonth} = useContext(MainContext)
+    //const {updateEntriesModalVisible} = useContext(StylesContext)
 
     const [typeOfEntrie, setTypeOfEntrie] = useState('');
 
@@ -303,6 +306,28 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         })
     }
 
+    function updateEntrieReceived(selectedId: number) {
+        entriesDB.findById(selectedId).then((res: any) => {
+            let obj = {
+                title: res._array[0].title,
+                day: res._array[0].day,
+                dtStart: res._array[0].dtStart,
+                dtEnd: res._array[0].dtEnd,
+                monthly: res._array[0].monthly,
+                received: true,
+                type: res._array[0].type,
+            }
+            entriesDB.update(selectedId, obj).then(res => {
+                alert("Pago!")
+                //updateEntriesModalVisible()
+                updateLoadAction()
+                //loadResults()
+            }).catch(err => {
+                console.log(err)
+            })
+        })
+    }
+
     return(
         <NewEntriesContext.Provider value={{
             calendarDate,
@@ -325,6 +350,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             handleCreateNewEntrie,
             handleDeleteEntrie,
             handleDeleteEntrieValues,
+            updateEntrieReceived,
         }}>
             {children}
         </NewEntriesContext.Provider>

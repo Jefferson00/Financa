@@ -38,7 +38,7 @@ export default function ModalContent() {
     } = useContext(StylesContext)
     const {entriesByDate, entriesValuesByDate, updateLoadAction} = useContext(DataBDContext)
     const {todayDate, selectedMonth, currentMonth, selectedYear, currentYear} = useContext(MainContext)
-    const {handleDeleteEntrie, handleDeleteEntrieValues} = useContext(NewEntriesContext)
+    const {handleDeleteEntrie, handleDeleteEntrieValues, updateEntrieReceived} = useContext(NewEntriesContext)
 
     const entrieModal = entriesByDate.filter(entrie => entrie.id == selectedEntrieId)
 
@@ -188,7 +188,7 @@ export default function ModalContent() {
                                           Texto 
                                     </Text>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity onPress={()=>updateEntrieReceived(selectedEntrieId)}>
                                             <Text style={[styles.tittleText, { color: entrieSecondaryColor }]}>SIM</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={updateEntriesModalVisible}>
