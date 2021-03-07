@@ -14,6 +14,7 @@ interface EntriesData{
 }
 
 interface EntriesValuesData{
+    id:number,
     description: string,
     amount: number,
     dtStart: number,
@@ -71,7 +72,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadAllEntriesResults(){ 
         entriesDB.all().then((res:any)=>{
             setAllEntries(res._array)
-            if(res._array.length > allEntries.length){
+            if(res._array.length != allEntries.length){
                 setIsValuesUpdated(!isValuesUpdated)
                 console.log("Carregou todas as entradas")
             }
@@ -99,7 +100,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadAllEntriesValuesResults(){
         valuesDB.all().then((res:any)=>{
             setAllEntriesValues(res._array)
-            if(res._array.length > allEntriesValues.length){
+            if(res._array.length != allEntriesValues.length){
                 setIsValuesUpdated(!isValuesUpdated)
                 console.log("carregou todos os valores")
                 console.log("    "+res._array[0].type)

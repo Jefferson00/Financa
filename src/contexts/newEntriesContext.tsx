@@ -5,16 +5,17 @@ import valuesDB from '../services/valuesDB';
 
 import Functions from "../utils"
 import { DataBDContext } from './dataBDContext';
+import { MainContext } from './mainContext';
 
-interface EntriesValuesData{
-    description: string,
-    amount: number,
+interface EntriesByDateData{
+    id: number,
+    title: string,
+    day: number,
     dtStart: number,
     dtEnd: number,
-    entries_id: number,
-    day: number,
-    type: string,
+    monthly: boolean,
     received: boolean,
+    type: string,
 }
 
 interface EntriesData{
@@ -33,6 +34,18 @@ interface ValuesData{
     dtStart: number,
     dtEnd: number,
     entries_id: number,
+}
+
+interface EntriesValuesData{
+    id:number,
+    description: string,
+    amount: number,
+    dtStart: number,
+    dtEnd: number,
+    entries_id: number,
+    day: number,
+    type: string,
+    received: boolean,
 }
 
 interface NewEntriesContextData{
@@ -54,6 +67,8 @@ interface NewEntriesContextData{
     updateTypeOfEntrie: (type:string) => void;
     updateEntrieValuesBeforeCreate: (subitem: string, index: number, value: any) => void;
     handleCreateNewEntrie: ()=> void;
+    handleDeleteEntrie: (entrieId:number)=> void;
+    handleDeleteEntrieValues: (entrieId:number, valueId:number)=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -65,7 +80,8 @@ export const NewEntriesContext = createContext({} as NewEntriesContextData)
 
 export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
-    const {updateLoadAction} = useContext(DataBDContext)
+    const {entriesByDate, entriesValuesByDate , updateLoadAction} = useContext(DataBDContext)
+    const {selectedYear, selectedMonth} = useContext(MainContext)
 
     const [typeOfEntrie, setTypeOfEntrie] = useState('');
 
@@ -214,6 +230,79 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         })
     }
 
+    function handleDeleteEntrie(entrieId:number){
+        entriesByDate.map((entrie:EntriesByDateData)=>{
+            if (entrie.id == entrieId){
+                const newDate = new Date()
+                newDate.setMonth(parseInt(Functions.toMonthAndYear(entrie.dtStart).month) - 1)
+                newDate.setFullYear(parseInt(Functions.toMonthAndYear(entrie.dtStart).year))
+                let newDtEnd
+                if ((selectedMonth) < 10) {
+                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
+                } else {
+                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
+                }
+                let contRep = Functions.toFrequency(parseInt(newDtEnd), entrie.dtStart)
+                if (contRep > 0) {
+                    const entrieObj = {
+                        title: entrie.title,
+                        day: entrie.day,
+                        dtStart: entrie.dtStart,
+                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
+                        monthly: entrie.monthly,
+                        received: entrie.received,
+                        type: entrie.type
+                    }
+                    
+                    entriesDB.update(entrieId, entrieObj)
+                    updateLoadAction()
+                } else {
+                    entriesDB.remove2(entrieId).then(()=>{
+                        updateLoadAction()
+                    }).catch(err =>{
+                        console.log(err)
+                    })
+                }
+                
+                updateLoadAction()
+                handleDeleteEntrieValues(entrieId, -1)
+            }
+        })
+    }
+
+    function handleDeleteEntrieValues(entrieId:number, valueId:number){
+        entriesValuesByDate.map((value: EntriesValuesData)=>{
+            if(value.entries_id == entrieId || value.id == valueId){
+                const newDate = new Date()
+                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month) - 1)
+                newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
+                let newDtEnd
+                if ((selectedMonth) < 10) {
+                    newDtEnd = selectedYear.toString() + '0' + selectedMonth.toString()
+                } else {
+                    newDtEnd = selectedYear.toString() + selectedMonth.toString()
+                }
+                let contRep = Functions.toFrequency(parseInt(newDtEnd), value.dtStart)
+
+                if (contRep > 0) {
+                    const vlObj = {
+                        description: value.description,
+                        amount: value.amount,
+                        dtStart: value.dtStart,
+                        dtEnd: Functions.setDtEnd(false, contRep, newDate),
+                        entries_id: value.entries_id
+                    }
+                    valuesDB.update(value.id, vlObj)
+                    updateLoadAction()
+                } else {
+                    valuesDB.remove(value.id)
+                    updateLoadAction()
+                }
+                updateLoadAction()
+            }
+        })
+    }
+
     return(
         <NewEntriesContext.Provider value={{
             calendarDate,
@@ -234,6 +323,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             updateEntrieValuesBeforeCreate,
             updateTypeOfEntrie,
             handleCreateNewEntrie,
+            handleDeleteEntrie,
+            handleDeleteEntrieValues,
         }}>
             {children}
         </NewEntriesContext.Provider>

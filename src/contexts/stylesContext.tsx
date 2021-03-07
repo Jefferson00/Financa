@@ -16,6 +16,7 @@ interface StylesContextData{
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
+    resetSelectedEntrieId: ()=> void;
 }
 
 interface StylesProviderProps{
@@ -49,6 +50,10 @@ export function StylesProvider({children}: StylesProviderProps){
         setIsEntriesModalVisible(true)
         setSelectedEntrieId(entrieId)
         setSelectedEntrieTotalValues(totalValues)
+    }
+
+    function resetSelectedEntrieId(){
+        setSelectedEntrieId(0)
     }
 
 
@@ -102,6 +107,7 @@ export function StylesProvider({children}: StylesProviderProps){
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,
+            resetSelectedEntrieId,
         }}>
             {children}
         </StylesContext.Provider>

@@ -1,6 +1,6 @@
 
 import React, { useContext } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal} from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Modal, Alert} from 'react-native';
 import NumberFormat from 'react-number-format';
 import { Feather, Ionicons } from '@expo/vector-icons'
 import { StylesContext } from '../../../contexts/stylesContext';
@@ -8,8 +8,10 @@ import { DataBDContext } from '../../../contexts/dataBDContext';
 import { MainContext } from '../../../contexts/mainContext';
 
 import Functions from "../../../utils"
+import { NewEntriesContext } from '../../../contexts/newEntriesContext';
 
 interface EntriesValuesData{
+    id:number,
     description: string,
     amount: number,
     dtStart: number,
@@ -31,10 +33,12 @@ export default function ModalContent() {
         selectedEntrieId, 
         selectedEntrieTotalValues,
         entrieSecondaryColor,
-        updateEntriesModalVisible
+        updateEntriesModalVisible,
+        resetSelectedEntrieId,
     } = useContext(StylesContext)
-    const {entriesByDate, entriesValuesByDate} = useContext(DataBDContext)
+    const {entriesByDate, entriesValuesByDate, updateLoadAction} = useContext(DataBDContext)
     const {todayDate, selectedMonth, currentMonth, selectedYear, currentYear} = useContext(MainContext)
+    const {handleDeleteEntrie, handleDeleteEntrieValues} = useContext(NewEntriesContext)
 
     const entrieModal = entriesByDate.filter(entrie => entrie.id == selectedEntrieId)
 
@@ -47,6 +51,48 @@ export default function ModalContent() {
     function frequencyController(dtEnd: number, dtStart: number){
         //mudar todayDate para currentDate
         return Functions.toFrequency(dtEnd, dtStart) - Functions.toFrequency(dtEnd, Functions.setDtStart(todayDate)) + 1 + "/" + (Functions.toFrequency(dtEnd, dtStart)+1)
+    }
+
+    function removeEntrie(entrieId: number) {
+        Alert.alert(
+            "Remover",
+            "Deseja mesmo remover?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK", onPress: () => {
+                        handleDeleteEntrie(entrieId)
+                        resetSelectedEntrieId()
+                        updateLoadAction()
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    }
+
+    function removeValue(valueId: number) {
+        Alert.alert(
+            "Remover",
+            "Deseja mesmo remover?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK", onPress: () => {
+                       handleDeleteEntrieValues(-1, valueId)
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
     }
 
     return (
@@ -67,7 +113,7 @@ export default function ModalContent() {
                                 <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
                                     {entrieModal[0].title}
                                 </Text>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={()=> removeEntrie(entrieModal[0].id)}>
                                     <Feather name="trash-2" size={20} color={entriePrimaryColor} />
                                 </TouchableOpacity>
                             </View>
@@ -115,7 +161,7 @@ export default function ModalContent() {
                                                             {value} 
                                                         </Text>}
                                                 />
-                                                <TouchableOpacity>
+                                                <TouchableOpacity onPress={()=> removeValue(value.id)}>
                                                     <Feather name="trash-2" size={20} color={entrieSecondaryColor} />
                                                 </TouchableOpacity>
                                             </View>
