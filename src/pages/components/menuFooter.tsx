@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {Entypo, Ionicons, MaterialIcons} from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { MainContext } from '../../contexts/mainContext';
 
 
 export default function Footer(){
@@ -11,9 +12,11 @@ export default function Footer(){
 
     const navigation = useNavigation()
     const route = useRoute()
+    const {resetDate} = useContext(MainContext)
 
     function handleHome(){
         navigation.navigate('Main')
+        resetDate()
     }
     function handleProfile(){
         

@@ -1,4 +1,5 @@
 import React, {createContext, useState, ReactNode, useEffect} from 'react';
+import Functions from "../utils"
 
 interface MainContextData{
     isBalanceActive: boolean;
@@ -19,6 +20,10 @@ interface MainContextData{
     handleSeeExpansesValues: () =>void;
     handleSeeEarningsValues: () =>void;
     handleSeeBalanceValues: () =>void;
+    handleNextMonth: () =>void;
+    handlePrevMonth: () =>void;
+    resetDate: () =>void;
+    
 }
 
 interface MainProviderProps{
@@ -45,10 +50,10 @@ export function MainProvider({children}:MainProviderProps){
     const [initialDate, setInitialDate] = useState('202103')
     
     function updateInitialDate(){
-        if (selectedMonth < 10) {
-            setInitialDate(selectedYear.toString() + '0' + selectedMonth.toString())
+        if (currentMonth < 10) {
+            setInitialDate(currentYear.toString() + '0' + currentMonth.toString())
         } else {
-            setInitialDate(selectedYear.toString() + selectedMonth.toString())
+            setInitialDate(currentYear.toString() + currentMonth.toString())
         }
     }
 
@@ -56,6 +61,29 @@ export function MainProvider({children}:MainProviderProps){
         updateInitialDate()
         console.log("dta inicial: "+initialDate)
     },[])
+
+    function resetDate(){
+        setSelectedMonth(currentMonth)
+        setSelectedYear(currentYear)
+        updateInitialDate()
+        console.log("currentMonth: "+currentMonth)
+        console.log("currentYear: "+currentYear)
+        console.log("Initial Date: "+initialDate)
+    }
+
+    function handleNextMonth(){
+        let nextDate = Functions.nextMonth(selectedMonth,selectedYear)
+        setSelectedMonth(nextDate.nextMonth)
+        setSelectedYear(nextDate.nextYear)
+        setInitialDate(nextDate.dt)
+    }
+
+    function handlePrevMonth(){
+        let prevDate = Functions.prevMonth(selectedMonth,selectedYear)
+        setSelectedMonth(prevDate.prevMonth)
+        setSelectedYear(prevDate.prevYear)
+        setInitialDate(prevDate.dt)
+    }
 
     function activeBalanceView(){
         setIsBalanceActive(true)
@@ -106,6 +134,9 @@ export function MainProvider({children}:MainProviderProps){
             handleSeeExpansesValues,
             handleSeeEarningsValues,
             handleSeeBalanceValues,
+            handleNextMonth,
+            handlePrevMonth,
+            resetDate,
         }}>
             {children}
         </MainContext.Provider>

@@ -95,6 +95,11 @@ export default function ModalContent() {
         );
     }
 
+    function closeModal(){
+        resetSelectedEntrieId()
+        updateEntriesModalVisible()
+    }
+
     return (
         <Modal animationType="slide" visible={isEntriesModalVisible} transparent>
             <View style={styles.modalContainer}>
@@ -103,7 +108,7 @@ export default function ModalContent() {
                         <TouchableOpacity>
                             <Feather name="edit-2" size={30} color={entriePrimaryColor} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={updateEntriesModalVisible}>
+                        <TouchableOpacity onPress={closeModal}>
                             <Feather name="x" size={30} color={entriePrimaryColor} />
                         </TouchableOpacity>
                     </View>

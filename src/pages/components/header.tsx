@@ -2,20 +2,23 @@ import React, { useContext } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons'
 import { StylesContext } from '../../contexts/stylesContext';
+import { MainContext } from '../../contexts/mainContext';
+import Functions from "../../utils"
 
 export default function Header() {
 
   const {monthColor} = useContext(StylesContext)
+  const {selectedYear, selectedMonth, handleNextMonth, handlePrevMonth} = useContext(MainContext)
 
   return (
     <View style={styles.monthView}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handlePrevMonth}>
         <Feather name="chevron-left" size={40} color={monthColor} />
       </TouchableOpacity>
       <Text style={[styles.monthText, { color: monthColor }]}>
-          Nov 2020
+          {Functions.convertDtToStringMonth(selectedMonth)} { selectedYear}
       </Text>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleNextMonth}>
         <Feather name="chevron-right" size={40} color={monthColor} />
       </TouchableOpacity>
     </View>

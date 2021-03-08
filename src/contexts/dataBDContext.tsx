@@ -1,6 +1,9 @@
-import React, {createContext, useState, ReactNode, useEffect} from 'react';
+import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
+import { parse } from 'react-native-svg';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
+import Functions from "../utils"
+import { MainContext } from './mainContext';
 
 interface EntriesData{
     id: number,
@@ -11,6 +14,12 @@ interface EntriesData{
     monthly: boolean,
     received: boolean,
     type: string,
+}
+
+interface BalanceData{
+    month:number,
+    year:number,
+    amount: number
 }
 
 interface EntriesValuesData{
@@ -40,6 +49,7 @@ interface DataBDContextData{
     latestEntries: LatestEntries[];
     entriesValuesByDate: EntriesValuesData[];
     entriesByDate: EntriesData[];
+    balances: BalanceData[];
     loadAllEntriesResults: () => void;
     loadAllEntriesValuesResults: () => void;
     updateLoadAction: () => void;
@@ -56,12 +66,16 @@ export const DataBDContext = createContext({} as DataBDContextData)
 export function DataBDProvider({children}: DataBDProviderProps){
 
     const [isValuesUpdated, setIsValuesUpdated] = useState(false)
+    const {currentYear, selectedMonth, initialDate} = useContext(MainContext)
+
+    let DatasArray : any = []
 
     function updateLoadAction(){
         setIsValuesUpdated(!isValuesUpdated)
     }
     
 
+    const [balances, setBalances] = useState<BalanceData[]>([])
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
     const [entriesByDate, setEntriesByDate] = useState<EntriesData[]>([])
     const [entriesValuesByDate, setEntriesValuesByDate] = useState<EntriesValuesData[]>([])
@@ -82,7 +96,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
 
     function loadEntriesValuesByDate(){
-        valuesDB.findByDate(202103).then((res:any)=>{
+        valuesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesValuesByDate(res._array)
         }).catch(err=>{
             console.log(err)
@@ -90,7 +104,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
 
     function loadEntriesByDate(){
-        entriesDB.findByDate(202103).then((res:any)=>{
+        entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
         }).catch(err=>{
             console.log(err)
@@ -136,7 +150,79 @@ export function DataBDProvider({children}: DataBDProviderProps){
         setLatestEntries(ltsEntriesArray)
     }
 
+    function defineDates(){
+        valuesDB.allOrderByDate().then((res: any) => {
+            let firstDtStart = res._array[0].dtStart
+            let year: number = parseInt(Functions.toMonthAndYear(firstDtStart).year)
+            let month: number = parseInt(Functions.toMonthAndYear(firstDtStart).month)
+            let progressiveDate
 
+            do {
+                for (var i = month; i <= 13; i++) {
+                  if (i == 13) {
+                    month = 1
+                    year = year + 1
+                  } else {
+                    if (i < 10) {
+                        progressiveDate = year.toString() + '0' + i.toString()
+                    } else {
+                        progressiveDate = year.toString() + i.toString()
+                    }
+                    DatasArray.push(progressiveDate)
+                  }
+                }
+               
+            } while (year < currentYear + 5)
+            loadBalance()
+        })
+        DatasArray = []
+    }
+
+    async function loadBalance() {
+        let sumBalance = 0
+        let balanceArray : any = []
+        setBalances([])
+
+        for (const [index, data] of DatasArray.entries()){
+            await valuesDB.findByDate(parseInt(data)).then((res:any)=>{
+                let sumEarnings = 0
+                let sumExpenses = 0
+                for (var t = 0; t < res._array.length; t++) {
+                    if (res._array[t].type == 'Ganhos') {
+                      sumEarnings = sumEarnings + res._array[t].amount
+                    } else if (res._array[t].type == 'Despesas') {
+                      sumExpenses = sumExpenses + res._array[t].amount
+                    }
+                }
+                let balance = sumEarnings - sumExpenses
+                sumBalance = sumBalance + balance 
+                let year = parseInt(Functions.toMonthAndYear(data).year)
+                let month = parseInt(Functions.toMonthAndYear(data).month)
+                let obj: any = { month: month, year: year, amount: sumBalance }
+                if (balanceArray.indexOf(obj) > -1) {
+
+                } else {
+                  balanceArray.push(obj)
+                }
+                console.log("Soma do saldo: "+sumBalance)
+            }).catch(err => {
+                console.log(err)
+                let year = parseInt(Functions.toMonthAndYear(data).year)
+                let month = parseInt(Functions.toMonthAndYear(data).month)
+                let obj: any = { month: month, year: year, amount: sumBalance }
+                if (balanceArray.indexOf(obj) > -1) {
+
+                } else {
+                  balanceArray.push(obj)
+                }
+                console.log("Soma do saldo: "+sumBalance)
+            })
+        }
+        setBalances(balanceArray)
+        balanceArray = []
+    }
+
+  
     useEffect(()=>{
         loadAllEntriesResults()
         loadAllEntriesValuesResults()
@@ -144,6 +230,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
         loadEntriesByDate()
         setLatestTransations()
         console.log("isValuesUpdated: "+isValuesUpdated)
+    },[isValuesUpdated, selectedMonth])
+
+    useEffect(()=>{
+      defineDates()
     },[isValuesUpdated])
 
     return(
@@ -153,6 +243,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             latestEntries,
             entriesValuesByDate,
             entriesByDate,
+            balances,
             loadAllEntriesResults,
             loadAllEntriesValuesResults,
             updateLoadAction,

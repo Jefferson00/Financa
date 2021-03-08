@@ -8,7 +8,9 @@ import Functions from '../../../utils'
 
 interface BalanceValues{
   currentBalance:number,
-  estimatedBalance:number
+  estimatedBalance:number,
+  remainingBalance:number,
+  totalEstimatedBalance:number,
 }
 
 interface BalanceProps{
@@ -18,6 +20,7 @@ interface BalanceProps{
 
 export default function BalanceView(props:BalanceProps) {
    const {seeBalanceValues, handleSeeBalanceValues} = useContext(MainContext)
+   
    
 
     return(
@@ -101,9 +104,22 @@ export default function BalanceView(props:BalanceProps) {
                       <Text style={styles.currentBalanceText}>Atual</Text>
                   </View>
                 {seeBalanceValues?
-                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                      <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
-                  </View>
+                  props.values.remainingBalance == 0 ?
+                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+                    </View>
+                  :
+                  <NumberFormat
+                        value={props.values.remainingBalance}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        format={Functions.currencyFormatter}
+                        renderText={value =>
+                          <Text style={styles.currentBalanceTextValue}>
+                            {value}
+                          </Text> 
+                        }
+                  />
                 :
                   <View style={styles.censoredValue}/>
                 }
@@ -115,9 +131,22 @@ export default function BalanceView(props:BalanceProps) {
                       <Text style={styles.estimatedBalanceText}>Estimado</Text>
                   </View>
                   {seeBalanceValues?
+                    props.values.totalEstimatedBalance == 0 ?
                       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                             <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
                       </View>
+                      :
+                      <NumberFormat
+                        value={props.values.totalEstimatedBalance}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        format={Functions.currencyFormatter}
+                        renderText={value =>
+                          <Text style={styles.estimatedBalanceTextValue}>
+                            {value}
+                          </Text> 
+                        }
+                      />
                   :
                       <View style={styles.censoredValue}/>
                   }

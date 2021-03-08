@@ -60,7 +60,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
                 <MenuFooter/>
             </View>
-            {selectedEntrieId != 0 && <ModalContent/>}
+            {selectedEntrieId != 0 && selectedEntrieId != undefined && <ModalContent/>}
 
         </LinearGradient>
     )

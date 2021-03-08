@@ -30,7 +30,9 @@ interface EntriesValuesData{
 
 interface BalanceValues{
   currentBalance:number,
-  estimatedBalance:number
+  estimatedBalance:number,
+  remainingBalance:number,
+  totalEstimatedBalance:number,
 }
 
 interface EarningsValues{
@@ -43,11 +45,18 @@ interface ExpansesValues{
   estimatedExpanses:number
 }
 
+interface BalanceData{
+  month:number,
+  year:number,
+  amount: number
+}
+
 export default function Main() {
   const navigation = useNavigation()
   const isFocused = useIsFocused()
 
-  const {isBalanceActive, isExpansesActive, isEarningsActive} = useContext(MainContext);
+  const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, selectedYear} = useContext(MainContext);
+  const {balances} = useContext(DataBDContext)
 
   const {updateMonthColorMainScreen} = useContext(StylesContext)
 
@@ -83,7 +92,19 @@ export default function Main() {
   let estimatedExpanses = estimatedExpansesArrays.reduce((a: any, b: any) => a + b, 0)
   let estimatedBalance = estimatedEarnings - estimatedExpanses
 
-  let balanceValuesProps: BalanceValues = {currentBalance,estimatedBalance}
+  
+  let remainingBalance = 0
+  let totalEstimatedBalance = 0
+  
+  
+  balances.map((bal: BalanceData, index: number) => {
+    if (bal.year == selectedYear && bal.month == selectedMonth) {
+      remainingBalance = bal.amount - (estimatedEarnings - estimatedExpanses)
+      totalEstimatedBalance = bal.amount
+    }
+  })
+  
+  let balanceValuesProps: BalanceValues = {currentBalance,estimatedBalance,remainingBalance,totalEstimatedBalance}
   let earningsValuesProps: EarningsValues= {currentEarnings,estimatedEarnings}
   let expansesValuesProps: ExpansesValues= {currentExpanses, estimatedExpanses}
 
@@ -144,3 +165,4 @@ const styles = StyleSheet.create({
   },
 
 });
+
