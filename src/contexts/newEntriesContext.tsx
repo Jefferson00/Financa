@@ -1,4 +1,4 @@
-import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
+import React, {createContext, useState, ReactNode, useContext} from 'react';
 import { Platform } from 'react-native';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
@@ -6,7 +6,6 @@ import valuesDB from '../services/valuesDB';
 import Functions from "../utils"
 import { DataBDContext } from './dataBDContext';
 import { MainContext } from './mainContext';
-import { StylesContext } from './stylesContext';
 
 interface EntriesByDateData{
     id: number,
@@ -151,6 +150,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         setEntriesValuesBeforeCreate([...entrieValuesBeforeCreate, newValue])
     }
 
+    //----------------------------------------------//
+
     function resetValues(){
         setEntriesValuesBeforeCreate(initialValue)
         setEntrieFrequency(1)
@@ -194,8 +195,6 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         let dtStart = Functions.setDtStart(calendarDate)
         let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
         console.log("******CADASTRO********** ")
-        console.log("data inicial: "+dtStart)
-        console.log("data final: "+dtEnd)
 
         const EntrieObj : EntriesData = {
             title: titleInputEntrie,
@@ -333,9 +332,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             }
             entriesDB.update(selectedId, obj).then(res => {
                 alert("Pago!")
-                //updateEntriesModalVisible()
                 updateLoadAction()
-                //loadResults()
             }).catch(err => {
                 console.log(err)
             })

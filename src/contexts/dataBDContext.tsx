@@ -1,5 +1,4 @@
 import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
-import { parse } from 'react-native-svg';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
 import Functions from "../utils"
@@ -50,6 +49,7 @@ interface DataBDContextData{
     entriesValuesByDate: EntriesValuesData[];
     entriesByDate: EntriesData[];
     balances: BalanceData[];
+    isBalancesDone:boolean;
     loadAllEntriesResults: () => void;
     loadAllEntriesValuesResults: () => void;
     updateLoadAction: () => void;
@@ -68,21 +68,21 @@ export function DataBDProvider({children}: DataBDProviderProps){
     const [isValuesUpdated, setIsValuesUpdated] = useState(false)
     const {currentYear, selectedMonth, initialDate} = useContext(MainContext)
 
-    let DatasArray : any = []
-
-    function updateLoadAction(){
-        setIsValuesUpdated(!isValuesUpdated)
-    }
-    
-
     const [balances, setBalances] = useState<BalanceData[]>([])
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
     const [entriesByDate, setEntriesByDate] = useState<EntriesData[]>([])
     const [entriesValuesByDate, setEntriesValuesByDate] = useState<EntriesValuesData[]>([])
     const [allEntriesValues, setAllEntriesValues] = useState<EntriesValuesData[]>([])
-
     const [latestEntries, setLatestEntries] = useState<LatestEntries[]>([])
 
+    const [isBalancesDone, setIsBalancesDone] = useState(false)
+    
+    let DatasArray : any = []
+    
+    function updateLoadAction(){
+        setIsValuesUpdated(!isValuesUpdated)
+    }
+    
     function loadAllEntriesResults(){ 
         entriesDB.all().then((res:any)=>{
             setAllEntries(res._array)
@@ -98,6 +98,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadEntriesValuesByDate(){
         valuesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesValuesByDate(res._array)
+            console.log("Carregou todas as entradas da data::  "+initialDate)
         }).catch(err=>{
             console.log(err)
         })
@@ -106,6 +107,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadEntriesByDate(){
         entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
+            console.log("Carregou todos os valores da data::  "+initialDate)
         }).catch(err=>{
             console.log(err)
         })
@@ -117,8 +119,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
             if(res._array.length != allEntriesValues.length){
                 setIsValuesUpdated(!isValuesUpdated)
                 console.log("carregou todos os valores")
-                console.log("    "+res._array[0].type)
-                console.log("    "+res._array[0].received)
             }
         }).catch(err=>{
             console.log(err)
@@ -133,7 +133,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
             allEntriesValues.map((value:EntriesValuesData) => {
                 if (ltsEntries[index].id === value.entries_id){
                     totalValues = totalValues + value.amount
-                    console.log("Valor: "+totalValues)
                 }
             })
             let ltsEntriesObj = {
@@ -173,6 +172,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 }
                
             } while (year < currentYear + 5)
+            console.log("carregou as datas")
             loadBalance()
         })
         DatasArray = []
@@ -204,7 +204,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 } else {
                   balanceArray.push(obj)
                 }
-                console.log("Soma do saldo: "+sumBalance)
             }).catch(err => {
                 console.log(err)
                 let year = parseInt(Functions.toMonthAndYear(data).year)
@@ -215,11 +214,12 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 } else {
                   balanceArray.push(obj)
                 }
-                console.log("Soma do saldo: "+sumBalance)
             })
         }
+        console.log("carregou os saldos")
         setBalances(balanceArray)
         balanceArray = []
+        setIsBalancesDone(true)
     }
 
   
@@ -229,7 +229,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         loadEntriesValuesByDate()
         loadEntriesByDate()
         setLatestTransations()
-        console.log("isValuesUpdated: "+isValuesUpdated)
+        //console.log("isValuesUpdated: "+isValuesUpdated)
     },[isValuesUpdated, selectedMonth])
 
     useEffect(()=>{
@@ -244,6 +244,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             entriesValuesByDate,
             entriesByDate,
             balances,
+            isBalancesDone,
             loadAllEntriesResults,
             loadAllEntriesValuesResults,
             updateLoadAction,

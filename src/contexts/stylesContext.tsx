@@ -1,4 +1,3 @@
-import { useRoute } from '@react-navigation/native';
 import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
 import { NewEntriesContext } from './newEntriesContext';
 
@@ -70,10 +69,6 @@ export function StylesProvider({children}: StylesProviderProps){
         setSelectedEntrieId(0)
     }
 
-
-    //const route = useRoute()
-
-    //&& route.name!="Main"
 
     function updateMonthColorMainScreen(){
         setMonthColor('#3C93F9')

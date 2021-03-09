@@ -5,6 +5,7 @@ import { MainContext } from '../../../contexts/mainContext';
 import { DataBDContext } from '../../../contexts/dataBDContext';
 import NumberFormat from 'react-number-format';
 import Functions from '../../../utils'
+import BalanceLoader from './balanceLoader';
 
 interface BalanceValues{
   currentBalance:number,
@@ -21,7 +22,7 @@ interface BalanceProps{
 export default function BalanceView(props:BalanceProps) {
    const {seeBalanceValues, handleSeeBalanceValues} = useContext(MainContext)
    
-   
+   const {isBalancesDone} = useContext(DataBDContext)
 
     return(
         <>
@@ -98,6 +99,10 @@ export default function BalanceView(props:BalanceProps) {
               <Text style={styles.currentBalanceText}>Seu Saldo Total</Text>
           </View>
 
+          {!isBalancesDone ?
+            <BalanceLoader/>
+          
+          :
           <View style={styles.balanceView}>
               <View style={styles.currentBalanceView}>
                   <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
@@ -152,6 +157,7 @@ export default function BalanceView(props:BalanceProps) {
                   }
               </View>
           </View>
+        }
 
         </>
     )

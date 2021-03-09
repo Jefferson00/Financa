@@ -57,18 +57,11 @@ export function MainProvider({children}:MainProviderProps){
         }
     }
 
-    useEffect(()=>{
-        updateInitialDate()
-        console.log("dta inicial: "+initialDate)
-    },[])
-
     function resetDate(){
         setSelectedMonth(currentMonth)
         setSelectedYear(currentYear)
         updateInitialDate()
-        console.log("currentMonth: "+currentMonth)
-        console.log("currentYear: "+currentYear)
-        console.log("Initial Date: "+initialDate)
+        console.log("Data resetada: : ")
     }
 
     function handleNextMonth(){
@@ -113,6 +106,11 @@ export function MainProvider({children}:MainProviderProps){
     function handleSeeBalanceValues(){
         setSeeBalanceValues(!seeBalanceValues)
     }
+
+    useEffect(()=>{
+        updateInitialDate()
+        console.log("dta inicial: "+initialDate)
+    },[])
 
     return(
         <MainContext.Provider value={{
