@@ -23,6 +23,8 @@ import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces'
 import Loader from './components/loader';
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
 import { StylesContext } from '../../contexts/stylesContext';
+import { DataBDContext } from '../../contexts/dataBDContext';
+import LoaderBalance from './components/loaderBalance';
 
 
 export default function Entries({ route }: { route: any }, { navigation }: { navigation: any }) {
@@ -31,6 +33,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     const isFocused = useIsFocused()
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
+    const {isEntriesDone} = useContext(DataBDContext)
     const {firstGradientColor, secondGradientColor, selectedEntrieId} = useContext(StylesContext)
 
     useEffect(()=>{
@@ -46,13 +49,18 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             style={styles.container}>
             <StatusBar style="light" translucent />
             <Header/>
-
-            <Balance/>
+            {isEntriesDone ?
+                <Balance/>
+                :
+                <LoaderBalance/>
+            }
 
             <View style={styles.mainContainer}>
-            
-                <EntriesResults/>
-           
+                {isEntriesDone ?
+                    <EntriesResults/>
+                    :
+                    <Loader/>
+                }
                
             
 

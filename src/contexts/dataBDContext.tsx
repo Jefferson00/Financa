@@ -50,6 +50,7 @@ interface DataBDContextData{
     entriesByDate: EntriesData[];
     balances: BalanceData[];
     isBalancesDone:boolean;
+    isEntriesDone:boolean;
     loadAllEntriesResults: () => void;
     loadAllEntriesValuesResults: () => void;
     updateLoadAction: () => void;
@@ -76,6 +77,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     const [latestEntries, setLatestEntries] = useState<LatestEntries[]>([])
 
     const [isBalancesDone, setIsBalancesDone] = useState(false)
+    const [isEntriesDone, setIsEntriesDone] = useState(false)
     
     let DatasArray : any = []
     
@@ -105,9 +107,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
 
     function loadEntriesByDate(){
+        setIsEntriesDone(false)
         entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
             console.log("Carregou todos os valores da data::  "+initialDate)
+            setIsEntriesDone(true)
         }).catch(err=>{
             console.log(err)
         })
@@ -245,6 +249,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             entriesByDate,
             balances,
             isBalancesDone,
+            isEntriesDone,
             loadAllEntriesResults,
             loadAllEntriesValuesResults,
             updateLoadAction,

@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {Entypo, Ionicons, MaterialIcons} from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainContext } from '../../contexts/mainContext';
+import { NewEntriesContext } from '../../contexts/newEntriesContext';
 
 
 export default function Footer(){
@@ -13,13 +14,17 @@ export default function Footer(){
     const navigation = useNavigation()
     const route = useRoute()
     const {resetDate} = useContext(MainContext)
+    const {typeOfEntrie} = useContext(NewEntriesContext)
 
     function handleHome(){
         navigation.navigate('Main')
         resetDate()
     }
-    function handleProfile(){
-        
+    function handleEarnings(){
+        navigation.navigate('Entries', { item: 'Ganhos'})
+    }
+    function handleExpanses(){
+        navigation.navigate('Entries', { item: 'Despesas'})
     }
     function handleNotification(){
         navigation.navigate('Notifications')
@@ -31,11 +36,19 @@ export default function Footer(){
             <TouchableOpacity onPress={handleHome}>
                  <Entypo name="home" size={40} color={route.name=="Main"?activeItemColor:nonActiveItemColor}/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleProfile}>
-                 <Ionicons name="person" size={40} color={nonActiveItemColor} />
+            <TouchableOpacity onPress={handleEarnings}>
+                 <Ionicons 
+                    name="arrow-up-circle" 
+                    size={40} 
+                    color={route.name=="Entries" && typeOfEntrie == 'Ganhos'? activeItemColor: nonActiveItemColor}
+                />
             </TouchableOpacity>
-            <TouchableOpacity>
-                <MaterialIcons name="analytics" size={40} color={nonActiveItemColor} />
+            <TouchableOpacity onPress={handleExpanses}>
+                <Ionicons 
+                    name="arrow-down-circle" 
+                    size={40} 
+                    color={route.name=="Entries" && typeOfEntrie == "Despesas" ? activeItemColor: nonActiveItemColor} 
+                />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleNotification}>
                 <Ionicons name="notifications" size={40} color={route.name=="Notifications"?activeItemColor:nonActiveItemColor} />

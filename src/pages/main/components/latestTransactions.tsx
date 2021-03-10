@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },
     title: {
-        color: '#1A8289',
+        color: '#3C93F9',
         fontFamily: 'Poppins_600SemiBold',
         fontSize: 14,
     },

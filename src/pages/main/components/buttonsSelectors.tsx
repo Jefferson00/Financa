@@ -48,12 +48,12 @@ const styles = StyleSheet.create({
     activeText:{
       fontSize: 14,
       fontFamily: 'Poppins_500Medium',
-      color:'#1A8289'
+      color:'#3C93F9'
     },
     nonActiveText:{
       fontSize: 14,
       fontFamily: 'Poppins_500Medium',
-      color:'rgba(26, 130, 137, 0.6)'
+      color:'rgba(60, 147, 249, 0.6)'
     },
     selectValuesView: {
       flexDirection: 'row',
