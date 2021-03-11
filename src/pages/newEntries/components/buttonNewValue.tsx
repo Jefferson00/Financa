@@ -13,8 +13,8 @@ import { NewEntriesContext } from "../../../contexts/newEntriesContext"
 interface ValuesData{
     description: string,
     amount: number,
-    dtStart: number,
-    dtEnd: number,
+    monthly: boolean,
+    frequency: number,
     entries_id: number,
 }
 
@@ -31,8 +31,8 @@ export default function ButtonNewValue() {
     const newValue: ValuesData = {
         description: '',
         amount: 0,
-        dtStart: 0,
-        dtEnd: 0,
+        monthly: false,
+        frequency: 1,
         entries_id: 0,
     }
 

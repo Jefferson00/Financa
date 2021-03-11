@@ -3,11 +3,13 @@ import { StyleSheet, Text, View, TextInput, Switch } from 'react-native'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext"
 import { StylesContext } from "../../../contexts/stylesContext"
 
+import Functions from "../../../utils"
+
 interface ValuesData{
     description: string,
     amount: number,
-    dtStart: number,
-    dtEnd: number,
+    monthly: boolean,
+    frequency: number,
     entries_id: number,
 }
 
@@ -19,10 +21,13 @@ export default function FormContentCreate() {
         } = useContext(NewEntriesContext)
 
     const {entriePrimaryColor, entrieSecondaryColor} = useContext(StylesContext)
+
+    
     
     return(
         <>
          {entrieValuesBeforeCreate.map((values:ValuesData, index:number) => {
+            
                 return (
                     <View style={styles.valuesViewItem} key={index}>
                         <View style={styles.valuesView}>
@@ -65,15 +70,15 @@ export default function FormContentCreate() {
                             <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>Mensal</Text>
                             <Switch
                                 trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
-                                thumbColor={isEnabledMonthly ? 'd2d2d2' : entriePrimaryColor}
+                                thumbColor={values.monthly ? 'd2d2d2' : entriePrimaryColor}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={e=> updateEntrieValuesBeforeCreate('monthly', index, e)}
-                                value={isEnabledMonthly}
+                                value={values.monthly}
                             />
-    
+                          
                             <TextInput
-                                
-        
+                                onChange={e => updateEntrieValuesBeforeCreate('frequency', index, e)}
+                                value={values.frequency.toString()}
                                 style={styles.InputText}
                                 keyboardType='numeric'
                                 maxLength={2}

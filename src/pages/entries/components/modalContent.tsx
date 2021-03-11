@@ -49,8 +49,10 @@ export default function ModalContent() {
     }
 
     function frequencyController(dtEnd: number, dtStart: number){
-        //mudar todayDate para currentDate
-        return Functions.toFrequency(dtEnd, dtStart) - Functions.toFrequency(dtEnd, Functions.setDtStart(todayDate)) + 1 + "/" + (Functions.toFrequency(dtEnd, dtStart)+1)
+        const newDate = new Date()
+        newDate.setMonth(selectedMonth-1)
+        newDate.setFullYear(selectedYear)
+        return Functions.toFrequency(dtEnd, dtStart) - Functions.toFrequency(dtEnd, Functions.setDtStart(newDate)) + 1 + "/" + (Functions.toFrequency(dtEnd, dtStart)+1)
     }
 
     function removeEntrie(entrieId: number) {

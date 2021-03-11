@@ -31,8 +31,8 @@ interface EntriesData{
 interface ValuesData{
     description: string,
     amount: number,
-    dtStart: number,
-    dtEnd: number,
+    monthly: boolean,
+    frequency: number,
     entries_id: number,
 }
 
@@ -108,6 +108,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         setShowCalendar(true);
     };
 
+    //TODO a data no cadastro tem que ser igual a data selecionada
+
     //----------------------//
 
     const [isEnabledReceived, setIsEnabledReceived] = useState(false);
@@ -139,8 +141,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     const initialValue: ValuesData[] = [{
         description: '',
         amount: 0,
-        dtStart: 0,
-        dtEnd: 0,
+        monthly: false,
+        frequency: 1,
         entries_id: 0,
     }]
 
@@ -164,7 +166,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             let arrOfEntriesValues = entrieValuesBeforeCreate.map((entrieValue:ValuesData, i:number)=>{
                 if (index === i){
                     if (subitem == 'monthly') {
-                        return { ...entrieValue, ['dtend']:'209912' }
+                        return { ...entrieValue, ['monthly']: !entrieValue.monthly }
                     }
                     else if (subitem == 'amount') {
                         var valor = e.nativeEvent.text
@@ -180,6 +182,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     }
                     else if (subitem == "description"){
                         return { ...entrieValue, [subitem]: e.nativeEvent.text }
+                    }
+                    else if (subitem == "frequency"){
+                        return { ...entrieValue, ['frequency']:  e.nativeEvent.text}
                     }
                     else {
                         return { ...entrieValue, [subitem]: e.nativeEvent.text }
@@ -224,16 +229,23 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 let amount = String(value.amount)
                 amount = amount.replace(/[.]/g, '')
                 amount = amount.replace(/[,]/g, '')
-                const ValueObj:ValuesData = {
+                let newDtEnd
+                if (value.monthly){
+                    newDtEnd = 209912
+                }else{
+                    newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
+                }
+                
+                const ValueObj:any = {
                     description: value.description,
                     amount: Number(amount),
                     dtStart: dtStart,
-                    dtEnd: dtEnd, ///mudar depois
+                    dtEnd: newDtEnd, 
                     entries_id: EntrieId
                 }
                 valuesDB.create(ValueObj).then(()=>{
                     console.log("Create!")
-                    alert('valor cadastrado com sucesso!')
+                    //alert('valor cadastrado com sucesso!')
                     updateLoadAction()
                     resetValues()
                 }).catch(err => {

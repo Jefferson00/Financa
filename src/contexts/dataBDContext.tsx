@@ -103,6 +103,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             console.log("Carregou todas as entradas da data::  "+initialDate)
         }).catch(err=>{
             console.log(err)
+            setEntriesValuesByDate([])
         })
     }
 
@@ -114,6 +115,8 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setIsEntriesDone(true)
         }).catch(err=>{
             console.log(err)
+            setEntriesByDate([])
+            setIsEntriesDone(true)
         })
     }
 
