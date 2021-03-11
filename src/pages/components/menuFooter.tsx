@@ -4,6 +4,7 @@ import {Entypo, Ionicons, MaterialIcons} from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainContext } from '../../contexts/mainContext';
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
+import { StylesContext } from '../../contexts/stylesContext';
 
 
 export default function Footer(){
@@ -14,11 +15,14 @@ export default function Footer(){
     const navigation = useNavigation()
     const route = useRoute()
     const {resetDate} = useContext(MainContext)
-    const {typeOfEntrie} = useContext(NewEntriesContext)
+    const {typeOfEntrie, updateEntrieIdUpdate} = useContext(NewEntriesContext)
+    const {resetValuesForm} = useContext(StylesContext)
 
     function handleHome(){
         navigation.navigate('Main')
         resetDate()
+        resetValuesForm()
+        updateEntrieIdUpdate(0)
     }
     function handleEarnings(){
         navigation.navigate('Entries', { item: 'Ganhos'})

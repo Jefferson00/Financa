@@ -30,11 +30,12 @@ import { StylesContext } from '../../contexts/stylesContext';
 export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const { item } = route.params
 
-    const {updateTypeOfEntrie} = useContext(NewEntriesContext)
+    const {updateTypeOfEntrie, entrieIdUpdate} = useContext(NewEntriesContext)
     const {entriePrimaryColor, isValuesFormVisible} = useContext(StylesContext)
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
+        console.log('entrie id update: '+entrieIdUpdate)
     },[item])
    
     return (

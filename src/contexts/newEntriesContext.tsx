@@ -1,5 +1,6 @@
 import React, {createContext, useState, ReactNode, useContext} from 'react';
 import { Platform } from 'react-native';
+import functions from '../functions';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
 
@@ -57,6 +58,7 @@ interface NewEntriesContextData{
     entrieFrequency:number,
     entrieValuesBeforeCreate: ValuesData[];
     typeOfEntrie:string
+    entrieIdUpdate:number;
     onChangeDate: (event: any, selectedDate: any) => void;
     showDatepicker: () => void;
     setTitleInputEntrie: (titleInputEntrie:string) => void;
@@ -71,6 +73,8 @@ interface NewEntriesContextData{
     handleDeleteEntrieValues: (entrieId:number, valueId:number)=> void;
     updateEntrieReceived: (selectedId:number)=> void;
     addNewValueBeforeCreate: (newValue : ValuesData)=> void;
+    updateEntrieIdUpdate: (idUpdate:number)=> void;
+    setEntrieValuesUpdate: (entrie:any)=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -87,6 +91,21 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     //const {updateEntriesModalVisible} = useContext(StylesContext)
 
     const [typeOfEntrie, setTypeOfEntrie] = useState('');
+    const [entrieIdUpdate, setEntrieIdUpdate] = useState(0);
+
+    function setEntrieValuesUpdate(entrie:any){
+        setTitleInputEntrie(entrie.title)
+
+        entrie.monthly == 1 ? setIsEnabledMonthly(true) : setIsEnabledMonthly(false)
+        entrie.received == 1 ? setIsEnabledReceived(true) : setIsEnabledReceived(false)
+        
+        let frequency = Functions.toFrequency(entrie.dtEnd, entrie.dtStart)+1
+        setEntrieFrequency(frequency) 
+    }
+
+    function updateEntrieIdUpdate(idUpdate:number){
+        setEntrieIdUpdate(idUpdate)
+    }
 
     function updateTypeOfEntrie(type:string){
         setTypeOfEntrie(type)
@@ -361,6 +380,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             entrieFrequency,
             entrieValuesBeforeCreate,
             typeOfEntrie,
+            entrieIdUpdate,
             onChangeDate,
             showDatepicker,
             setTitleInputEntrie,
@@ -375,6 +395,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             handleDeleteEntrieValues,
             updateEntrieReceived,
             addNewValueBeforeCreate,
+            updateEntrieIdUpdate,
+            setEntrieValuesUpdate,
         }}>
             {children}
         </NewEntriesContext.Provider>

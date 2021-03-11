@@ -9,6 +9,8 @@ import { MainContext } from '../../../contexts/mainContext';
 
 import Functions from "../../../utils"
 import { NewEntriesContext } from '../../../contexts/newEntriesContext';
+import functions from '../../../functions';
+import { useNavigation } from '@react-navigation/native';
 
 interface EntriesValuesData{
     id:number,
@@ -26,6 +28,7 @@ interface EntriesValuesData{
 export default function ModalContent() {
     let rec
     let isLate = false
+    const navigation = useNavigation()
 
     const {
         isEntriesModalVisible,
@@ -38,7 +41,7 @@ export default function ModalContent() {
     } = useContext(StylesContext)
     const {entriesByDate, entriesValuesByDate, updateLoadAction} = useContext(DataBDContext)
     const {todayDate, selectedMonth, currentMonth, selectedYear, currentYear} = useContext(MainContext)
-    const {handleDeleteEntrie, handleDeleteEntrieValues, updateEntrieReceived} = useContext(NewEntriesContext)
+    const {handleDeleteEntrie, handleDeleteEntrieValues, updateEntrieReceived, updateEntrieIdUpdate, typeOfEntrie} = useContext(NewEntriesContext)
 
     const entrieModal = entriesByDate.filter(entrie => entrie.id == selectedEntrieId)
 
@@ -102,12 +105,18 @@ export default function ModalContent() {
         updateEntriesModalVisible()
     }
 
+    function handleToUpdate(){
+        updateEntrieIdUpdate(selectedEntrieId)
+        updateEntriesModalVisible()
+        navigation.navigate('NewEntries', { item: typeOfEntrie})
+    }
+
     return (
         <Modal animationType="slide" visible={isEntriesModalVisible} transparent>
             <View style={styles.modalContainer}>
                <View style={styles.modalContent}>
                     <View style={styles.headerModal}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={handleToUpdate}>
                             <Feather name="edit-2" size={30} color={entriePrimaryColor} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={closeModal}>

@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import { StyleSheet, Text, View, TextInput, Switch } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -7,6 +7,7 @@ import Functions from '../../../functions'
 import { Feather } from '@expo/vector-icons'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
 import { StylesContext } from "../../../contexts/stylesContext";
+import entriesDB from "../../../services/entriesDB";
 
 
 export default function FormContent() {
@@ -26,9 +27,19 @@ export default function FormContent() {
            increaseEntrieFrequency,
            decreaseEntrieFrequency,
            updateEntrieValuesBeforeCreate,
+           setEntrieValuesUpdate,
+           entrieIdUpdate,
         } = useContext(NewEntriesContext)
 
-        const {entriePrimaryColor, entrieSecondaryColor } = useContext(StylesContext)
+        const {entriePrimaryColor, entrieSecondaryColor , isValuesFormVisible} = useContext(StylesContext)
+
+    useEffect(()=>{
+        if (entrieIdUpdate != 0){
+            entriesDB.findById(entrieIdUpdate).then((res:any)=>{
+                setEntrieValuesUpdate(res._array[0])
+            })
+        }
+    },[])
 
     return (
         <>
@@ -109,17 +120,19 @@ export default function FormContent() {
             <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                 Valor
             </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={[styles.secondColorText, { color: entrieSecondaryColor, marginRight: 10, fontSize: 18 }]}>
-                    R$
-                </Text>
-                <TextInput
-                    keyboardType='numeric'
-                    style={styles.InputTextValue}
-                    onChange={e => updateEntrieValuesBeforeCreate('amount', 0 , e)}
-                    value={entrieValuesBeforeCreate[0].amount.toString()}
-                />
-            </View>
+            {!isValuesFormVisible && 
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={[styles.secondColorText, { color: entrieSecondaryColor, marginRight: 10, fontSize: 18 }]}>
+                        R$
+                    </Text>
+                    <TextInput
+                        keyboardType='numeric'
+                        style={styles.InputTextValue}
+                        onChange={e => updateEntrieValuesBeforeCreate('amount', 0 , e)}
+                        value={entrieValuesBeforeCreate[0].amount.toString()}
+                    />
+                </View>
+            }
 
 
         </>
