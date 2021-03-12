@@ -101,6 +101,13 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         
         let frequency = Functions.toFrequency(entrie.dtEnd, entrie.dtStart)+1
         setEntrieFrequency(frequency) 
+
+        let newDate = new Date()
+        newDate.setMonth(Number(Functions.toMonthAndYear(entrie.dtStart).month)-1)
+        newDate.setFullYear(Number(Functions.toMonthAndYear(entrie.dtStart).year))
+        console.log("DIA: "+entrie.day)
+        newDate.setDate(entrie.day)
+        setCalendarDate(newDate)
     }
 
     function updateEntrieIdUpdate(idUpdate:number){
@@ -296,7 +303,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                         day: entrie.day,
                         dtStart: entrie.dtStart,
                         dtEnd: Functions.setDtEnd(false, contRep, newDate),
-                        monthly: entrie.monthly,
+                        monthly: false,
                         received: entrie.received,
                         type: entrie.type
                     }
