@@ -22,8 +22,7 @@ export default function FormContentCreate() {
 
     const {entriePrimaryColor, entrieSecondaryColor} = useContext(StylesContext)
 
-    
-    
+        
     return(
         <>
          {entrieValuesBeforeCreate.map((values:ValuesData, index:number) => {
@@ -54,7 +53,7 @@ export default function FormContentCreate() {
                                     keyboardType='numeric'
                                     placeholder='R$ 0,00'
                                     onChange={e => updateEntrieValuesBeforeCreate('amount', index, e)}
-                                    value={values.amount.toString()}
+                                    value={Functions.formatCurrency(values.amount)}
                                     style={styles.InputTextValue}
                                     maxLength={10}
                                 />
@@ -76,6 +75,9 @@ export default function FormContentCreate() {
                                 value={values.monthly}
                             />
                           
+                          {values.monthly ?
+                            <Text> - </Text>
+                            :
                             <TextInput
                                 onChange={e => updateEntrieValuesBeforeCreate('frequency', index, e)}
                                 value={values.frequency.toString()}
@@ -83,6 +85,7 @@ export default function FormContentCreate() {
                                 keyboardType='numeric'
                                 maxLength={2}
                             />
+                          }
     
                             <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>Vezes</Text>
                         </View>

@@ -30,6 +30,7 @@ interface EntriesData{
 }
 
 interface ValuesData{
+    id:number,
     description: string,
     amount: number,
     monthly: boolean,
@@ -69,12 +70,15 @@ interface NewEntriesContextData{
     updateTypeOfEntrie: (type:string) => void;
     updateEntrieValuesBeforeCreate: (subitem: string, index: number, value: any) => void;
     handleCreateNewEntrie: ()=> void;
+    handleUpdate: ()=> void;
     handleDeleteEntrie: (entrieId:number)=> void;
     handleDeleteEntrieValues: (entrieId:number, valueId:number)=> void;
     updateEntrieReceived: (selectedId:number)=> void;
     addNewValueBeforeCreate: (newValue : ValuesData)=> void;
     updateEntrieIdUpdate: (idUpdate:number)=> void;
     setEntrieValuesUpdate: (entrie:any)=> void;
+    resetValues: ()=> void;
+    setValuesUpdate: (valuesUpdate:EntriesValuesData[])=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -93,14 +97,21 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     const [typeOfEntrie, setTypeOfEntrie] = useState('');
     const [entrieIdUpdate, setEntrieIdUpdate] = useState(0);
 
+    const [valuesIsChanged, setValuesIsChanged] = useState(false);
+
     function setEntrieValuesUpdate(entrie:any){
         setTitleInputEntrie(entrie.title)
 
-        entrie.monthly == 1 ? setIsEnabledMonthly(true) : setIsEnabledMonthly(false)
         entrie.received == 1 ? setIsEnabledReceived(true) : setIsEnabledReceived(false)
         
-        let frequency = Functions.toFrequency(entrie.dtEnd, entrie.dtStart)+1
-        setEntrieFrequency(frequency) 
+        if (entrie.monthly == 1){
+            setIsEnabledMonthly(true) 
+            setEntrieFrequency(1)
+        }else{
+            setIsEnabledMonthly(false)
+            let frequency = Functions.toFrequency(entrie.dtEnd, entrie.dtStart)+1
+            setEntrieFrequency(frequency) 
+        }
 
         let newDate = new Date()
         newDate.setMonth(Number(Functions.toMonthAndYear(entrie.dtStart).month)-1)
@@ -108,6 +119,25 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         console.log("DIA: "+entrie.day)
         newDate.setDate(entrie.day)
         setCalendarDate(newDate)
+    }
+
+    function setValuesUpdate(valuesUpdate:EntriesValuesData[]){
+        let valuesBeforeUpdate: ValuesData[] = []
+        valuesUpdate.map((value: EntriesValuesData, index: number)=>{
+            let monthly 
+            let frequency = Functions.toFrequency(value.dtEnd, value.dtStart) + 1
+            value.dtEnd == 209912 ? monthly = true : monthly = false
+            let valueObj = {
+                id: value.id,
+                description: value.description,
+                amount: value.amount,
+                monthly: monthly,
+                frequency: frequency,
+                entries_id: value.entries_id,
+            }
+            valuesBeforeUpdate.push(valueObj)
+        })
+        setEntriesValuesBeforeCreate(valuesBeforeUpdate)
     }
 
     function updateEntrieIdUpdate(idUpdate:number){
@@ -165,6 +195,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     //----------------------------------------------//
 
     const initialValue: ValuesData[] = [{
+        id:0,
         description: '',
         amount: 0,
         monthly: false,
@@ -186,12 +217,14 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         setTitleInputEntrie('')
         setIsEnabledMonthly(false)
         setIsEnabledReceived(false)
+        setCalendarDate(new Date())
     }
     
     function updateEntrieValuesBeforeCreate(subitem: string, index: number, e: any){
             let arrOfEntriesValues = entrieValuesBeforeCreate.map((entrieValue:ValuesData, i:number)=>{
-                if (index === i){
+                if (index === i){    
                     if (subitem == 'monthly') {
+                        setValuesIsChanged(true)
                         return { ...entrieValue, ['monthly']: !entrieValue.monthly }
                     }
                     else if (subitem == 'amount') {
@@ -210,6 +243,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                         return { ...entrieValue, [subitem]: e.nativeEvent.text }
                     }
                     else if (subitem == "frequency"){
+                        setValuesIsChanged(true)
                         return { ...entrieValue, ['frequency']:  e.nativeEvent.text}
                     }
                     else {
@@ -256,10 +290,14 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 amount = amount.replace(/[.]/g, '')
                 amount = amount.replace(/[,]/g, '')
                 let newDtEnd
-                if (value.monthly){
-                    newDtEnd = 209912
+                if (valuesIsChanged){
+                    if (value.monthly){
+                        newDtEnd = 209912
+                    }else{
+                        newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
+                    }
                 }else{
-                    newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
+                    newDtEnd = dtEnd 
                 }
                 
                 const ValueObj:any = {
@@ -281,6 +319,46 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             updateLoadAction()
         }).catch(err => {
             console.log(err)
+        })
+    }
+
+    function handleUpdate(){
+        let dtStart = Functions.setDtStart(calendarDate)
+        let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
+        const EntrieObj : EntriesData = {
+            title: titleInputEntrie,
+            day: calendarDate.getDate(),
+            dtStart: dtStart,
+            dtEnd: dtEnd,
+            monthly: isEnabledMonthly,
+            received: isEnabledReceived,
+            type: typeOfEntrie,
+        }
+        entriesDB.update(entrieIdUpdate, EntrieObj).then(()=>{
+            alert("atualizado!")
+            updateLoadAction()
+        })
+
+        entrieValuesBeforeCreate.map((value: ValuesData) =>{
+            let amount = String(value.amount)
+                amount = amount.replace(/[.]/g, '')
+                amount = amount.replace(/[,]/g, '')
+            let newDtEnd
+                    if (value.monthly){
+                        newDtEnd = 209912
+                    }else{
+                        newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
+                    }
+            const ValueObj:any = {
+                description: value.description,
+                amount: Number(amount),
+                dtStart: dtStart,
+                dtEnd: newDtEnd, 
+                entries_id: entrieIdUpdate
+            }
+            valuesDB.update(value.id, ValueObj).then(()=>{
+
+            })
         })
     }
 
@@ -404,6 +482,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             addNewValueBeforeCreate,
             updateEntrieIdUpdate,
             setEntrieValuesUpdate,
+            resetValues,
+            setValuesUpdate,
+            handleUpdate,
         }}>
             {children}
         </NewEntriesContext.Provider>

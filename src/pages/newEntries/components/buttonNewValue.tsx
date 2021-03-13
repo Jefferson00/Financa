@@ -11,6 +11,7 @@ import { StylesContext } from "../../../contexts/stylesContext"
 import { NewEntriesContext } from "../../../contexts/newEntriesContext"
 
 interface ValuesData{
+    id:number,
     description: string,
     amount: number,
     monthly: boolean,
@@ -29,6 +30,7 @@ export default function ButtonNewValue() {
     const {addNewValueBeforeCreate} = useContext(NewEntriesContext)
 
     const newValue: ValuesData = {
+        id:0,
         description: '',
         amount: 0,
         monthly: false,

@@ -8,6 +8,20 @@ import { Feather } from '@expo/vector-icons'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
 import { StylesContext } from "../../../contexts/stylesContext";
 import entriesDB from "../../../services/entriesDB";
+import valuesDB from "../../../services/valuesDB";
+import { DataBDContext } from "../../../contexts/dataBDContext";
+
+interface EntriesValuesData{
+    id:number,
+    description: string,
+    amount: number,
+    dtStart: number,
+    dtEnd: number,
+    entries_id: number,
+    day: number,
+    type: string,
+    received: boolean,
+}
 
 
 export default function FormContent() {
@@ -29,15 +43,22 @@ export default function FormContent() {
            updateEntrieValuesBeforeCreate,
            setEntrieValuesUpdate,
            entrieIdUpdate,
+           setValuesUpdate,
         } = useContext(NewEntriesContext)
 
         const {entriePrimaryColor, entrieSecondaryColor , isValuesFormVisible} = useContext(StylesContext)
+        const {entriesValuesByDate} = useContext(DataBDContext)
 
     useEffect(()=>{
         if (entrieIdUpdate != 0){
             entriesDB.findById(entrieIdUpdate).then((res:any)=>{
                 setEntrieValuesUpdate(res._array[0])
+            }).catch(err=>{
+                console.log(err)
             })
+
+            let entrieUpdate = entriesValuesByDate.filter((vlr: EntriesValuesData) => vlr.entries_id == entrieIdUpdate)
+            setValuesUpdate(entrieUpdate)
         }
     },[])
 
@@ -106,7 +127,7 @@ export default function FormContent() {
                     onPress={decreaseEntrieFrequency} />
 
                 <Text style={{ fontSize: 18 }}>
-                     {entrieFrequency}
+                     {isEnabledMonthly? '-' : entrieFrequency}
                 </Text>
 
                 <Feather name='chevron-right' size={30}

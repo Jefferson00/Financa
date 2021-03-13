@@ -15,7 +15,7 @@ export default function Footer(){
     const navigation = useNavigation()
     const route = useRoute()
     const {resetDate} = useContext(MainContext)
-    const {typeOfEntrie, updateEntrieIdUpdate} = useContext(NewEntriesContext)
+    const {typeOfEntrie, updateEntrieIdUpdate, resetValues } = useContext(NewEntriesContext)
     const {resetValuesForm} = useContext(StylesContext)
 
     function handleHome(){
@@ -23,15 +23,22 @@ export default function Footer(){
         resetDate()
         resetValuesForm()
         updateEntrieIdUpdate(0)
+        resetValues()
     }
     function handleEarnings(){
         navigation.navigate('Entries', { item: 'Ganhos'})
+        updateEntrieIdUpdate(0)
+        resetValues()
     }
     function handleExpanses(){
         navigation.navigate('Entries', { item: 'Despesas'})
+        updateEntrieIdUpdate(0)
+        resetValues()
     }
     function handleNotification(){
         navigation.navigate('Notifications')
+        updateEntrieIdUpdate(0)
+        resetValues()
     }
 
 
