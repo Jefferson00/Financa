@@ -356,9 +356,12 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 dtEnd: newDtEnd, 
                 entries_id: entrieIdUpdate
             }
-            valuesDB.update(value.id, ValueObj).then(()=>{
-
-            })
+            if (value.id !=0){
+                valuesDB.update(value.id, ValueObj).then(()=>{
+                })
+            }else{
+                valuesDB.create(ValueObj)
+            }
         })
     }
 

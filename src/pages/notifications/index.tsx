@@ -11,7 +11,7 @@ export default function NotificationsScreen() {
 
     return(
         <LinearGradient
-            colors={['#1A8289', '#1579B2']}
+            colors={['#3C93F9', '#1579B2']}
             start={{ x: -0.4, y: 0.1 }}
             style={styles.container}
         >

@@ -9,8 +9,12 @@ import { StylesContext } from '../../contexts/stylesContext';
 
 export default function Footer(){
 
-    const activeItemColor = '#3C93F9'
-    const nonActiveItemColor = 'rgba(60, 147, 249, 0.5)'
+    //const activeItemColor = '#3C93F9'
+   // const nonActiveItemColor = 'rgba(60, 147, 249, 0.5)'
+
+    const [activeItemColor, setActiveItemColor] = useState('#3C93F9')
+    const [nonActiveItemColor, setNonActiveItemColor] = useState('rgba(60, 147, 249, 0.5)')
+
 
     const navigation = useNavigation()
     const route = useRoute()
@@ -18,6 +22,16 @@ export default function Footer(){
     const {typeOfEntrie, updateEntrieIdUpdate, resetValues } = useContext(NewEntriesContext)
     const {resetValuesForm} = useContext(StylesContext)
 
+   useEffect(()=>{
+        if (route.name=="Entries" && typeOfEntrie == 'Ganhos'){
+            setActiveItemColor('#155F69')
+            setNonActiveItemColor('rgba(26, 130, 137, 0.5)')
+        }else if(route.name=="Entries" && typeOfEntrie == 'Despesas'){
+            setActiveItemColor('#CC3728')
+            setNonActiveItemColor('"rgba(255, 72, 53, 0.5)')
+        }
+   },[route.name, typeOfEntrie])
+    
     function handleHome(){
         navigation.navigate('Main')
         resetDate()
