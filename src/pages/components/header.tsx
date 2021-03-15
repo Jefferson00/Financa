@@ -8,9 +8,14 @@ import { NewEntriesContext } from '../../contexts/newEntriesContext';
 
 export default function Header() {
 
-  const {monthColor} = useContext(StylesContext)
+  const {monthColor, selectedEntrieId} = useContext(StylesContext)
   const {selectedYear, selectedMonth, handleNextMonth, handlePrevMonth} = useContext(MainContext)
   const {calendarDate, entrieIdUpdate} = useContext(NewEntriesContext)
+
+  function nextMonth(){
+    handleNextMonth()
+    console.log("selected Entrie ID: "+selectedEntrieId)
+  }
   
   useEffect(()=>{
     if (entrieIdUpdate == 0){
@@ -27,7 +32,7 @@ export default function Header() {
       <Text style={[styles.monthText, { color: monthColor }]}>
           {Functions.convertDtToStringMonth(selectedMonth)} { selectedYear}
       </Text>
-      <TouchableOpacity onPress={handleNextMonth}>
+      <TouchableOpacity onPress={nextMonth}>
         <Feather name="chevron-right" size={40} color={monthColor} />
       </TouchableOpacity>
     </View>

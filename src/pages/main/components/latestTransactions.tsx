@@ -38,36 +38,43 @@ export default function LatestTransactions() {
                                 name="dollar" 
                                 size={30} 
                                 color={entr.type == 'Ganhos' ? '#136065' : '#CC3728'}/>
-                            <Text style={[
-                                styles.itemText,
-                                { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728' }
-                                ]}>
-                                {entr.title}
-                            </Text>
-                            {entr.amount > 0 ?
-                        
-                                <NumberFormat
-                                    value={entr.amount }
-                                    displayType={'text'}
-                                    thousandSeparator={true}
-                                    format={Functions.currencyFormatter}
-                                    renderText={value => 
-                                        <Text style={[
-                                            styles.itemText,
-                                            { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
-                                        ]}> 
-                                        {entr.type == 'Despesas'? '- ' + value: value} 
-                                        </Text>
-                                    }
-                                />
-                                :
+                            
+                            <View style={styles.centerView}>
                                 <Text style={[
                                     styles.itemText,
-                                    { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
-                                ]}> 
-                                R$ 0,00 
+                                    { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728' }
+                                    ]}
+                                    numberOfLines={1}
+                                >
+                                    {entr.title}
                                 </Text>
-                            }
+                                {entr.amount > 0 ?
+                            
+                                    <NumberFormat
+                                        value={entr.amount }
+                                        displayType={'text'}
+                                        thousandSeparator={true}
+                                        format={Functions.currencyFormatter}
+                                        renderText={value => 
+                                            <Text style={[
+                                                styles.itemText,
+                                                { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
+                                            ]}> 
+                                            {entr.type == 'Despesas'? '- ' + value: value} 
+                                            </Text>
+                                        }
+                                    />
+                                    :
+                                    <Text style={[
+                                        styles.itemText,
+                                        { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
+                                    ]}> 
+                                    R$ 0,00 
+                                    </Text>
+                                }
+                            </View>
+
+
                             <Text style={styles.dateText}>
                                 {entr.day}/{Functions.convertDtToStringMonth(month)}
                             </Text>
@@ -114,6 +121,7 @@ const styles = StyleSheet.create({
     itemText: {
         fontSize: 12,
         fontFamily: 'Poppins_500Medium',
+        maxWidth:150
     },
     dateText: {
         fontFamily: 'Poppins_400Regular',
@@ -124,5 +132,11 @@ const styles = StyleSheet.create({
         height:25,
         width:'100%',
         backgroundColor:'rgba(247, 241, 241, 0.80)',
+    },
+    centerView:{
+        justifyContent:'space-between', 
+        flexDirection:'row',
+        flex:1,
+        marginHorizontal:20,
     }
 })

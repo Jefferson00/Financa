@@ -1,16 +1,19 @@
-import React from "react"
+import React, { useContext } from "react"
 import { StyleSheet, Text, View } from 'react-native'
 
 import { Feather } from '@expo/vector-icons'
+import { StylesContext } from "../../../contexts/stylesContext"
 
 export default function NoResultsView() {
 
+    const {entriePrimaryColor, entrieSecondaryColor} = useContext(StylesContext)
+
     return (
         <View style={styles.container}>
-            <Text style={[styles.noResultsText]}>
+            <Text style={[styles.noResultsText, {color:entriePrimaryColor}]}>
                 Sem resultados!
             </Text>
-            <Feather name="x-octagon" size={40} color={"#d2d2d2"} />
+            <Feather name="x-octagon" size={40} color={entrieSecondaryColor} />
         </View>
     )
 }

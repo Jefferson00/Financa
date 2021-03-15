@@ -51,7 +51,7 @@ export default function Balance(){
                     <Text style={styles.currentBalanceText}>
                         Atual
                     </Text>
-                    {selectedMonth == currentMonth && selectedYear == currentYear?
+                    {SumOfAmountsArray1 != 0 && selectedMonth == currentMonth && selectedYear == currentYear?
                         <NumberFormat
                         value={SumOfAmountsArray1.reduce((a: any, b: any) => a + b, 0)}
                         displayType={'text'}
@@ -68,13 +68,17 @@ export default function Balance(){
                     <Text style={styles.estimatedBalanceText}>
                             Estimado
                     </Text>
-                    <NumberFormat
-                        value={SumOfAmountsArray2.reduce((a: any, b: any) => a + b, 0)}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        format={Functions.currencyFormatter}
-                        renderText={value => <Text style={styles.estimatedBalanceTextValue}> {value} </Text>}
-                    />
+                    {SumOfAmountsArray2 != 0 ?
+                        <NumberFormat
+                            value={SumOfAmountsArray2.reduce((a: any, b: any) => a + b, 0)}
+                            displayType={'text'}
+                            thousandSeparator={true}
+                            format={Functions.currencyFormatter}
+                            renderText={value => <Text style={styles.estimatedBalanceTextValue}> {value} </Text>}
+                        />
+                    :
+                        <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
+                    }
                 </View>
         </View>
     )

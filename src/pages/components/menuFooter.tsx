@@ -18,7 +18,7 @@ export default function Footer(){
 
     const navigation = useNavigation()
     const route = useRoute()
-    const {resetDate} = useContext(MainContext)
+    const {resetDate, activeBalanceView} = useContext(MainContext)
     const {typeOfEntrie, updateEntrieIdUpdate, resetValues } = useContext(NewEntriesContext)
     const {resetValuesForm} = useContext(StylesContext)
 
@@ -38,6 +38,7 @@ export default function Footer(){
         resetValuesForm()
         updateEntrieIdUpdate(0)
         resetValues()
+        activeBalanceView()
     }
     function handleEarnings(){
         navigation.navigate('Entries', { item: 'Ganhos'})

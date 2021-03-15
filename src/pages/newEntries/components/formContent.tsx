@@ -58,6 +58,7 @@ export default function FormContent() {
             })
 
             let entrieUpdate = entriesValuesByDate.filter((vlr: EntriesValuesData) => vlr.entries_id == entrieIdUpdate)
+            console.log("Entrie Update: "+entrieUpdate)
             setValuesUpdate(entrieUpdate)
         }
     },[])

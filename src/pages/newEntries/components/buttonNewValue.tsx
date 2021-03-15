@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react"
+import React, {useContext, useEffect, useState} from "react"
 import { StyleSheet, Text, View, TextInput, Switch, TouchableOpacity } from 'react-native'
 
 import Functions from '../../../functions'
@@ -9,6 +9,9 @@ import { Feather } from '@expo/vector-icons'
 import ValuesDB from '../../../services/valuesDB'
 import { StylesContext } from "../../../contexts/stylesContext"
 import { NewEntriesContext } from "../../../contexts/newEntriesContext"
+import entriesDB from "../../../services/entriesDB"
+import { MainContext } from "../../../contexts/mainContext"
+import { DataBDContext } from "../../../contexts/dataBDContext"
 
 interface ValuesData{
     id:number,
@@ -19,15 +22,28 @@ interface ValuesData{
     entries_id: number,
 }
 
+interface EntriesData{
+    id: number,
+    title: string,
+    day: number,
+    dtStart: number,
+    dtEnd: number,
+    monthly: boolean,
+    received: boolean,
+    type: string,
+}
+
 
 export default function ButtonNewValue() {
 
     
     const [contPlusButtonPressed, setContPlusButtonPressed] = useState(0)
-    const [idValues, setIdValues] = useState(0)
+    const [hasResults, setHasResults] = useState(false)
 
     const {entriePrimaryColor, entrieSecondaryColor, showValuesForm, isValuesFormVisible} = useContext(StylesContext)
-    const {addNewValueBeforeCreate} = useContext(NewEntriesContext)
+    const {addNewValueBeforeCreate, entrieIdUpdate} = useContext(NewEntriesContext)
+    const {selectedMonth} = useContext(MainContext)
+    const {entriesByDate} = useContext(DataBDContext)
 
     const newValue: ValuesData = {
         id:0,
@@ -37,6 +53,16 @@ export default function ButtonNewValue() {
         frequency: 1,
         entries_id: 0,
     }
+
+    const entrie = entriesByDate.filter(entrie => entrie.id == entrieIdUpdate)
+    
+    useEffect(()=>{
+        console.log(entrie[0])
+
+        entrie.length > 0 ? setHasResults(true) : setHasResults(false)
+       
+        console.log("Has results: "+hasResults)
+    },[entrie])
 
     return (
         <View style={styles.newValuesView}>
@@ -54,8 +80,7 @@ export default function ButtonNewValue() {
                     showValuesForm()
                     setContPlusButtonPressed(contPlusButtonPressed + 1)
                     if (contPlusButtonPressed > 0){
-                        
-                        addNewValueBeforeCreate(newValue)
+                        hasResults && addNewValueBeforeCreate(newValue)
                     }
                 }}>
                 {isValuesFormVisible ?

@@ -18,12 +18,12 @@ interface ExpansesProps{
 
 export default function ExpansesView(props:ExpansesProps) {
 
-  const {seeExpansesValues, handleSeeExpansesValues} = useContext(MainContext)
+  const {seeExpansesValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeExpansesValues} = useContext(MainContext)
 
   return (
     <>
         <View style={styles.balanceTitleView}>
-            <Text style={styles.currentBalanceText}>Suas despesas do mês</Text>
+            <Text style={styles.titleText}>Suas despesas do mês</Text>
             <TouchableOpacity style={{ marginLeft: 5 }} onPress={handleSeeExpansesValues}>
               {seeExpansesValues ?
                   <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
@@ -41,7 +41,7 @@ export default function ExpansesView(props:ExpansesProps) {
               </View>
               {
                 seeExpansesValues ?
-                  props.values.currentExpanses == 0 ?
+                  props.values.currentExpanses == 0 || selectedMonth != currentMonth || selectedYear != currentYear?
                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                         <Text style={styles.expensesTextValue}>R$ 0,00</Text>
                     </View>
@@ -100,6 +100,11 @@ const styles = StyleSheet.create({
   currentBalanceView: {
     justifyContent: 'center',
     marginHorizontal: 26,
+  },
+  titleText:{
+    fontFamily:'Poppins_600SemiBold',
+    fontSize:14,
+    color: '#fff',
   },
 
   censoredValue: {

@@ -8,6 +8,7 @@ import { DataBDContext } from "../../../contexts/dataBDContext";
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
 import { MainContext } from "../../../contexts/mainContext";
 import { StylesContext } from "../../../contexts/stylesContext";
+import NoResultsView from "./noResultsView";
 
 interface EntriesData {
     id: number,
@@ -32,7 +33,7 @@ export default function EntriesResults() {
     return (
         <View style={{ flex: 1, height: '100%' }}>
             <ScrollView style={styles.scrollViewContainer}>
-                {entriesByDateByType.map((entrie: EntriesData, index: number) => {
+                {entriesByDateByType.length > 0 ? entriesByDateByType.map((entrie: EntriesData, index: number) => {
                     let totalValues = 0
                     let notReceived = false
                     let isLate = false
@@ -93,7 +94,10 @@ export default function EntriesResults() {
 
                         </View>
                     )
-                })}
+                })
+                :
+                <NoResultsView/>
+                }
 
 
             </ScrollView>

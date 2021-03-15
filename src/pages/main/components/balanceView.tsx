@@ -20,14 +20,14 @@ interface BalanceProps{
 
 
 export default function BalanceView(props:BalanceProps) {
-   const {seeBalanceValues, handleSeeBalanceValues} = useContext(MainContext)
+   const {seeBalanceValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeBalanceValues} = useContext(MainContext)
    
    const {isBalancesDone} = useContext(DataBDContext)
 
     return(
         <>
           <View style={styles.balanceTitleView}>
-                <Text style={styles.currentBalanceText}>
+                <Text style={styles.titleText}>
                     Seu Saldo do mês
                 </Text>
                 <TouchableOpacity style={{ marginLeft: 5 }} onPress={handleSeeBalanceValues}>
@@ -47,7 +47,7 @@ export default function BalanceView(props:BalanceProps) {
                   </View>
 
                   {seeBalanceValues?
-                      props.values.currentBalance == 0 ?
+                      props.values.currentBalance == 0 || selectedMonth != currentMonth || selectedYear != currentYear?
                         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                             <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
                         </View>
@@ -96,7 +96,7 @@ export default function BalanceView(props:BalanceProps) {
           </View>
 
           <View style={styles.balanceTitleView}>
-              <Text style={styles.currentBalanceText}>Seu Saldo Total</Text>
+              <Text style={styles.titleText}>Seu Saldo Total</Text>
           </View>
 
           {!isBalancesDone ?
@@ -190,6 +190,12 @@ const styles = StyleSheet.create({
       fontFamily: 'Poppins_400Regular',
       fontSize: 14,
       textAlign: 'center'
+    },
+
+    titleText:{
+      fontFamily:'Poppins_600SemiBold',
+      fontSize:14,
+      color: '#fff',
     },
   
     currentBalanceTextValue: {

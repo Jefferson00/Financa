@@ -19,12 +19,12 @@ interface EarningProps{
 
 export default function EarningsView(props:EarningProps) {
   
-  const {seeEarningsValues, handleSeeEarningsValues} = useContext(MainContext)
+  const {seeEarningsValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeEarningsValues} = useContext(MainContext)
 
   return (
     <>
       <View style={styles.balanceTitleView}>
-          <Text style={styles.currentBalanceText}>Seus ganhos do Mês</Text>
+          <Text style={styles.titleText}>Seus ganhos do Mês</Text>
           <TouchableOpacity style={{ marginLeft: 5 }} onPress={handleSeeEarningsValues}>
               {seeEarningsValues ?
                 <Ionicons name="eye-off" size={30} color="#ffffff" style={{ opacity: 0.5 }} />
@@ -41,7 +41,7 @@ export default function EarningsView(props:EarningProps) {
                   <Text style={styles.earningsText}>Recebido</Text>
               </View>
               {seeEarningsValues ?
-                props.values.currentEarnings == 0 ?
+                props.values.currentEarnings == 0 || selectedMonth != currentMonth || selectedYear != currentYear ?
                     <Text style={styles.earningsTextValue}>R$ 0,00</Text>
                 :
                     <NumberFormat
@@ -116,7 +116,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center'
   },
-
+  titleText:{
+    fontFamily:'Poppins_600SemiBold',
+    fontSize:14,
+    color: '#fff',
+  },
 
   earningsText: {
     color: '#1A8289',

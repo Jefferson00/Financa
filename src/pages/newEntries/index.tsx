@@ -31,10 +31,11 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     const { item } = route.params
 
     const {updateTypeOfEntrie, entrieIdUpdate} = useContext(NewEntriesContext)
-    const {entriePrimaryColor, isValuesFormVisible, showValuesForm} = useContext(StylesContext)
+    const {entriePrimaryColor, isValuesFormVisible, showValuesForm, resetSelectedEntrieId} = useContext(StylesContext)
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
+        resetSelectedEntrieId()
         entrieIdUpdate!=0 && showValuesForm()
     },[item])
    
