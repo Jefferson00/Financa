@@ -344,24 +344,43 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 amount = amount.replace(/[.]/g, '')
                 amount = amount.replace(/[,]/g, '')
             let newDtEnd
-                    if (value.monthly){
-                        newDtEnd = 209912
-                    }else{
-                        newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
-                    }
-            const ValueObj:any = {
-                description: value.description,
-                amount: Number(amount),
-                dtStart: dtStart,
-                dtEnd: newDtEnd, 
-                entries_id: entrieIdUpdate
-            }
             if (value.id !=0){
-                valuesDB.update(value.id, ValueObj).then(()=>{
+                if (value.monthly){
+                    newDtEnd = 209912
+                }else{
+                    newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
+                }
+                const ValueObjUpdate:any = {
+                    description: value.description,
+                    amount: Number(amount),
+                    dtStart: dtStart,
+                    dtEnd: newDtEnd, 
+                    entries_id: entrieIdUpdate
+                }
+                valuesDB.update(value.id, ValueObjUpdate).then(()=>{
                 })
             }else{
-                valuesDB.create(ValueObj)
+                let newDate = new Date()
+                newDate.setMonth(selectedMonth-1)
+                newDate.setFullYear(selectedYear)
+                let newDtStart = Functions.setDtStart(newDate)
+
+                if (value.monthly){
+                    newDtEnd = 209912
+                }else{
+                    newDtEnd = Functions.setDtEnd(false, value.frequency, newDate)
+                }
+
+                const ValueObjCreate:any = {
+                    description: value.description,
+                    amount: Number(amount),
+                    dtStart: newDtStart,
+                    dtEnd: newDtEnd, 
+                    entries_id: entrieIdUpdate
+                }
+                valuesDB.create(ValueObjCreate)
             }
+           
         })
     }
 

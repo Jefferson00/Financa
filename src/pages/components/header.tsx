@@ -1,14 +1,23 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons'
 import { StylesContext } from '../../contexts/stylesContext';
 import { MainContext } from '../../contexts/mainContext';
 import Functions from "../../utils"
+import { NewEntriesContext } from '../../contexts/newEntriesContext';
 
 export default function Header() {
 
   const {monthColor} = useContext(StylesContext)
   const {selectedYear, selectedMonth, handleNextMonth, handlePrevMonth} = useContext(MainContext)
+  const {calendarDate, entrieIdUpdate} = useContext(NewEntriesContext)
+  
+  useEffect(()=>{
+    if (entrieIdUpdate == 0){
+        calendarDate.setMonth(selectedMonth-1)
+        calendarDate.setFullYear(selectedYear)
+    }
+  },[selectedYear, selectedMonth])
 
   return (
     <View style={styles.monthView}>
