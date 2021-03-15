@@ -1,6 +1,7 @@
 import React , {useEffect, useState} from 'react';
 import { StyleSheet, Text, TouchableOpacity, View ,ScrollView} from 'react-native';
 import { MaterialIcons,  Ionicons } from '@expo/vector-icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import Functions from '../../../functions/index'
 import NumberFormat from 'react-number-format';
@@ -8,6 +9,8 @@ import NumberFormat from 'react-number-format';
 
 import EntriesDB from '../../../services/entriesDB'
 import ValuesDB from '../../../services/valuesDB'
+
+
 
 export default function Results() {
 
@@ -41,6 +44,30 @@ export default function Results() {
             //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação
             EntriesDB.findByDate(parseInt(firstDate)).then((res: any) => {
                 setEntries(res._array)
+                for (let entrie of res._array){
+                    //console.log(entrie)
+                    if (entrie.received == 0){
+                        console.log(entrie)
+                        const storeEntrie = async () =>{
+                            try {
+                                await AsyncStorage.setItem('@late_entries', entrie.id)
+                            } catch (error) {
+                                
+                            }
+                        }
+                        //console.log('storeEntrie: '+storeEntrie)
+                    }
+
+                    const getData = async () =>{
+                        try {
+                            const value = await AsyncStorage.getItem('@late_entries')
+                            console.log('valor: '+value)
+                        } catch (error) {
+                            
+                        }
+                    }
+                    console.log('valor: '+getData)
+                }
                 
             }).catch(err => {
                 console.log(err)
