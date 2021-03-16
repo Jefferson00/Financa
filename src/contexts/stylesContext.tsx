@@ -13,6 +13,8 @@ interface StylesContextData{
     selectedEntrieId:number;
     selectedEntrieTotalValues:number;
     isValuesFormVisible:boolean;
+    textModal:string;
+    textAlertModal:string;
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
@@ -44,6 +46,9 @@ export function StylesProvider({children}: StylesProviderProps){
     const [selectedEntrieTotalValues, setSelectedEntrieTotalValues] = useState(0)
     
     const [isValuesFormVisible, setIsValuesFormVisible] = useState(false)
+
+    const [textAlertModal, setTextAlertModal] = useState('')
+    const [textModal, setTextModal] = useState('')
 
 
     function updateEntriesModalVisible(){
@@ -86,6 +91,8 @@ export function StylesProvider({children}: StylesProviderProps){
             setEntrieButtonBorder("#24DBBA")
             setEntriePrimaryColor("#1A8289")
             setEntrieSecondaryColor("#1B9F88")
+            setTextAlertModal('Não recebido!')
+            setTextModal('Esse ganho foi recebido?')
         }
         else if(typeOfEntrie == "Despesas"){
             setFirstGradientColor("#CC3728")
@@ -95,6 +102,8 @@ export function StylesProvider({children}: StylesProviderProps){
             setEntrieButtonBorder("#CC3728")
             setEntriePrimaryColor("#CC3728")
             setEntrieSecondaryColor("#FF4835")
+            setTextAlertModal('Despesa não paga!')
+            setTextModal('Essa despesa foi paga?')
         }
         else{
             setMonthColor("#3C93F9")
@@ -114,6 +123,8 @@ export function StylesProvider({children}: StylesProviderProps){
             selectedEntrieId,
             selectedEntrieTotalValues,
             isValuesFormVisible,
+            textModal,
+            textAlertModal,
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,

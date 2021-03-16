@@ -72,7 +72,7 @@ export default function FormContent() {
                 onChangeText={text => setTitleInputEntrie(text)}
                 value={titleInputEntrie}
                 style={styles.InputText}
-                maxLength={45}
+                maxLength={30}
             />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View>

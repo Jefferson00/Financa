@@ -44,6 +44,7 @@ export default function FormContentCreate() {
                                 value={values.description}
                                 style={[styles.InputText, { width: 150 }]}
                                 multiline={true}
+                                maxLength={30}
                             />
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:10}}>
                                 <Text style={[styles.secondColorText, { color: entrieSecondaryColor, marginRight: 10, fontSize: 18 }]}>

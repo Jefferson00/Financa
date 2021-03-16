@@ -1,6 +1,6 @@
 import React, { useContext } from "react"
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native'
-import { MaterialIcons, Ionicons } from '@expo/vector-icons'
+import { MaterialIcons,  MaterialCommunityIcons  } from '@expo/vector-icons'
 
 import Functions from '../../../functions/index'
 import NumberFormat from 'react-number-format';
@@ -29,6 +29,14 @@ export default function EntriesResults() {
     const {entriePrimaryColor, showEntrieModal} = useContext(StylesContext)
 
     const entriesByDateByType = entriesByDate.filter(entrie => entrie.type == typeOfEntrie)
+    
+    // order by days
+    entriesByDateByType.sort((a:EntriesData,b:EntriesData) => a.day - b.day)
+
+    // order by not received entries
+    /*entriesByDateByType.sort(function(a:EntriesData,b:EntriesData){
+        return (a.received === b.received) ? 0 : a ? -1 : 1
+    })*/
 
     return (
         <View style={{ flex: 1, height: '100%' }}>
@@ -89,7 +97,7 @@ export default function EntriesResults() {
                             </TouchableOpacity>
 
                             {isLate &&
-                            <Ionicons name="alert-circle" size={40} color={entriePrimaryColor} style={styles.alertSign} />
+                            <MaterialCommunityIcons  name="alert-circle" size={40} color={entriePrimaryColor} style={styles.alertSign} />
                             }
 
                         </View>

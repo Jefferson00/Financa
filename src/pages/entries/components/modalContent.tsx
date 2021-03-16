@@ -36,9 +36,12 @@ export default function ModalContent() {
         selectedEntrieId, 
         selectedEntrieTotalValues,
         entrieSecondaryColor,
+        textAlertModal,
+        textModal,
         updateEntriesModalVisible,
         resetSelectedEntrieId,
     } = useContext(StylesContext)
+
     const {entriesByDate, entriesValuesByDate, updateLoadAction} = useContext(DataBDContext)
     const {todayDate, selectedMonth, currentMonth, selectedYear, currentYear} = useContext(MainContext)
     const {handleDeleteEntrie, handleDeleteEntrieValues, updateEntrieReceived, updateEntrieIdUpdate, typeOfEntrie} = useContext(NewEntriesContext)
@@ -130,7 +133,7 @@ export default function ModalContent() {
                                     {entrieModal[0].title}
                                 </Text>
                                 <TouchableOpacity onPress={()=> removeEntrie(entrieModal[0].id)}>
-                                    <Feather name="trash-2" size={20} color={entriePrimaryColor} />
+                                    <Feather name="trash-2" size={20} color={entrieSecondaryColor} />
                                 </TouchableOpacity>
                             </View>
 
@@ -158,11 +161,11 @@ export default function ModalContent() {
                                      return (
                                         <View style={styles.valuesList} key={index}>
                                             <View style={{ flexDirection: 'row' }}>
-                                                <Text style={[styles.valuesListText, { color: entriePrimaryColor, marginRight: 5 }]}>
+                                                <Text numberOfLines={1} style={[styles.valuesListText, { color: entriePrimaryColor, marginRight: 5, maxWidth:200 }]}>
                                                      {value.description == '' ? entrieModal[0].title : value.description}
                                                 </Text>
                                                 <Text style={[styles.valuesListText, { color: entrieSecondaryColor }]}>
-                                                    {value.dtEnd != 209912 && frequencyController(value.dtEnd, value.dtStart)}
+                                                    {value.dtEnd != 209912 && "("+frequencyController(value.dtEnd, value.dtStart)+")"}
                                                 </Text>
                                             </View>
 
@@ -177,7 +180,7 @@ export default function ModalContent() {
                                                             {value} 
                                                         </Text>}
                                                 />
-                                                <TouchableOpacity onPress={()=> removeValue(value.id)}>
+                                                <TouchableOpacity onPress={()=> removeValue(value.id)} style={{marginLeft:10}}>
                                                     <Feather name="trash-2" size={20} color={entrieSecondaryColor} />
                                                 </TouchableOpacity>
                                             </View>
@@ -196,12 +199,12 @@ export default function ModalContent() {
                                     <View style={{flexDirection:'row',alignItems:'center'}}>
                                         <Ionicons name="alert-circle" size={40} color={entriePrimaryColor}/>
                                         <Text style={[styles.tittleText, { color: entrieSecondaryColor , marginLeft:5}]}>
-                                            Texto de Alerta
+                                            {textAlertModal}
                                         </Text>
                                     </View>
                                 }
                                     <Text style={[styles.subTittleText, { color: entriePrimaryColor , marginTop:15}]}>
-                                          Texto 
+                                          {textModal}
                                     </Text>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
                                         <TouchableOpacity onPress={()=>updateEntrieReceived(selectedEntrieId)}>
