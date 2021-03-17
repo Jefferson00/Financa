@@ -1,5 +1,5 @@
 import React, { useContext } from "react"
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl } from 'react-native'
 import { MaterialIcons,  MaterialCommunityIcons  } from '@expo/vector-icons'
 
 import Functions from '../../../functions/index'
@@ -23,8 +23,8 @@ interface EntriesData {
 
 export default function EntriesResults() {
 
-    const { entriesByDate, entriesValuesByDate } = useContext(DataBDContext)
-    const {todayDate} = useContext(MainContext)
+    const { entriesByDate, entriesValuesByDate, updateLoadAction } = useContext(DataBDContext)
+    const {todayDate, selectedMonth, selectedYear, resetDate} = useContext(MainContext)
     const {typeOfEntrie} = useContext(NewEntriesContext)
     const {entriePrimaryColor, showEntrieModal} = useContext(StylesContext)
 
@@ -37,10 +37,29 @@ export default function EntriesResults() {
     /*entriesByDateByType.sort(function(a:EntriesData,b:EntriesData){
         return (a.received === b.received) ? 0 : a ? -1 : 1
     })*/
+    const wait = (timeout:number) => {
+        return new Promise(resolve => setTimeout(resolve, timeout));
+    }
+
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        updateLoadAction()
+        resetDate()
+        wait(2000).then(() => setRefreshing(false));
+      }, []);
 
     return (
         <View style={{ flex: 1, height: '100%' }}>
-            <ScrollView style={styles.scrollViewContainer}>
+            <ScrollView style={styles.scrollViewContainer}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            >
                 {entriesByDateByType.length > 0 ? entriesByDateByType.map((entrie: EntriesData, index: number) => {
                     let totalValues = 0
                     let notReceived = false
@@ -54,12 +73,12 @@ export default function EntriesResults() {
                     })
 
                     if (!entrie.received) notReceived = true
-                    if(!entrie.received && entrie.day <= todayDate.getDate()){
+                    if(!entrie.received && entrie.day <= todayDate.getDate() && selectedMonth == (todayDate.getMonth()+1) && selectedYear == todayDate.getFullYear()){
                         isLate = true
                         borderColor = entriePrimaryColor
                     }
 
-                    if (notReceived) {
+                    if (notReceived || selectedMonth != (todayDate.getMonth()+1) || selectedYear != todayDate.getFullYear()) {
                         opacColor = entriePrimaryColor+"AA"
                     }else{
                         opacColor = entriePrimaryColor

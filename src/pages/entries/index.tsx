@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, View, Alert, Text } from 'react-native'
+import { StyleSheet, View, RefreshControl } from 'react-native'
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
