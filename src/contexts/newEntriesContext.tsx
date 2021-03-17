@@ -36,6 +36,7 @@ interface ValuesData{
     monthly: boolean,
     frequency: number,
     entries_id: number,
+    dtStart: number,
 }
 
 interface EntriesValuesData{
@@ -134,6 +135,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 monthly: monthly,
                 frequency: frequency,
                 entries_id: value.entries_id,
+                dtStart: value.dtStart
             }
             valuesBeforeUpdate.push(valueObj)
         })
@@ -193,7 +195,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     }
 
     //----------------------------------------------//
-
+    //define dtStart of initalValue
+    const dtStart = Functions.setDtStart(new Date())
     const initialValue: ValuesData[] = [{
         id:0,
         description: '',
@@ -201,6 +204,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         monthly: false,
         frequency: 1,
         entries_id: 0,
+        dtStart:dtStart,
     }]
 
     const [entrieValuesBeforeCreate, setEntriesValuesBeforeCreate] = useState<ValuesData[]>(initialValue)
@@ -344,16 +348,22 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 amount = amount.replace(/[.]/g, '')
                 amount = amount.replace(/[,]/g, '')
             let newDtEnd
+            let valueDate = new Date()
+            valueDate.setMonth(Number(Functions.toMonthAndYear(value.dtStart).month)-1)
+            valueDate.setFullYear(Number(Functions.toMonthAndYear(value.dtStart).year))
             if (value.id !=0){
                 if (value.monthly){
                     newDtEnd = 209912
                 }else{
-                    newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
+                    newDtEnd = Functions.setDtEnd(false, value.frequency, valueDate)
                 }
+                //console.log("VALUE PARA ATUALUZAR - description: "+value.description)
+                //console.log("VALUE PARA ATUALUZAR - dtStart: "+value.dtStart)
+                //console.log("VALUE PARA ATUALUZAR - dtEnd: "+newDtEnd)
                 const ValueObjUpdate:any = {
                     description: value.description,
                     amount: Number(amount),
-                    dtStart: dtStart,
+                    dtStart: value.dtStart,
                     dtEnd: newDtEnd, 
                     entries_id: entrieIdUpdate
                 }
@@ -364,13 +374,16 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 newDate.setMonth(selectedMonth-1)
                 newDate.setFullYear(selectedYear)
                 let newDtStart = Functions.setDtStart(newDate)
-
+                
                 if (value.monthly){
                     newDtEnd = 209912
                 }else{
                     newDtEnd = Functions.setDtEnd(false, value.frequency, newDate)
                 }
-
+                
+                //console.log("VALUE PARA CRIAR - description: "+value.description)
+                //console.log("VALUE PARA CRIAR - dtStart: "+value.dtStart)
+                //console.log("VALUE PARA CRIAR - dtENd: "+newDtEnd)
                 const ValueObjCreate:any = {
                     description: value.description,
                     amount: Number(amount),

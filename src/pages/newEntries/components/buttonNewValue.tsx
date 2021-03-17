@@ -20,6 +20,7 @@ interface ValuesData{
     monthly: boolean,
     frequency: number,
     entries_id: number,
+    dtStart:number,
 }
 
 interface EntriesData{
@@ -45,6 +46,8 @@ export default function ButtonNewValue() {
     const {selectedMonth} = useContext(MainContext)
     const {entriesByDate} = useContext(DataBDContext)
 
+    //define dtStart of initalValue
+    const dtStart = Functions.setDtStart(new Date())
     const newValue: ValuesData = {
         id:0,
         description: '',
@@ -52,16 +55,17 @@ export default function ButtonNewValue() {
         monthly: false,
         frequency: 1,
         entries_id: 0,
+        dtStart:dtStart,
     }
 
     const entrie = entriesByDate.filter(entrie => entrie.id == entrieIdUpdate)
     
     useEffect(()=>{
-        console.log(entrie[0])
+        //console.log(entrie[0])
 
-        entrie.length > 0 ? setHasResults(true) : setHasResults(false)
+        entrie.length > 0 || entrieIdUpdate == 0 ? setHasResults(true) : setHasResults(false)
        
-        console.log("Has results: "+hasResults)
+        //console.log("Has results: "+hasResults)
     },[entrie])
 
     return (

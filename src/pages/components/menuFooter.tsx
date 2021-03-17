@@ -23,10 +23,10 @@ export default function Footer(){
     const {resetValuesForm} = useContext(StylesContext)
 
    useEffect(()=>{
-        if (route.name=="Entries" && typeOfEntrie == 'Ganhos'){
+        if ((route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == 'Ganhos'){
             setActiveItemColor('#155F69')
             setNonActiveItemColor('rgba(26, 130, 137, 0.5)')
-        }else if(route.name=="Entries" && typeOfEntrie == 'Despesas'){
+        }else if((route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == 'Despesas'){
             setActiveItemColor('#CC3728')
             setNonActiveItemColor('"rgba(255, 72, 53, 0.5)')
         }
@@ -66,14 +66,14 @@ export default function Footer(){
                  <Ionicons 
                     name="arrow-up-circle" 
                     size={40} 
-                    color={route.name=="Entries" && typeOfEntrie == 'Ganhos'? activeItemColor: nonActiveItemColor}
+                    color={(route.name=="Entries" || route.name=="NewEntries")  && typeOfEntrie == 'Ganhos'? activeItemColor: nonActiveItemColor}
                 />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleExpanses}>
                 <Ionicons 
                     name="arrow-down-circle" 
                     size={40} 
-                    color={route.name=="Entries" && typeOfEntrie == "Despesas" ? activeItemColor: nonActiveItemColor} 
+                    color={(route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == "Despesas" ? activeItemColor: nonActiveItemColor} 
                 />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleNotification}>
