@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/core"
 import React, { useContext } from "react"
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext"
@@ -5,13 +6,34 @@ import { StylesContext } from "../../../contexts/stylesContext"
 
 
 export default function ButtonSubmit() {
+    const navigation = useNavigation()
 
-    const {handleCreateNewEntrie, handleUpdate ,entrieIdUpdate} = useContext(NewEntriesContext)
+    const {handleCreateNewEntrie, handleUpdate ,entrieIdUpdate, titleInputEntrie, entrieValuesBeforeCreate, typeOfEntrie} = useContext(NewEntriesContext)
     const {entrieButtonBorder, entrieButtonBackground,resetValuesForm} = useContext(StylesContext)
 
+    function verifyInputs(){
+        if (titleInputEntrie == ''){
+            console.log('titulo vazio')
+            return false
+        }
+        let emptyEntries = entrieValuesBeforeCreate.filter(entrie => entrie.amount == 0 )
+        console.log(emptyEntries.length)
+        if (emptyEntries.length > 0){
+            console.log('valor vazio')
+            return false
+            
+        }
+        return true
+    }
+
     function handleCreateNew(){
-        handleCreateNewEntrie()
-        resetValuesForm()
+        if (verifyInputs()){
+            handleCreateNewEntrie()
+            resetValuesForm()
+            navigation.navigate('Entries', { item: typeOfEntrie})
+        }else{
+            alert('Preencha todos os campos!')
+        }
     }
 
     function handleEntrieUpdate(){
