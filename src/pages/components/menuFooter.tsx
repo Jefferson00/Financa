@@ -86,7 +86,7 @@ export default function Footer(){
 
 const styles = StyleSheet.create({
     container:{
-        height:96,
+        height:80,
         flexDirection: 'row',
         paddingHorizontal:30,
         justifyContent:'space-around',

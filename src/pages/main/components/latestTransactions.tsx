@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     container: {
         height:161,
         marginHorizontal: 26,
-        marginTop:28,
+        marginTop:23,
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#C8C8C8',

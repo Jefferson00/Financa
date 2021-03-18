@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop: 33,
+    marginTop: 21,
     borderTopStartRadius: 40,
     borderTopEndRadius: 40,
     justifyContent: 'flex-start'
