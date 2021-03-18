@@ -15,6 +15,7 @@ import { NewEntriesContext } from '../../contexts/newEntriesContext';
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native'
 import { StylesContext } from '../../contexts/stylesContext';
 import { DataBDContext } from '../../contexts/dataBDContext';
+import ChartView from './components/chartView';
 
 interface EntriesValuesData{
   id:number,
@@ -124,6 +125,7 @@ export default function Main() {
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>
+          <ChartView/>
        
           <View style={{flex:1}}>
               <LatestTransations/>
