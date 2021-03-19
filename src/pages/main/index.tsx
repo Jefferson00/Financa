@@ -1,7 +1,10 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Platform, View} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+
 
 import Header from "../components/header"
 import MenuFooter from '../components/menuFooter'
@@ -16,6 +19,14 @@ import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native'
 import { StylesContext } from '../../contexts/stylesContext';
 import { DataBDContext } from '../../contexts/dataBDContext';
 import ChartView from './components/chartView';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 interface EntriesValuesData{
   id:number,
@@ -55,6 +66,10 @@ interface BalanceData{
 export default function Main() {
   const navigation = useNavigation()
   const isFocused = useIsFocused()
+  const [expoPushToken, setExpoPushToken] = useState<any>('');
+  const [notification, setNotification] = useState<any>(false);
+  const notificationListener = useRef<any | Subscription>();
+  const responseListener = useRef<any>();
 
   const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, selectedYear} = useContext(MainContext);
   const {balances} = useContext(DataBDContext)
@@ -68,6 +83,77 @@ export default function Main() {
       updateMonthColorMainScreen()
     }
   },[isFocused])
+
+
+
+
+  useEffect(()=>{
+      registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotification(notification);
+      });
+
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log(response);
+      });
+
+      return () => {
+        Notifications.removeNotificationSubscription(notificationListener);
+        Notifications.removeNotificationSubscription(responseListener);
+        schedulePushNotification()
+        //schedulePushNotification()
+      };
+  },[])
+
+  const schedulePushNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+          title: 'title here',
+          body: 'text here',
+          data: {
+          //more data here
+          }
+        },
+      trigger: {
+        repeats: false,
+        seconds: 2,
+      },
+  
+    })
+  };
+
+  const registerForPushNotificationsAsync = async () => {
+    let token;
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+  
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+    return token;
+  };
+  
 
   const {entriesValuesByDate} = useContext(DataBDContext)
 

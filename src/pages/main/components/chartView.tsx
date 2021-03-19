@@ -46,6 +46,7 @@ export default function ChartView() {
     return (
         <ScrollView 
             horizontal
+            disableScrollViewPanResponder
             style={{
             marginTop:23,
            maxHeight:110,

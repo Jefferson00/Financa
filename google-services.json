@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "963080569584",
+    "firebase_url": "https://financasapp-f5435-default-rtdb.firebaseio.com",
+    "project_id": "financasapp-f5435",
+    "storage_bucket": "financasapp-f5435.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963080569584:android:3b3430282258e8c295f835",
+        "android_client_info": {
+          "package_name": "com.jeffersoncsilva.financaapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "963080569584-0pl1rnupung2uqr72igvs27pbta63nej.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWitwdoUQWBcIyyllWTlRnOcbtuI5aZow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "963080569584-0pl1rnupung2uqr72igvs27pbta63nej.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

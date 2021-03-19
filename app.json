@@ -25,7 +25,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package":"com.jeffersoncsilva.financaapp"
+      "useNextNotificationsApi": true,
+      "package":"com.jeffersoncsilva.financaapp",
+      "googleServicesFile":"./google-services.json"
     }
   }
 }
