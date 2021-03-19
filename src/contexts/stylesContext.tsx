@@ -15,12 +15,14 @@ interface StylesContextData{
     isValuesFormVisible:boolean;
     textModal:string;
     textAlertModal:string;
+    hasNotifications:boolean;
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
     resetSelectedEntrieId: ()=> void;
     showValuesForm: ()=> void;
     resetValuesForm: ()=> void;
+    updateHasNotification: (value:boolean)=> void;
 }
 
 interface StylesProviderProps{
@@ -49,6 +51,7 @@ export function StylesProvider({children}: StylesProviderProps){
 
     const [textAlertModal, setTextAlertModal] = useState('')
     const [textModal, setTextModal] = useState('')
+    const [hasNotifications, setHasNotifications] = useState(false)
 
 
     function updateEntriesModalVisible(){
@@ -63,6 +66,9 @@ export function StylesProvider({children}: StylesProviderProps){
         setIsValuesFormVisible(false)
     }
 
+    function updateHasNotification(value:boolean){
+        setHasNotifications(value)
+    }
 
     function showEntrieModal(entrieId: number, totalValues:number){
         setIsEntriesModalVisible(true)
@@ -125,12 +131,14 @@ export function StylesProvider({children}: StylesProviderProps){
             isValuesFormVisible,
             textModal,
             textAlertModal,
+            hasNotifications,
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,
             resetSelectedEntrieId,
             showValuesForm,
             resetValuesForm,
+            updateHasNotification,
         }}>
             {children}
         </StylesContext.Provider>

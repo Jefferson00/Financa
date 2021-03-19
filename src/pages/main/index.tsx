@@ -63,29 +63,39 @@ interface BalanceData{
   amount: number
 }
 
+declare type Subscription = {
+  remove: () => void;
+};
+
 export default function Main() {
   const navigation = useNavigation()
   const isFocused = useIsFocused()
   const [expoPushToken, setExpoPushToken] = useState<any>('');
   const [notification, setNotification] = useState<any>(false);
-  const notificationListener = useRef<any | Subscription>();
-  const responseListener = useRef<any>();
+ 
+  const notificationListener = useRef<Subscription>();
+  const responseListener = useRef<Subscription>();
 
-  const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, selectedYear} = useContext(MainContext);
-  const {balances} = useContext(DataBDContext)
+  const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear} = useContext(MainContext);
+  const {balances, entriesByCurrentDate } = useContext(DataBDContext)
 
-  const {updateMonthColorMainScreen} = useContext(StylesContext)
-
+  const {updateMonthColorMainScreen, updateHasNotification} = useContext(StylesContext)
+  
+  let latedEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Ganhos")
+  let latedExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Despesas")
   //const isFocused = useIsFocused()
 
   useEffect(()=>{
     if(navigation.isFocused()){
       updateMonthColorMainScreen()
+
+      if (latedEarningEntries.length > 0 || latedExpansesEntries.length > 0){
+        updateHasNotification(true)
+      }else{
+        updateHasNotification(false)
+      }
     }
   },[isFocused])
-
-
-
 
   useEffect(()=>{
       registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -97,19 +107,28 @@ export default function Main() {
       responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
         console.log(response);
       });
-
+      console.log('length: '+latedEarningEntries.length)
       return () => {
         Notifications.removeNotificationSubscription(notificationListener);
         Notifications.removeNotificationSubscription(responseListener);
-        schedulePushNotification()
+        let notficationDate = new Date()
+        notficationDate.setHours(22)
+        console.log(notficationDate)
+        if(latedEarningEntries.length > 0){
+          schedulePushNotification('ganhos não recebidos!', notficationDate)
+        }
+        if(latedExpansesEntries.length > 0){
+          schedulePushNotification('Despesas não pagas!', notficationDate)
+        }
+       
         //schedulePushNotification()
       };
   },[])
 
-  const schedulePushNotification = async () => {
+  const schedulePushNotification = async (title: string, notficationDate: Date) => {
     await Notifications.scheduleNotificationAsync({
       content: {
-          title: 'title here',
+          title: title,
           body: 'text here',
           data: {
           //more data here
@@ -117,7 +136,7 @@ export default function Main() {
         },
       trigger: {
         repeats: false,
-        seconds: 2,
+        seconds: notficationDate.getSeconds(),
       },
   
     })

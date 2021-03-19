@@ -48,6 +48,7 @@ interface DataBDContextData{
     latestEntries: LatestEntries[];
     entriesValuesByDate: EntriesValuesData[];
     entriesByDate: EntriesData[];
+    entriesByCurrentDate: EntriesData[];
     balances: BalanceData[];
     isBalancesDone:boolean;
     isEntriesDone:boolean;
@@ -67,11 +68,12 @@ export const DataBDContext = createContext({} as DataBDContextData)
 export function DataBDProvider({children}: DataBDProviderProps){
 
     const [isValuesUpdated, setIsValuesUpdated] = useState(false)
-    const {currentYear, selectedMonth, initialDate} = useContext(MainContext)
+    const {currentYear, selectedMonth, initialDate, currentMonth} = useContext(MainContext)
 
     const [balances, setBalances] = useState<BalanceData[]>([])
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
     const [entriesByDate, setEntriesByDate] = useState<EntriesData[]>([])
+    const [entriesByCurrentDate, setEntriesByCurrentDate] = useState<EntriesData[]>([])
     const [entriesValuesByDate, setEntriesValuesByDate] = useState<EntriesValuesData[]>([])
     const [allEntriesValues, setAllEntriesValues] = useState<EntriesValuesData[]>([])
     const [latestEntries, setLatestEntries] = useState<LatestEntries[]>([])
@@ -117,6 +119,22 @@ export function DataBDProvider({children}: DataBDProviderProps){
             console.log(err)
             setEntriesByDate([])
             setIsEntriesDone(true)
+        })
+    }
+
+    function loadEntriesByCurrentDate(){
+        let currentDate
+        if (currentMonth < 10) {
+            currentDate = currentYear.toString() + '0' + currentMonth.toString()
+        } else {
+            currentDate = currentYear.toString() + currentMonth.toString()
+        }
+        setEntriesByCurrentDate([])
+        entriesDB.findByDate(parseInt(currentDate)).then((res:any)=>{
+            setEntriesByCurrentDate(res._array)
+        }).catch(err=>{
+            console.log(err)
+            setEntriesByCurrentDate([])
         })
     }
 
@@ -235,7 +253,9 @@ export function DataBDProvider({children}: DataBDProviderProps){
         loadAllEntriesValuesResults()
         loadEntriesValuesByDate()
         loadEntriesByDate()
+        loadEntriesByCurrentDate()
         setLatestTransations()
+
         //console.log("isValuesUpdated: "+isValuesUpdated)
     },[isValuesUpdated, selectedMonth])
 
@@ -253,6 +273,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             balances,
             isBalancesDone,
             isEntriesDone,
+            entriesByCurrentDate,
             loadAllEntriesResults,
             loadAllEntriesValuesResults,
             updateLoadAction,

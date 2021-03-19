@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import {Entypo, Ionicons, MaterialIcons} from '@expo/vector-icons'
+import {Entypo, Ionicons, Octicons} from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MainContext } from '../../contexts/mainContext';
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
@@ -20,7 +20,7 @@ export default function Footer(){
     const route = useRoute()
     const {resetDate, activeBalanceView} = useContext(MainContext)
     const {typeOfEntrie, updateEntrieIdUpdate, resetValues } = useContext(NewEntriesContext)
-    const {resetValuesForm} = useContext(StylesContext)
+    const {resetValuesForm, hasNotifications} = useContext(StylesContext)
 
    useEffect(()=>{
         if ((route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == 'Ganhos'){
@@ -78,6 +78,9 @@ export default function Footer(){
             </TouchableOpacity>
             <TouchableOpacity onPress={handleNotification}>
                 <Ionicons name="notifications" size={40} color={route.name=="Notifications"?activeItemColor:nonActiveItemColor} />
+                {hasNotifications && 
+                    <Octicons name="primitive-dot" size={25} color={activeItemColor} style={{position:'absolute', right:-5, top: -5}}/>
+                }
             </TouchableOpacity>
         </View>
     )
