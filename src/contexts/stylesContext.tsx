@@ -88,7 +88,7 @@ export function StylesProvider({children}: StylesProviderProps){
     }
 
     useEffect(()=>{
-        console.log(" Tipo: "+typeOfEntrie)
+        //console.log(" Tipo: "+typeOfEntrie)
         if(typeOfEntrie == "Ganhos"){
             setFirstGradientColor("#155F69")
             setSecondGradientColor("#F9CF3C")

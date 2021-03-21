@@ -117,7 +117,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         let newDate = new Date()
         newDate.setMonth(Number(Functions.toMonthAndYear(entrie.dtStart).month)-1)
         newDate.setFullYear(Number(Functions.toMonthAndYear(entrie.dtStart).year))
-        console.log("DIA: "+entrie.day)
+        //console.log("DIA: "+entrie.day)
         newDate.setDate(entrie.day)
         setCalendarDate(newDate)
     }
@@ -148,7 +148,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
     function updateTypeOfEntrie(type:string){
         setTypeOfEntrie(type)
-        console.log("Atualizou o tipo da entrada")
+        //console.log("Atualizou o tipo da entrada")
     }
 
     //-------------------------------//
@@ -159,7 +159,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         const currentDate = selectedDate || calendarDate;
         setShowCalendar(Platform.OS === 'ios');
         setCalendarDate(currentDate);
-        console.log("Atualizou a data do calendario")
+       // console.log("Atualizou a data do calendario")
     };
 
     const showDatepicker = () => {
@@ -178,7 +178,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     const toggleSwitchMonthly = () => {
         //seta o switch mensal como true ou false
         setIsEnabledMonthly(previousState => !previousState)
-        console.log("Mudou o switch mensal")
+       // console.log("Mudou o switch mensal")
     };
 
     //-------------------------------------//
@@ -263,7 +263,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     function handleCreateNewEntrie(){
         let dtStart = Functions.setDtStart(calendarDate)
         let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
-        console.log("******CADASTRO********** ")
+       // console.log("******CADASTRO********** ")
 
         const EntrieObj : EntriesData = {
             title: titleInputEntrie,
@@ -275,10 +275,10 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             type: typeOfEntrie,
         }
 
-        console.log("Objeto: "+EntrieObj)
+        ///console.log("Objeto: "+EntrieObj)
 
         entriesDB.create(EntrieObj).then(()=>{
-            console.log("Create!")
+           // console.log("Create!")
             alert('cadastrado com sucesso!')
             updateLoadAction()
         }).catch(err=>{
@@ -287,7 +287,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         entriesDB.all().then((res:any)=>{
             //console.log(res)
 
-            console.log("All!")
+            //console.log("All!")
             entrieValuesBeforeCreate.map((value: ValuesData) =>{
                 let EntrieId = res._array.slice(-1)[0].id
                 let amount = String(value.amount)
@@ -312,7 +312,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     entries_id: EntrieId
                 }
                 valuesDB.create(ValueObj).then(()=>{
-                    console.log("Create!")
+                    //console.log("Create!")
                     //alert('valor cadastrado com sucesso!')
                     updateLoadAction()
                     resetValues()

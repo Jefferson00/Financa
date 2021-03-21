@@ -28,10 +28,10 @@ export default function ChartView() {
             }
         })
         balanceChart = [
-            balances[indexOfFirstMonth].amount, 
-            balances[indexOfFirstMonth+1].amount,
-            balances[indexOfFirstMonth+2].amount,
-            balances[indexOfFirstMonth+3].amount
+            Functions.chartNumber(balances[indexOfFirstMonth].amount),
+            Functions.chartNumber(balances[indexOfFirstMonth+1].amount),
+            Functions.chartNumber(balances[indexOfFirstMonth+2].amount),
+            Functions.chartNumber(balances[indexOfFirstMonth+3].amount)
         ]  
         months = [
             Functions.convertDtToStringMonth(balances[indexOfFirstMonth].month), 
@@ -49,8 +49,9 @@ export default function ChartView() {
             disableScrollViewPanResponder
             style={{
             marginTop:23,
-           maxHeight:110,
-            marginHorizontal:26}}>
+            maxHeight:115,
+            marginHorizontal:26
+        }}>
             <LineChart
                 data={{
                     labels: months,
@@ -61,21 +62,21 @@ export default function ChartView() {
                     ]
                 }}
                 width={(Dimensions.get("window").width)} // from react-native
-                height={110}
-                yAxisLabel="R$"
-                yLabelsOffset={0}
-                xLabelsOffset={-20}
+                height={115}
+                yAxisLabel="R$ "
+                yLabelsOffset={5}
+                xLabelsOffset={-13}
                 segments={2}
                 yAxisInterval={1} // optional, defaults to 1
                 chartConfig={{
                     backgroundColor: "#ffffff",
                     backgroundGradientFrom: "#3C93F9",
                     backgroundGradientTo: "#63A9FA",
-                    decimalPlaces: 0, // optional, defaults to 2dp
+                    decimalPlaces: 2, // optional, defaults to 2dp
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 0) => `rgba(255, 255, 255, ${opacity})`,
-                    height:95,
-                    width:(Dimensions.get("window").width)-15,
+                    //height:95,
+                    //width:(Dimensions.get("window").width)+20,
                     style: {
                         
                      
@@ -84,14 +85,14 @@ export default function ChartView() {
                         r: "6",
                         strokeWidth: "2",
                         stroke: "#ffa726",
-                        y:-10,
-                        //x:30
+                        //y:-10,
+                        //x:20
                     },
                     propsForBackgroundLines:{
-                        //x:30,
+                        //x:20,
                     },
                     propsForVerticalLabels:{
-                        //dx:30,
+                        //dx:20,
                     }
                 }}
                 bezier

@@ -92,7 +92,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setAllEntries(res._array)
             if(res._array.length != allEntries.length){
                 setIsValuesUpdated(!isValuesUpdated)
-                console.log("Carregou todas as entradas")
+                //console.log("Carregou todas as entradas")
             }
         }).catch(err=>{
             console.log(err)
@@ -102,7 +102,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadEntriesValuesByDate(){
         valuesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesValuesByDate(res._array)
-            console.log("Carregou todas as entradas da data::  "+initialDate)
+           // console.log("Carregou todas as entradas da data::  "+initialDate)
         }).catch(err=>{
             console.log(err)
             setEntriesValuesByDate([])
@@ -113,7 +113,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         setIsEntriesDone(false)
         entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
-            console.log("Carregou todos os valores da data::  "+initialDate)
+            //console.log("Carregou todos os valores da data::  "+initialDate)
             setIsEntriesDone(true)
         }).catch(err=>{
             console.log(err)
@@ -131,6 +131,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         }
         setEntriesByCurrentDate([])
         entriesDB.findByDate(parseInt(currentDate)).then((res:any)=>{
+            console.log("caralho!!!!")
             setEntriesByCurrentDate(res._array)
         }).catch(err=>{
             console.log(err)
@@ -143,7 +144,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setAllEntriesValues(res._array)
             if(res._array.length != allEntriesValues.length){
                 setIsValuesUpdated(!isValuesUpdated)
-                console.log("carregou todos os valores")
+               /// console.log("carregou todos os valores")
             }
         }).catch(err=>{
             console.log(err)
@@ -170,7 +171,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             }
             ltsEntriesArray.push(ltsEntriesObj)
         })
-        console.log("carregou as ultimas transações")
+       // console.log("carregou as ultimas transações")
         setLatestEntries(ltsEntriesArray)
     }
 
@@ -197,7 +198,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 }
                
             } while (year < currentYear + 5)
-            console.log("carregou as datas")
+            //console.log("carregou as datas")
             loadBalance()
         })
         DatasArray = []
@@ -230,7 +231,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
                   balanceArray.push(obj)
                 }
             }).catch(err => {
-                console.log(err)
+                //console.log(err)
                 let year = parseInt(Functions.toMonthAndYear(data).year)
                 let month = parseInt(Functions.toMonthAndYear(data).month)
                 let obj: any = { month: month, year: year, amount: sumBalance }
@@ -241,7 +242,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 }
             })
         }
-        console.log("carregou os saldos")
+       // console.log("carregou os saldos")
         setBalances(balanceArray)
         balanceArray = []
         setIsBalancesDone(true)

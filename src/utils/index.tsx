@@ -235,7 +235,12 @@ function prevMonth(selectedMonth:any, selectedYear:any) {
     return value
   }
 
+  function chartNumber(amount: number){
+        return Math.floor(amount/100)
+  }
+
 export default{
+    chartNumber,
     setDtStart,
     setDtEnd,
     currencyFormatter,

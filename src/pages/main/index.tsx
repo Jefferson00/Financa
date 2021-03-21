@@ -19,6 +19,7 @@ import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native'
 import { StylesContext } from '../../contexts/stylesContext';
 import { DataBDContext } from '../../contexts/dataBDContext';
 import ChartView from './components/chartView';
+import dates from '../../services/dates';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -72,18 +73,22 @@ export default function Main() {
   const isFocused = useIsFocused()
   const [expoPushToken, setExpoPushToken] = useState<any>('');
   const [notification, setNotification] = useState<any>(false);
+  const [teste, setTeste] = useState(true)
  
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
 
   const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear} = useContext(MainContext);
   const {balances, entriesByCurrentDate } = useContext(DataBDContext)
+  const {hasNotifications } = useContext(StylesContext)
 
   const {updateMonthColorMainScreen, updateHasNotification} = useContext(StylesContext)
   
-  let latedEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Ganhos")
-  let latedExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Despesas")
+  let latedEarningEntries
+  let latedExpansesEntries
   //const isFocused = useIsFocused()
+  latedEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Ganhos")
+  latedExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Despesas")
 
   useEffect(()=>{
     if(navigation.isFocused()){
@@ -95,48 +100,58 @@ export default function Main() {
         updateHasNotification(false)
       }
     }
-  },[isFocused])
+    //console.log("entries; "+entriesByCurrentDate)
+  },[isFocused,entriesByCurrentDate])
 
   useEffect(()=>{
-      registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+      if(entriesByCurrentDate.length > 0){
+          dates.findByFullDate(todayDate.getDate(),(todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
+            console.log('já existe')
+          }).catch(err => {
+            console.log(err)
+            const DateObj = {
+              day:todayDate.getDate(),
+              month: todayDate.getMonth()+1,
+              year: todayDate.getFullYear(),
+            }
+            dates.create(DateObj)
+            console.log('teste')
+            registerForPushNotificationsAsync().then(token => setExpoPushToken(token)).then(res=>{
+              console.log(res)
+            })
+            notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+              setNotification(notification);
+            });
+      
+            responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+              console.log(response);
+            });
 
-      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        setNotification(notification);
-      });
-
-      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-        console.log(response);
-      });
-      console.log('length: '+latedEarningEntries.length)
-      return () => {
-        Notifications.removeNotificationSubscription(notificationListener);
-        Notifications.removeNotificationSubscription(responseListener);
-        let notficationDate = new Date()
-        notficationDate.setHours(22)
-        console.log(notficationDate)
-        if(latedEarningEntries.length > 0){
-          schedulePushNotification('ganhos não recebidos!', notficationDate)
+            
+              entriesByCurrentDate.map(entrie=>{
+                if(entrie.day <= todayDate.getDate() && !entrie.received && entrie.type == "Ganhos"){
+                  schedulePushNotification(entrie.title, new Date())
+                }
+              })
+          })
         }
-        if(latedExpansesEntries.length > 0){
-          schedulePushNotification('Despesas não pagas!', notficationDate)
-        }
-       
-        //schedulePushNotification()
-      };
   },[])
 
   const schedulePushNotification = async (title: string, notficationDate: Date) => {
+    //console.log('date: '+notficationDate)
+    //console.log('seconds: '+(notficationDate.getTime()/1000))
+    //console.log('seconds: '+(notficationDate.getSeconds()+60))
     await Notifications.scheduleNotificationAsync({
       content: {
           title: title,
-          body: 'text here',
+          body: 'teste 5 minutos',
           data: {
           //more data here
           }
         },
       trigger: {
         repeats: false,
-        seconds: notficationDate.getSeconds(),
+        seconds: 10,
       },
   
     })

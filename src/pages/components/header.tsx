@@ -14,7 +14,7 @@ export default function Header() {
 
   function nextMonth(){
     handleNextMonth()
-    console.log("selected Entrie ID: "+selectedEntrieId)
+    //console.log("selected Entrie ID: "+selectedEntrieId)
   }
   
   useEffect(()=>{

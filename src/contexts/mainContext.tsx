@@ -61,7 +61,7 @@ export function MainProvider({children}:MainProviderProps){
         setSelectedMonth(currentMonth)
         setSelectedYear(currentYear)
         updateInitialDate()
-        console.log("Data resetada: : ")
+        //console.log("Data resetada: : ")
     }
 
     function handleNextMonth(){
@@ -109,7 +109,7 @@ export function MainProvider({children}:MainProviderProps){
 
     useEffect(()=>{
         updateInitialDate()
-        console.log("dta inicial: "+initialDate)
+        //console.log("dta inicial: "+initialDate)
     },[])
 
     return(

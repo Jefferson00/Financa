@@ -27,23 +27,23 @@ export default function Balance(){
     const {selectedMonth, selectedYear, currentMonth, currentYear} = useContext(MainContext)
     const {typeOfEntrie} = useContext(NewEntriesContext)
 
-    let SumOfAmountsArray1: any = []
-    let SumOfAmountsArray2: any = []
+    let SumOfAmountsArray1: any = [2000,3000,4000]
+    let SumOfAmountsArray2: any = [2000,3000,4000,5000]
 
-    entriesValuesByDate.map((value:EntriesValuesData)=>{
+    /*entriesValuesByDate.map((value:EntriesValuesData)=>{
            
         if(selectedMonth == currentMonth && selectedYear == currentYear){
-            console.log(":::received:::"+value.received)
-            console.log(":::type:::"+value.type)
+            //console.log(":::received:::"+value.received)
+            //console.log(":::type:::"+value.type)
             if(value.received && value.type == typeOfEntrie) {
-                console.log("::::::::::::"+typeOfEntrie)
+                //console.log("::::::::::::"+typeOfEntrie)
                 SumOfAmountsArray1.push(value.amount)
             }
             
         }
         if (value.amount != null && value.amount != 0 && value.type == typeOfEntrie) SumOfAmountsArray2.push(value.amount)
-    })
-    console.log("::::::::::::"+SumOfAmountsArray2)
+    })*/
+    //console.log("::::::::::::"+SumOfAmountsArray2)
 
     return (
         <View style={styles.balanceView}>
