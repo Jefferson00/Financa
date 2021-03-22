@@ -28,10 +28,14 @@ export default function ChartView() {
             }
         })
         balanceChart = [
-            Functions.chartNumber(balances[indexOfFirstMonth].amount),
+            /*Functions.chartNumber(balances[indexOfFirstMonth].amount),
             Functions.chartNumber(balances[indexOfFirstMonth+1].amount),
             Functions.chartNumber(balances[indexOfFirstMonth+2].amount),
-            Functions.chartNumber(balances[indexOfFirstMonth+3].amount)
+            Functions.chartNumber(balances[indexOfFirstMonth+3].amount)*/
+            3000,
+            2800,
+            500,
+            3500
         ]  
         months = [
             Functions.convertDtToStringMonth(balances[indexOfFirstMonth].month), 
@@ -50,7 +54,8 @@ export default function ChartView() {
             style={{
             marginTop:23,
             maxHeight:115,
-            marginHorizontal:26
+            marginHorizontal:26,
+            //paddingLeft:20,
         }}>
             <LineChart
                 data={{
@@ -61,10 +66,10 @@ export default function ChartView() {
                         }
                     ]
                 }}
-                width={(Dimensions.get("window").width)} // from react-native
+                width={(Dimensions.get("screen").width-50)} // from react-native
                 height={115}
                 yAxisLabel="R$ "
-                yLabelsOffset={5}
+                //yLabelsOffset={5}
                 xLabelsOffset={-13}
                 segments={2}
                 yAxisInterval={1} // optional, defaults to 1
@@ -76,30 +81,34 @@ export default function ChartView() {
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 0) => `rgba(255, 255, 255, ${opacity})`,
                     //height:95,
-                    //width:(Dimensions.get("window").width)+20,
-                    style: {
-                        
-                     
-                    },
+                    //width:(Dimensions.get("window").width)-10,
+
                     propsForDots: {
                         r: "6",
                         strokeWidth: "2",
                         stroke: "#ffa726",
-                        //y:-10,
-                        //x:20
+                        y:-5,
+                        x:10
                     },
                     propsForBackgroundLines:{
-                        //x:20,
+                        x:10,
                     },
                     propsForVerticalLabels:{
-                        //dx:20,
-                    }
+                        dx:10,
+                    },
+                    propsForHorizontalLabels:{
+                        dx:10,
+                        fontSize:11,
+                    },
+                    
                 }}
                 bezier
+                withShadow={false}
+                
                 style={{
                     marginVertical: 0,
                     borderRadius: 20,
-                    alignItems:'center',
+                    alignItems:'stretch',
                    
                 }}
             />
