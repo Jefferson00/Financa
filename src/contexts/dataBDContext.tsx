@@ -1,8 +1,10 @@
 import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
+import dates from '../services/dates';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
 import Functions from "../utils"
 import { MainContext } from './mainContext';
+import * as Notifications from 'expo-notifications';
 
 interface EntriesData{
     id: number,
@@ -68,7 +70,7 @@ export const DataBDContext = createContext({} as DataBDContextData)
 export function DataBDProvider({children}: DataBDProviderProps){
 
     const [isValuesUpdated, setIsValuesUpdated] = useState(false)
-    const {currentYear, selectedMonth, initialDate, currentMonth} = useContext(MainContext)
+    const {currentYear, selectedMonth, initialDate, currentMonth, todayDate} = useContext(MainContext)
 
     const [balances, setBalances] = useState<BalanceData[]>([])
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
@@ -92,12 +94,62 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setAllEntries(res._array)
             if(res._array.length != allEntries.length){
                 setIsValuesUpdated(!isValuesUpdated)
-                //console.log("Carregou todas as entradas")
+                console.log("Carregou todas as entradas")
             }
         }).catch(err=>{
             console.log(err)
+            console.log("err entradas")
         })
     }
+
+    function loadNotifications(){
+       if (entriesByCurrentDate.length > 0){
+            dates.findByFullDate(todayDate.getDate(),(todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
+                console.log('já existe')
+            }).catch(err => {
+                const DateObj = {
+                    day:todayDate.getDate(),
+                    month: todayDate.getMonth()+1,
+                    year: todayDate.getFullYear(),
+                }
+                dates.create(DateObj)
+                let thereAreLateEarnings = false
+                let thereAreLateExpanses = false
+                entriesByCurrentDate.map(entrie=>{
+                    if(entrie.day <= todayDate.getDate() && !entrie.received && entrie.type == "Ganhos"){
+                        thereAreLateEarnings = true
+                        //schedulePushNotification(entrie.title, new Date())
+                    }
+                    if(entrie.day <= todayDate.getDate() && !entrie.received && entrie.type == "Despesas"){
+                        thereAreLateExpanses = true
+                        //schedulePushNotification(entrie.title, new Date())
+                    }
+                    if(entrie.day == (todayDate.getDate()+1) && !entrie.received){ 
+                        schedulePushNotification(entrie.title, 'Você possui um(a)'+entrie.type+' próximo do vencimento!', 60*60)
+                    }
+                })
+                thereAreLateEarnings && schedulePushNotification('Ganhos não recebidos', 'Você possui ganhos para receber', 60*10)
+                thereAreLateExpanses && schedulePushNotification('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60*10)
+            })
+       }
+    }
+
+    const schedulePushNotification = async (title: string, body: string, seconds:number) => {
+        await Notifications.scheduleNotificationAsync({
+          content: {
+              title: title,
+              body: body,
+              data: {
+              //more data here
+              }
+            },
+          trigger: {
+            repeats: false,
+            seconds: seconds,
+          },
+      
+        })
+      };
 
     function loadEntriesValuesByDate(){
         valuesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
@@ -256,6 +308,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         loadEntriesByDate()
         loadEntriesByCurrentDate()
         setLatestTransations()
+        loadNotifications()
 
         //console.log("isValuesUpdated: "+isValuesUpdated)
     },[isValuesUpdated, selectedMonth])

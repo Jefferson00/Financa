@@ -73,7 +73,6 @@ export default function Main() {
   const isFocused = useIsFocused()
   const [expoPushToken, setExpoPushToken] = useState<any>('');
   const [notification, setNotification] = useState<any>(false);
-  const [teste, setTeste] = useState(true)
  
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
@@ -100,62 +99,20 @@ export default function Main() {
         updateHasNotification(false)
       }
     }
-    //console.log("entries; "+entriesByCurrentDate)
   },[isFocused,entriesByCurrentDate])
 
   useEffect(()=>{
-      if(entriesByCurrentDate.length > 0){
-          dates.findByFullDate(todayDate.getDate(),(todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
-            console.log('já existe')
-          }).catch(err => {
-            console.log(err)
-            const DateObj = {
-              day:todayDate.getDate(),
-              month: todayDate.getMonth()+1,
-              year: todayDate.getFullYear(),
-            }
-            dates.create(DateObj)
-            console.log('teste')
-            registerForPushNotificationsAsync().then(token => setExpoPushToken(token)).then(res=>{
-              console.log(res)
-            })
-            notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-              setNotification(notification);
-            });
-      
-            responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-              console.log(response);
-            });
-
-            
-              entriesByCurrentDate.map(entrie=>{
-                if(entrie.day <= todayDate.getDate() && !entrie.received && entrie.type == "Ganhos"){
-                  schedulePushNotification(entrie.title, new Date())
-                }
-              })
-          })
-        }
-  },[])
-
-  const schedulePushNotification = async (title: string, notficationDate: Date) => {
-    //console.log('date: '+notficationDate)
-    //console.log('seconds: '+(notficationDate.getTime()/1000))
-    //console.log('seconds: '+(notficationDate.getSeconds()+60))
-    await Notifications.scheduleNotificationAsync({
-      content: {
-          title: title,
-          body: 'teste 5 minutos',
-          data: {
-          //more data here
-          }
-        },
-      trigger: {
-        repeats: false,
-        seconds: 10,
-      },
+        registerForPushNotificationsAsync().then(token => setExpoPushToken(token)).then(res=>{
+          console.log(res)
+        })
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+          setNotification(notification);
+        });
   
-    })
-  };
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+          console.log(response);
+        });
+  },[])
 
   const registerForPushNotificationsAsync = async () => {
     let token;

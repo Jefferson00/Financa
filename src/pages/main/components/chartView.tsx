@@ -28,14 +28,10 @@ export default function ChartView() {
             }
         })
         balanceChart = [
-            /*Functions.chartNumber(balances[indexOfFirstMonth].amount),
+            Functions.chartNumber(balances[indexOfFirstMonth].amount),
             Functions.chartNumber(balances[indexOfFirstMonth+1].amount),
             Functions.chartNumber(balances[indexOfFirstMonth+2].amount),
-            Functions.chartNumber(balances[indexOfFirstMonth+3].amount)*/
-            3000,
-            2800,
-            500,
-            3500
+            Functions.chartNumber(balances[indexOfFirstMonth+3].amount)
         ]  
         months = [
             Functions.convertDtToStringMonth(balances[indexOfFirstMonth].month), 
