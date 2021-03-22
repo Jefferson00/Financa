@@ -252,6 +252,8 @@ export function DataBDProvider({children}: DataBDProviderProps){
             } while (year < currentYear + 5)
             //console.log("carregou as datas")
             loadBalance()
+        }).catch(err=>{
+            setIsBalancesDone(true)
         })
         DatasArray = []
     }
@@ -310,7 +312,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         setLatestTransations()
         loadNotifications()
 
-        //console.log("isValuesUpdated: "+isValuesUpdated)
+        console.log("teste: ")
     },[isValuesUpdated, selectedMonth])
 
     useEffect(()=>{

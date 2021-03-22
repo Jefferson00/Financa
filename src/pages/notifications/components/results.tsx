@@ -1,6 +1,6 @@
-import React , {useEffect, useState} from 'react';
+import React , {useContext, useEffect, useState} from 'react';
 import { StyleSheet, Text, TouchableOpacity, View ,ScrollView} from 'react-native';
-import { MaterialIcons,  Ionicons } from '@expo/vector-icons'
+import { MaterialIcons,  Entypo  } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import Functions from '../../../functions/index'
@@ -9,6 +9,7 @@ import NumberFormat from 'react-number-format';
 
 import EntriesDB from '../../../services/entriesDB'
 import ValuesDB from '../../../services/valuesDB'
+import { DataBDContext } from '../../../contexts/dataBDContext';
 
 
 
@@ -16,8 +17,13 @@ export default function Results() {
 
 
 
-    const [entries, setEntries] = useState([])
+    //const [lateResults, setLateResults] = useState(0)
+    //const [nextDaysResults, setNextDaysResults] = useState(0)
+
+    let lateResults = 0
+    let nextDaysResults = 0
     const [itemSelected, setItemSelected] = useState('Ganhos')
+    const {entriesByCurrentDate} = useContext(DataBDContext)
 
     const todayDate = new Date()
     const CurrentMonth = todayDate.getMonth() + 1
@@ -31,48 +37,6 @@ export default function Results() {
         setItemSelected('Despesas')
     }
 
-    useEffect(() => {
-        let firstDate
-            /*Converte para a data em String e no formato que é salvo no banco de dados*/
-            if (CurrentMonth < 10) {
-                firstDate = CurrentYear.toString() + '0' + CurrentMonth.toString()
-            } else {
-                firstDate = CurrentYear.toString() + CurrentMonth.toString()
-            }
-            //Ex: firstDate: '202101'
-
-            //Procura todos os ganhos e despesas correspondente a data atual ao abrir a aplicação
-            EntriesDB.findByDate(parseInt(firstDate)).then((res: any) => {
-                setEntries(res._array)
-                for (let entrie of res._array){
-                    //console.log(entrie)
-                    if (entrie.received == 0){
-                        console.log(entrie)
-                        const storeEntrie = async () =>{
-                            try {
-                                await AsyncStorage.setItem('@late_entries', entrie.id)
-                            } catch (error) {
-                                
-                            }
-                        }
-                        //console.log('storeEntrie: '+storeEntrie)
-                    }
-
-                    const getData = async () =>{
-                        try {
-                            const value = await AsyncStorage.getItem('@late_entries')
-                            console.log('valor: '+value)
-                        } catch (error) {
-                            
-                        }
-                    }
-                    console.log('valor: '+getData)
-                }
-                
-            }).catch(err => {
-                console.log(err)
-            })
-    },[])
 
     return(
         <View style={styles.container}>
@@ -116,9 +80,10 @@ export default function Results() {
                 Atrasados
             </Text>
 
-            {entries.map((entr:any,index:number)=>{
+            {entriesByCurrentDate.map((entr:any,index:number)=>{
                 //console.log(entr.received)
-                if (entr.received == 0 && entr.type == itemSelected){
+                if (entr.received == 0 && entr.type == itemSelected && entr.day <= todayDate.getDate()){
+                    lateResults = lateResults + 1
                     let colorText = ''
                     let bgcolor = ''
                         entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
@@ -146,11 +111,55 @@ export default function Results() {
 
             })}
 
+            {lateResults == 0 && 
+                <View style={styles.noResultView}>
+                    <Text style={styles.noResultText}>Tudo certo!</Text>
+                    <Entypo name="emoji-flirt" size={40} color="#3C93F9" />
+                </View>
+            }   
+
 
             <Text style={styles.titleContainer}>
                 Nos próximos dias...
             </Text>
 
+            {entriesByCurrentDate.map((entr:any,index:number)=>{
+                //console.log(entr.received)
+                if (entr.received == 0 && entr.type == itemSelected && entr.day > todayDate.getDate() && entr.day <= (todayDate.getDate()+5)){
+                    nextDaysResults = nextDaysResults + 1
+                    let colorText = ''
+                    let bgcolor = ''
+                        entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
+                        entr.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
+                    return(
+                        <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
+                            <MaterialIcons 
+                                name="monetization-on" 
+                                size={40} 
+                                color={colorText} />
+                            
+                            <View>
+                                <Text numberOfLines={1} style={[
+                                    styles.earningTittleText, { color: colorText, width: 150 }
+                                ]}>
+                                    {entr.title}
+                                </Text>
+                                <Text style={[styles.earningDateText, { color: colorText}]}>
+                                     
+                                </Text>
+                            </View>
+                        </View>
+                    )
+                }
+
+            })}
+
+            {nextDaysResults == 0 && 
+                <View style={styles.noResultView}>
+                    <Text style={styles.noResultText}>Nada ainda</Text>
+                    <Entypo name="emoji-happy" size={40} color="#3C93F9" />
+                </View>
+            }
 
 
          
@@ -209,4 +218,14 @@ const styles = StyleSheet.create({
             fontSize: 12,
             fontFamily: 'Poppins_400Regular',
         },
+        noResultView:{
+            flex:1,
+            justifyContent:'center',
+            alignItems:'center'
+        },
+        noResultText:{
+            color: '#3C93F9',
+            fontSize: 14,
+            fontFamily: 'Poppins_500Medium',
+        }
   })

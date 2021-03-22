@@ -76,6 +76,8 @@ export default function Main() {
  
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
+  const [fromBackgroundColor, setFromBackgroundColor] = useState('#F9CF3C')
+  const [toBackgroundColor, setToBackgroundColor] = useState('#B26A15')
 
   const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear} = useContext(MainContext);
   const {balances, entriesByCurrentDate } = useContext(DataBDContext)
@@ -100,6 +102,16 @@ export default function Main() {
       }
     }
   },[isFocused,entriesByCurrentDate])
+
+  useEffect(()=>{
+      if (selectedMonth == (todayDate.getMonth()+1) && selectedYear == todayDate.getFullYear()){
+        setFromBackgroundColor('#F9CF3C')
+        setToBackgroundColor('#B26A15')
+      }else{
+        setFromBackgroundColor('#ffefb5')
+        setToBackgroundColor('#3C93F9')
+      }
+  },[selectedMonth, selectedYear])
 
   useEffect(()=>{
         registerForPushNotificationsAsync().then(token => setExpoPushToken(token)).then(res=>{
@@ -187,7 +199,7 @@ export default function Main() {
   let expansesValuesProps: ExpansesValues= {currentExpanses, estimatedExpanses}
 
   return (
-    <LinearGradient colors={['#F9CF3C', '#B26A15']} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
+    <LinearGradient colors={[fromBackgroundColor, toBackgroundColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
       <Header/>

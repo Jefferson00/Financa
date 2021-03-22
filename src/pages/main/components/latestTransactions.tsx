@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Foundation , Ionicons} from '@expo/vector-icons'
+import { Foundation , Ionicons, Entypo} from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
 import Functions from '../../../functions/index'
 import { DataBDContext } from '../../../contexts/dataBDContext';
@@ -27,7 +27,7 @@ export default function LatestTransactions() {
                 </TouchableOpacity>
             </View>
 
-            {latestEntries.map((entr: any, index: number) => {
+            {latestEntries.length > 0 ? latestEntries.map((entr: any, index: number) => {
                 let month = parseInt(Functions.toMonthAndYear(entr.entrieDtStart).month)
 
                 return (
@@ -84,7 +84,12 @@ export default function LatestTransactions() {
                         }
                     </View>
                 )
-            })}
+            }) : 
+                <View style={styles.noResultsView}>
+                    <Text style={styles.noResultText}>Sem Transações</Text>
+                    <Entypo name="emoji-neutral" size={40} color="#3C93F9AA" />
+                </View>
+            }
         </View>
     )
 }
@@ -138,5 +143,15 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         flex:1,
         marginHorizontal:20,
+    },
+    noResultsView:{
+        flex:1,
+        justifyContent:'center',
+        alignItems:'center'
+    },
+    noResultText:{
+        color: '#3C93F9',
+        fontFamily: 'Poppins_500Medium',
+        fontSize: 18,
     }
 })
