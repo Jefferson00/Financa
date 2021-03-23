@@ -94,7 +94,8 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setAllEntries(res._array)
             if(res._array.length != allEntries.length){
                 setIsValuesUpdated(!isValuesUpdated)
-                console.log("Carregou todas as entradas")
+                console.log("loadAllEntriesResults ----  setIsValuesUpdated")
+                //console.log("loadAllEntriesResults")
             }
         }).catch(err=>{
             console.log(err)
@@ -105,7 +106,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadNotifications(){
        if (entriesByCurrentDate.length > 0){
             dates.findByFullDate(todayDate.getDate(),(todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
-                console.log('já existe')
+                console.log('loadNotifications ---- já existe')
             }).catch(err => {
                 const DateObj = {
                     day:todayDate.getDate(),
@@ -154,9 +155,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadEntriesValuesByDate(){
         valuesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesValuesByDate(res._array)
-           // console.log("Carregou todas as entradas da data::  "+initialDate)
+            console.log('loadEntriesValuesByDate ---- ok')
         }).catch(err=>{
             console.log(err)
+            console.log('loadEntriesValuesByDate ---- erro')
             setEntriesValuesByDate([])
         })
     }
@@ -165,10 +167,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
         setIsEntriesDone(false)
         entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
-            //console.log("Carregou todos os valores da data::  "+initialDate)
+            console.log('loadEntriesByDate ---- ok')
             setIsEntriesDone(true)
         }).catch(err=>{
             console.log(err)
+            console.log('loadEntriesByDate ---- erro')
             setEntriesByDate([])
             setIsEntriesDone(true)
         })
@@ -183,10 +186,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
         }
         setEntriesByCurrentDate([])
         entriesDB.findByDate(parseInt(currentDate)).then((res:any)=>{
-            console.log("caralho!!!!")
+            console.log('loadEntriesByCurrentDate ---- ok')
             setEntriesByCurrentDate(res._array)
         }).catch(err=>{
             console.log(err)
+            console.log('loadEntriesByCurrentDate ---- erro')
             setEntriesByCurrentDate([])
         })
     }
@@ -196,10 +200,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setAllEntriesValues(res._array)
             if(res._array.length != allEntriesValues.length){
                 setIsValuesUpdated(!isValuesUpdated)
-               /// console.log("carregou todos os valores")
+                console.log('loadAllEntriesValuesResults ---- ok')
             }
         }).catch(err=>{
             console.log(err)
+            console.log('loadAllEntriesValuesResults ---- erro')
         })
     }
 
@@ -223,7 +228,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             }
             ltsEntriesArray.push(ltsEntriesObj)
         })
-       // console.log("carregou as ultimas transações")
+        console.log('setLatestTransations ---- ok')
         setLatestEntries(ltsEntriesArray)
     }
 
@@ -305,15 +310,31 @@ export function DataBDProvider({children}: DataBDProviderProps){
   
     useEffect(()=>{
         loadAllEntriesResults()
-        loadAllEntriesValuesResults()
-        loadEntriesValuesByDate()
-        loadEntriesByDate()
-        loadEntriesByCurrentDate()
+        
+        
+        
+        
         setLatestTransations()
         loadNotifications()
 
-        console.log("teste: ")
+        //console.log("teste: ")
     },[isValuesUpdated, selectedMonth])
+
+    useEffect(()=>{
+        loadAllEntriesValuesResults()
+    },[allEntries])
+    
+    useEffect(()=>{
+        loadEntriesByCurrentDate()
+    },[allEntries])
+
+    useEffect(()=>{
+        loadEntriesValuesByDate()
+    },[allEntriesValues, selectedMonth])
+
+    useEffect(()=>{
+        loadEntriesByDate()
+    },[selectedMonth, isValuesUpdated])
 
     useEffect(()=>{
       defineDates()
