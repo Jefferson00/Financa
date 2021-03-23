@@ -31,7 +31,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "SELECT * FROM tableValues;",
+          "SELECT tableValues.*, entries.day, entries.type, entries.received FROM tableValues INNER JOIN entries ON tableValues.entries_id = entries.id;",
           [],
           //-----------------------
           (_, { rows }) => resolve(rows),

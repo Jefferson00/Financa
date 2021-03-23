@@ -20,6 +20,7 @@ import { StylesContext } from '../../contexts/stylesContext';
 import { DataBDContext } from '../../contexts/dataBDContext';
 import ChartView from './components/chartView';
 import dates from '../../services/dates';
+import Functions from '../../utils'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -124,6 +125,7 @@ export default function Main() {
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
           console.log(response);
         });
+        //console.log("isbetween: "+Functions.isBetweenDates(12,2022,202003,202204))
   },[])
 
   const registerForPushNotificationsAsync = async () => {
@@ -158,20 +160,23 @@ export default function Main() {
   };
   
 
-  const {entriesValuesByDate} = useContext(DataBDContext)
+  const {allEntriesValues} = useContext(DataBDContext)
 
   let earningsValuesArrays : Array<number> = []
   let expansesValuesArrays : Array<number> = []
   let estimatedEarningsArrays : Array<number> = []
   let estimatedExpansesArrays : Array<number> = []
 
-  entriesValuesByDate.map((value:EntriesValuesData)=>{
-    if(value.amount !=0 && value.received){
-      value.type == 'Ganhos' ? earningsValuesArrays.push(value.amount) : expansesValuesArrays.push(value.amount)  
-    }
-    if(value.amount !=0){
-      value.type == 'Ganhos' ? estimatedEarningsArrays.push(value.amount) : estimatedExpansesArrays.push(value.amount)  
-    }
+  allEntriesValues.map((value:EntriesValuesData)=>{
+      if(Functions.isBetweenDates(selectedMonth, selectedYear, value.dtStart, value.dtEnd)){
+          if(value.amount !=0 && value.received){
+            value.type == 'Ganhos' ? earningsValuesArrays.push(value.amount) : expansesValuesArrays.push(value.amount)  
+          }
+          if(value.amount !=0){
+            value.type == 'Ganhos' ? estimatedEarningsArrays.push(value.amount) : estimatedExpansesArrays.push(value.amount)  
+          }
+      }
+    //console.log(value.dtEnd)
   })
 
   let currentEarnings = earningsValuesArrays.reduce((a: any, b: any) => a + b, 0) 

@@ -90,8 +90,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
     
     function loadAllEntriesResults(){ 
+        setIsEntriesDone(false)
         entriesDB.all().then((res:any)=>{
             setAllEntries(res._array)
+            setIsEntriesDone(true)
             if(res._array.length != allEntries.length){
                 setIsValuesUpdated(!isValuesUpdated)
                 console.log("loadAllEntriesResults ----  setIsValuesUpdated")
@@ -99,6 +101,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             }
         }).catch(err=>{
             console.log(err)
+            setIsEntriesDone(true)
             console.log("err entradas")
         })
     }
@@ -164,16 +167,16 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
 
     function loadEntriesByDate(){
-        setIsEntriesDone(false)
+        
         entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
             console.log('loadEntriesByDate ---- ok')
-            setIsEntriesDone(true)
+            
         }).catch(err=>{
             console.log(err)
             console.log('loadEntriesByDate ---- erro')
             setEntriesByDate([])
-            setIsEntriesDone(true)
+           
         })
     }
 
@@ -199,7 +202,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         valuesDB.all().then((res:any)=>{
             setAllEntriesValues(res._array)
             if(res._array.length != allEntriesValues.length){
-                setIsValuesUpdated(!isValuesUpdated)
+                //setIsValuesUpdated(!isValuesUpdated)
                 console.log('loadAllEntriesValuesResults ---- ok')
             }
         }).catch(err=>{
@@ -314,18 +317,24 @@ export function DataBDProvider({children}: DataBDProviderProps){
         
         
         
-        setLatestTransations()
+        
         loadNotifications()
 
         //console.log("teste: ")
-    },[isValuesUpdated, selectedMonth])
+    },[isValuesUpdated])
 
     useEffect(()=>{
         loadAllEntriesValuesResults()
+        setLatestTransations()
+        loadEntriesByCurrentDate()
     },[allEntries])
+
+    useEffect(()=>{
+        
+    },[allEntries, allEntriesValues])
     
     useEffect(()=>{
-        loadEntriesByCurrentDate()
+       
     },[allEntries])
 
     useEffect(()=>{

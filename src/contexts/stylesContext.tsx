@@ -16,12 +16,15 @@ interface StylesContextData{
     textModal:string;
     textAlertModal:string;
     hasNotifications:boolean;
+    isRendered:boolean;
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
     resetSelectedEntrieId: ()=> void;
     showValuesForm: ()=> void;
     resetValuesForm: ()=> void;
+    onMonted: ()=> void;
+    onUnmonted: ()=> void;
     updateHasNotification: (value:boolean)=> void;
 }
 
@@ -52,6 +55,15 @@ export function StylesProvider({children}: StylesProviderProps){
     const [textAlertModal, setTextAlertModal] = useState('')
     const [textModal, setTextModal] = useState('')
     const [hasNotifications, setHasNotifications] = useState(false)
+    const [isRendered, setIsRendered] = useState(false)
+
+    function onMonted(){
+        setIsRendered(true)
+    }
+
+    function onUnmonted(){
+        setIsRendered(false)
+    }
 
 
     function updateEntriesModalVisible(){
@@ -89,6 +101,7 @@ export function StylesProvider({children}: StylesProviderProps){
 
     useEffect(()=>{
         //console.log(" Tipo: "+typeOfEntrie)
+    
         if(typeOfEntrie == "Ganhos"){
             setFirstGradientColor("#155F69")
             setSecondGradientColor("#F9CF3C")
@@ -114,6 +127,7 @@ export function StylesProvider({children}: StylesProviderProps){
         else{
             setMonthColor("#3C93F9")
         }
+ 
     },[typeOfEntrie])
 
     return(
@@ -132,6 +146,7 @@ export function StylesProvider({children}: StylesProviderProps){
             textModal,
             textAlertModal,
             hasNotifications,
+            isRendered,
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,
@@ -139,6 +154,8 @@ export function StylesProvider({children}: StylesProviderProps){
             showValuesForm,
             resetValuesForm,
             updateHasNotification,
+            onMonted,
+            onUnmonted
         }}>
             {children}
         </StylesContext.Provider>

@@ -244,13 +244,36 @@ function prevMonth(selectedMonth:any, selectedYear:any) {
         let startYear = Number(toMonthAndYear(dtStart).year)
         let endMonth = Number(toMonthAndYear(dtEnd).month)
         let endYear = Number(toMonthAndYear(dtEnd).year)
-       // 2020            2021            2021          2021
-        if (startYear <= selectedYear && endYear >= selectedYear){
-            // 11              3                10          3
-            if(startMonth <= selectedMonth && endMonth >= selectedMonth){
-
-            }
-        }
+       
+       if(selectedYear >= startYear && selectedYear <= endYear){
+           if (selectedYear == startYear && selectedYear == endYear){
+               if(selectedMonth >= startMonth && selectedMonth <= endMonth){
+                   return true
+               }else{
+                   return false
+               }
+           }
+           else if(selectedYear == startYear){
+                if(selectedMonth >= startMonth){
+                    return true
+                }else{
+                    return false
+                }
+           }
+           else if(selectedYear == endYear){
+               if(selectedMonth <= endMonth){
+                   return true
+               }else{
+                   return false
+               }
+           }
+           else{
+               return true
+           }
+       }else{
+           return false
+       }
+      
   }
 
 export default{
@@ -267,5 +290,6 @@ export default{
     toMonthAndYear,
     selectLastMonth,
     formatCurrency,
+    isBetweenDates
 }
 

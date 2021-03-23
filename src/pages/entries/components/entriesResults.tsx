@@ -2,7 +2,7 @@ import React, { useContext } from "react"
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, RefreshControl } from 'react-native'
 import { MaterialIcons,  MaterialCommunityIcons  } from '@expo/vector-icons'
 
-import Functions from '../../../functions/index'
+import Functions from '../../../utils'
 import NumberFormat from 'react-number-format';
 import { DataBDContext } from "../../../contexts/dataBDContext";
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
@@ -23,12 +23,12 @@ interface EntriesData {
 
 export default function EntriesResults() {
 
-    const { entriesByDate, entriesValuesByDate, updateLoadAction } = useContext(DataBDContext)
+    const { entriesByDate, entriesValuesByDate, allEntries, allEntriesValues, updateLoadAction } = useContext(DataBDContext)
     const {todayDate, selectedMonth, selectedYear, resetDate} = useContext(MainContext)
     const {typeOfEntrie} = useContext(NewEntriesContext)
     const {entriePrimaryColor, showEntrieModal} = useContext(StylesContext)
 
-    const entriesByDateByType = entriesByDate.filter(entrie => entrie.type == typeOfEntrie)
+    const entriesByDateByType = allEntries.filter(entrie => entrie.type == typeOfEntrie)
     
     // order by days
     entriesByDateByType.sort((a:EntriesData,b:EntriesData) => a.day - b.day)
@@ -60,67 +60,70 @@ export default function EntriesResults() {
                     />
                 }
             >
-                {entriesByDateByType.length > 0 ? entriesByDateByType.map((entrie: EntriesData, index: number) => {
+                {allEntries.length > 0 ? allEntries.map((entrie: EntriesData, index: number) => {
                     let totalValues = 0
                     let notReceived = false
                     let isLate = false
                     let borderColor = "#ffffff"
                     let opacColor = "#ffffffAA"
-                    entriesValuesByDate.map((value)=>{
-                        if (entriesByDateByType[index].id == value.entries_id){
-                            totalValues = totalValues + value.amount
-                        }
-                    })
-
-                    if (!entrie.received) notReceived = true
-                    if(!entrie.received && entrie.day <= todayDate.getDate() && selectedMonth == (todayDate.getMonth()+1) && selectedYear == todayDate.getFullYear()){
-                        isLate = true
-                        borderColor = entriePrimaryColor
-                    }
-
-                    if (notReceived || selectedMonth != (todayDate.getMonth()+1) || selectedYear != todayDate.getFullYear()) {
-                        opacColor = entriePrimaryColor+"AA"
-                    }else{
-                        opacColor = entriePrimaryColor
-                    }
-
-                    return (
-                        <View key={index}>
-                            <TouchableOpacity
-                                style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
-                                onPress={()=> showEntrieModal(entrie.id, totalValues)}
-                            >
-                                <MaterialIcons name="monetization-on" size={40} color={opacColor} />
-
-                                <View style={styles.earningTextView}>
-                                    <Text numberOfLines={1} 
-                                          style={[styles.earningTittleText, {color:opacColor, width:150}]}>
-                                        {entrie.title}
-                                    </Text>
-                                    <Text style={[styles.earningDateText, {color:opacColor}]}>
-                                        {entrie.day}/{Functions.convertDtToStringMonth(3)}
-                                    </Text>
-                                </View>
-
-                                <NumberFormat
-                                    value={totalValues}
-                                    displayType={'text'}
-                                    thousandSeparator={true}
-                                    format={Functions.currencyFormatter}
-                                    renderText={value => 
-                                        <Text style={[styles.earningTittleText,{color:opacColor}]}> 
-                                            {value} 
-                                        </Text>
-                                    }
-                                />
-                            </TouchableOpacity>
-
-                            {isLate &&
-                            <MaterialCommunityIcons  name="alert-circle" size={40} color={entriePrimaryColor} style={styles.alertSign} />
+                    if (Functions.isBetweenDates(selectedMonth,selectedYear,entrie.dtStart,entrie.dtEnd) && entrie.type == typeOfEntrie){
+                        allEntriesValues.map((value)=>{
+                            if (entrie.id == value.entries_id){
+                                totalValues = totalValues + value.amount
                             }
+                        })
+                    
 
-                        </View>
-                    )
+                        if (!entrie.received) notReceived = true
+                        if(!entrie.received && entrie.day <= todayDate.getDate() && selectedMonth == (todayDate.getMonth()+1) && selectedYear == todayDate.getFullYear()){
+                            isLate = true
+                            borderColor = entriePrimaryColor
+                        }
+
+                        if (notReceived || selectedMonth != (todayDate.getMonth()+1) || selectedYear != todayDate.getFullYear()) {
+                            opacColor = entriePrimaryColor+"AA"
+                        }else{
+                            opacColor = entriePrimaryColor
+                        }
+
+                        return (
+                            <View key={index}>
+                                <TouchableOpacity
+                                    style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
+                                    onPress={()=> showEntrieModal(entrie.id, totalValues)}
+                                >
+                                    <MaterialIcons name="monetization-on" size={40} color={opacColor} />
+
+                                    <View style={styles.earningTextView}>
+                                        <Text numberOfLines={1} 
+                                            style={[styles.earningTittleText, {color:opacColor, width:150}]}>
+                                            {entrie.title}
+                                        </Text>
+                                        <Text style={[styles.earningDateText, {color:opacColor}]}>
+                                            {entrie.day}/{Functions.convertDtToStringMonth(3)}
+                                        </Text>
+                                    </View>
+
+                                    <NumberFormat
+                                        value={totalValues}
+                                        displayType={'text'}
+                                        thousandSeparator={true}
+                                        format={Functions.currencyFormatter}
+                                        renderText={value => 
+                                            <Text style={[styles.earningTittleText,{color:opacColor}]}> 
+                                                {value} 
+                                            </Text>
+                                        }
+                                    />
+                                </TouchableOpacity>
+
+                                {isLate &&
+                                <MaterialCommunityIcons  name="alert-circle" size={40} color={entriePrimaryColor} style={styles.alertSign} />
+                                }
+
+                            </View>
+                        )
+                    }
                 })
                 :
                 <NoResultsView/>

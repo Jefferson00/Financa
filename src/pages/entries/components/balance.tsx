@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { StyleSheet, Text, View } from 'react-native'
 
 
-import Functions from '../../../functions/index'
+import Functions from '../../../utils'
 import NumberFormat from 'react-number-format';
 import { DataBDContext } from "../../../contexts/dataBDContext";
 import ModalContent from "./modalContent";
@@ -23,67 +23,86 @@ interface EntriesValuesData{
 
 export default function Balance(){
 
-    const {entriesValuesByDate} = useContext(DataBDContext)
+    const {entriesValuesByDate, allEntriesValues} = useContext(DataBDContext)
     const {selectedMonth, selectedYear, currentMonth, currentYear} = useContext(MainContext)
     const {typeOfEntrie} = useContext(NewEntriesContext)
 
     let SumOfAmountsArray1: any = []
     let SumOfAmountsArray2: any = []
 
-    entriesValuesByDate.map((value:EntriesValuesData)=>{
+    let cont = allEntriesValues.length -1 
+    let isDone= false
+
+    allEntriesValues.map((value:EntriesValuesData, index:number)=>{
        // console.log("::::::::::::") 
-        if(selectedMonth == currentMonth && selectedYear == currentYear){
-            //console.log(":::received:::"+value.received)
-            //console.log(":::type:::"+value.type)
-            if(value.received && value.type == typeOfEntrie) {
-                //console.log("::::::::::::"+typeOfEntrie)
-                SumOfAmountsArray1.push(value.amount)
-            }
-            
-        }
-        if (value.amount != null && value.amount != 0 && value.type == typeOfEntrie) SumOfAmountsArray2.push(value.amount)
+       if (Functions.isBetweenDates(selectedMonth,selectedYear,value.dtStart,value.dtEnd)){
+           //console.log('dtStart '+value.dtStart)
+           //console.log('dtEnd '+value.dtEnd)
+           if(selectedMonth == currentMonth && selectedYear == currentYear){
+               //console.log(":::received:::"+value.received)
+               //console.log(":::type:::"+value.type)
+               if(value.received && value.type == typeOfEntrie) {
+                   //console.log("::::::::::::"+value.amount)
+                   SumOfAmountsArray1.push(value.amount)
+               }
+               
+           }
+           if (value.amount != null && value.amount != 0 && value.type == typeOfEntrie) SumOfAmountsArray2.push(value.amount)
+       }
+       if (cont == index){
+            isDone = true
+       }
     })
+    //console.log('length '+cont)
+    
     //console.log("::::::::::::"+SumOfAmountsArray2)
     let sum1 = SumOfAmountsArray1.reduce((a: any, b: any) => a + b, 0)
     let sum2 = SumOfAmountsArray2.reduce((a: any, b: any) => a + b, 0)
 
     return (
-        <View style={styles.balanceView}>
-            {console.log()}
-                <View style={styles.currentBalanceView}>
-                    <Text style={styles.currentBalanceText}>
-                        Atual
-                    </Text>
-                    {sum1 != 0 && selectedMonth == currentMonth && selectedYear == currentYear?
-                        <NumberFormat
-                        value={sum1}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        format={Functions.currencyFormatter}
-                        renderText={value => <Text style={styles.currentBalanceTextValue}> {value} </Text>}
-                        />
-                        :
-                        <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
-                    }
-                </View>
+        <>
+            {!isDone ?
+                <Text>hehehe</Text>
+            :
 
-                <View style={styles.currentBalanceView}>
-                    <Text style={styles.estimatedBalanceText}>
-                            Estimado
-                    </Text>
-                    {sum2 != 0 ?
-                        <NumberFormat
-                            value={sum2}
+            <View style={styles.balanceView}>
+                {console.log()}
+                    <View style={styles.currentBalanceView}>
+                        <Text style={styles.currentBalanceText}>
+                            Atual
+                        </Text>
+                        {sum1 != 0 && selectedMonth == currentMonth && selectedYear == currentYear?
+                            <NumberFormat
+                            value={sum1}
                             displayType={'text'}
                             thousandSeparator={true}
                             format={Functions.currencyFormatter}
-                            renderText={value => <Text style={styles.estimatedBalanceTextValue}> {value} </Text>}
-                        />
-                    :
-                        <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
-                    }
-                </View>
-        </View>
+                            renderText={value => <Text style={styles.currentBalanceTextValue}> {value} </Text>}
+                            />
+                            :
+                            <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+                        }
+                    </View>
+
+                    <View style={styles.currentBalanceView}>
+                        <Text style={styles.estimatedBalanceText}>
+                                Estimado
+                        </Text>
+                        {sum2 != 0 ?
+                            <NumberFormat
+                                value={sum2}
+                                displayType={'text'}
+                                thousandSeparator={true}
+                                format={Functions.currencyFormatter}
+                                renderText={value => <Text style={styles.estimatedBalanceTextValue}> {value} </Text>}
+                            />
+                        :
+                            <Text style={styles.estimatedBalanceTextValue}>R$ 0,00</Text>
+                        }
+                    </View>
+            </View>
+            }
+        </>
     )
 }
 

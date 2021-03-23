@@ -34,12 +34,19 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
     const {isEntriesDone} = useContext(DataBDContext)
-    const {firstGradientColor, secondGradientColor, selectedEntrieId} = useContext(StylesContext)
+    const {firstGradientColor, secondGradientColor, selectedEntrieId, onMonted, onUnmonted, isRendered} = useContext(StylesContext)
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
     },[item])
    
+    useEffect(()=>{
+        onMonted()
+    },[])
+
+    useEffect(()=>{
+        return onUnmonted()
+    })
   
 
     return (
@@ -56,7 +63,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             }
 
             <View style={styles.mainContainer}>
-                {isEntriesDone ?
+                {!isRendered ?
                     <EntriesResults/>
                     :
                     <Loader/>
