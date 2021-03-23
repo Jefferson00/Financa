@@ -239,6 +239,20 @@ function prevMonth(selectedMonth:any, selectedYear:any) {
         return Math.floor(amount/100)
   }
 
+  function isBetweenDates(selectedMonth: number, selectedYear: number, dtStart: number, dtEnd: number){
+        let startMonth = Number(toMonthAndYear(dtStart).month)
+        let startYear = Number(toMonthAndYear(dtStart).year)
+        let endMonth = Number(toMonthAndYear(dtEnd).month)
+        let endYear = Number(toMonthAndYear(dtEnd).year)
+       // 2020            2021            2021          2021
+        if (startYear <= selectedYear && endYear >= selectedYear){
+            // 11              3                10          3
+            if(startMonth <= selectedMonth && endMonth >= selectedMonth){
+
+            }
+        }
+  }
+
 export default{
     chartNumber,
     setDtStart,
