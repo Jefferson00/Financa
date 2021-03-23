@@ -108,7 +108,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
 
     function loadNotifications(){
        if (entriesByCurrentDate.length > 0){
-            dates.findByFullDate(todayDate.getDate(),(todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
+            dates.findByDate((todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
                 console.log('loadNotifications ---- já existe')
             }).catch(err => {
                 const DateObj = {
@@ -119,7 +119,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 dates.create(DateObj)
                 let thereAreLateEarnings = false
                 let thereAreLateExpanses = false
-                entriesByCurrentDate.map(entrie=>{
+                entriesByCurrentDate.map((entrie, index)=>{
                     if(entrie.day <= todayDate.getDate() && !entrie.received && entrie.type == "Ganhos"){
                         thereAreLateEarnings = true
                         //schedulePushNotification(entrie.title, new Date())
@@ -128,18 +128,44 @@ export function DataBDProvider({children}: DataBDProviderProps){
                         thereAreLateExpanses = true
                         //schedulePushNotification(entrie.title, new Date())
                     }
-                    if(entrie.day == (todayDate.getDate()+1) && !entrie.received){ 
-                        schedulePushNotification(entrie.title, 'Você possui um(a)'+entrie.type+' próximo do vencimento!', 60*60)
+                    if(!entrie.received){ 
+                        schedulePushNotification(entrie.title, 'Você possui um(a)'+entrie.type+' próximo do vencimento!', 10*(index+1), entrie.day)
                     }
                 })
-                thereAreLateEarnings && schedulePushNotification('Ganhos não recebidos', 'Você possui ganhos para receber', 60*10)
-                thereAreLateExpanses && schedulePushNotification('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60*10)
+                thereAreLateEarnings && schedulePushNotification2('Ganhos não recebidos', 'Você possui ganhos para receber', 60* 60)
+                thereAreLateExpanses && schedulePushNotification2('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60* 60)
             })
        }
     }
 
-    const schedulePushNotification = async (title: string, body: string, seconds:number) => {
-        await Notifications.scheduleNotificationAsync({
+    async function cancelScheduleNotification(indentifier: string) {
+        await Notifications.cancelScheduledNotificationAsync(indentifier)
+    }
+
+    const schedulePushNotification = async (title: string, body: string, seconds:number, day:number) => {
+        const trigger = new Date()
+        trigger.setDate(day)
+        trigger.setHours(16)
+        trigger.setMinutes(32)
+        trigger.setSeconds(0)
+        const identifier = await Notifications.scheduleNotificationAsync({
+          content: {
+              title: title,
+              body: body,
+              data: {
+              //more data here
+              }
+            },
+            trigger
+      
+        })
+        console.log('identifier: '+identifier)
+        console.log('trigger: '+trigger)
+        //cancelScheduleNotification(identifier)
+      };
+
+      const schedulePushNotification2 = async (title: string, body: string, seconds:number) => {
+        const identifier = await Notifications.scheduleNotificationAsync({
           content: {
               title: title,
               body: body,
@@ -148,11 +174,13 @@ export function DataBDProvider({children}: DataBDProviderProps){
               }
             },
           trigger: {
-            repeats: false,
+            repeats: true,
             seconds: seconds,
           },
       
         })
+        console.log('identifier: '+identifier)
+        //cancelScheduleNotification(identifier)
       };
 
     function loadEntriesValuesByDate(){
