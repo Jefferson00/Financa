@@ -5,6 +5,8 @@ import valuesDB from '../services/valuesDB';
 import Functions from "../utils"
 import { MainContext } from './mainContext';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-community/async-storage';
+import latestDB from '../services/latestDB';
 
 interface EntriesData{
     id: number,
@@ -38,9 +40,9 @@ interface EntriesValuesData{
 interface LatestEntries{
     title: string,
     day: number,
-    entrieDtStart: number,
-    entrieDtEnd: number,
+    month:number,
     type: string,
+    category:string,
     amount: number,
 }
 
@@ -162,7 +164,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         console.log('identifier: '+identifier)
         console.log('trigger: '+trigger)
         //cancelScheduleNotification(identifier)
-      };
+    };
 
       const schedulePushNotification2 = async (title: string, body: string, seconds:number) => {
         const identifier = await Notifications.scheduleNotificationAsync({
@@ -240,27 +242,40 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
 
     function setLatestTransations(){
-        const ltsEntries = allEntries.slice(Math.max(allEntries.length - 3, 0))
-        let ltsEntriesArray : LatestEntries[] = [] 
-        ltsEntries.map((entr: EntriesData, index: number) => {
-            let totalValues = 0
-            allEntriesValues.map((value:EntriesValuesData) => {
-                if (ltsEntries[index].id === value.entries_id){
-                    totalValues = totalValues + value.amount
-                }
-            })
-            let ltsEntriesObj = {
-                title: entr.title,
-                day: entr.day,
-                entrieDtStart: entr.dtStart,
-                entrieDtEnd: entr.dtEnd,
-                type: entr.type,
-                amount: totalValues,
-            }
-            ltsEntriesArray.push(ltsEntriesObj)
+        latestDB.all().then((res:any)=>{
+            setLatestEntries(res._array)
         })
-        console.log('setLatestTransations ---- ok')
-        setLatestEntries(ltsEntriesArray)
+    }
+
+    function saveLatestTransation(ltsEntriesArray: LatestEntries[], id:string | undefined){
+                let totalValues = 0
+                allEntriesValues.map((value:EntriesValuesData) => {
+                    if (Number(id) === value.entries_id){
+                        totalValues = totalValues + value.amount
+                    }
+                })
+                entriesDB.findById(Number(id)).then((res:any)=>{
+                    let ltsEntriesObj = {
+                        title: res._array[0].title,
+                        day: res._array[0].day,
+                        month:3,
+                        type: res._array[0].type,
+                        amount: totalValues,
+                    }
+                    //ltsEntriesArray.push(ltsEntriesObj)
+                })       
+    }
+
+    async function getData (){
+        try {
+            const value = await AsyncStorage.getItem('latestEntries')
+            if(value !== null){
+                console.log(value)
+                return value
+            }else{
+            }
+        } catch (error) {
+        }
     }
 
     function defineDates(){

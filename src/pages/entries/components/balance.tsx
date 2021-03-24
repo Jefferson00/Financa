@@ -30,9 +30,6 @@ export default function Balance(){
     let SumOfAmountsArray1: any = []
     let SumOfAmountsArray2: any = []
 
-    let cont = allEntriesValues.length -1 
-    let isDone= false
-
     allEntriesValues.map((value:EntriesValuesData, index:number)=>{
        // console.log("::::::::::::") 
        if (Functions.isBetweenDates(selectedMonth,selectedYear,value.dtStart,value.dtEnd)){
@@ -49,9 +46,6 @@ export default function Balance(){
            }
            if (value.amount != null && value.amount != 0 && value.type == typeOfEntrie) SumOfAmountsArray2.push(value.amount)
        }
-       if (cont == index){
-            isDone = true
-       }
     })
     //console.log('length '+cont)
     
@@ -61,15 +55,11 @@ export default function Balance(){
 
     return (
         <>
-            {!isDone ?
-                <Text>hehehe</Text>
-            :
-
             <View style={styles.balanceView}>
                 {console.log()}
                     <View style={styles.currentBalanceView}>
                         <Text style={styles.currentBalanceText}>
-                            Atual
+                            {typeOfEntrie} Atuais
                         </Text>
                         {sum1 != 0 && selectedMonth == currentMonth && selectedYear == currentYear?
                             <NumberFormat
@@ -86,7 +76,7 @@ export default function Balance(){
 
                     <View style={styles.currentBalanceView}>
                         <Text style={styles.estimatedBalanceText}>
-                                Estimado
+                            {typeOfEntrie}  Estimados
                         </Text>
                         {sum2 != 0 ?
                             <NumberFormat
@@ -101,7 +91,6 @@ export default function Balance(){
                         }
                     </View>
             </View>
-            }
         </>
     )
 }

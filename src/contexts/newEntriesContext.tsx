@@ -1,7 +1,9 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, {createContext, useState, ReactNode, useContext} from 'react';
 import { Platform } from 'react-native';
 import functions from '../functions';
 import entriesDB from '../services/entriesDB';
+import latestDB from '../services/latestDB';
 import valuesDB from '../services/valuesDB';
 
 import Functions from "../utils"
@@ -91,7 +93,7 @@ export const NewEntriesContext = createContext({} as NewEntriesContextData)
 
 export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
-    const {entriesByDate, entriesValuesByDate , updateLoadAction} = useContext(DataBDContext)
+    const {entriesByDate, entriesValuesByDate , allEntriesValues, updateLoadAction} = useContext(DataBDContext)
     const {selectedYear, selectedMonth} = useContext(MainContext)
     //const {updateEntriesModalVisible} = useContext(StylesContext)
 
@@ -288,6 +290,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             //console.log(res)
 
             //console.log("All!")
+            let totalValues = 0
             entrieValuesBeforeCreate.map((value: ValuesData) =>{
                 let EntrieId = res._array.slice(-1)[0].id
                 let amount = String(value.amount)
@@ -303,7 +306,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 }else{
                     newDtEnd = dtEnd 
                 }
-                
+                totalValues = totalValues + Number(amount)
                 const ValueObj:any = {
                     description: value.description,
                     amount: Number(amount),
@@ -320,6 +323,19 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     console.log(err)
                 })
             })
+            if(isEnabledReceived){
+                let ltsObj = {
+                    title: titleInputEntrie,
+                    day: new Date().getDate(),
+                    month: new Date().getMonth() +1,
+                    type: typeOfEntrie,
+                    category: 'teste',
+                    amount: totalValues,
+                    entrie_id: res._array.slice(-1)[0].id,
+                }
+                console.log('lts: '+ltsObj.amount)
+                latestDB.create(ltsObj)
+            }
             updateLoadAction()
         }).catch(err => {
             console.log(err)
@@ -481,6 +497,22 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 received: true,
                 type: res._array[0].type,
             }
+            let totalValues = 0
+            allEntriesValues.map((value:EntriesValuesData) => {
+                if (selectedId === value.entries_id){
+                    totalValues = totalValues + value.amount
+                }
+            })
+            let ltsObj = {
+                title: res._array[0].title,
+                day: new Date().getDate(),
+                month: new Date().getMonth() +1,
+                type: res._array[0].type,
+                category: 'teste',
+                amount: totalValues,
+                entrie_id: selectedId,
+            }
+            latestDB.create(ltsObj)
             entriesDB.update(selectedId, obj).then(res => {
                 alert("Pago!")
                 updateLoadAction()

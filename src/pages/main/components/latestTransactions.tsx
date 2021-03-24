@@ -12,6 +12,8 @@ export default function LatestTransactions() {
 
     const {latestEntries } = useContext(DataBDContext)
 
+    const ltsEntries = latestEntries.slice(Math.max(latestEntries.length - 3, 0))
+
     return (
         <View style={styles.container}>
             <View style={styles.titleView}>
@@ -27,8 +29,8 @@ export default function LatestTransactions() {
                 </TouchableOpacity>
             </View>
 
-            {latestEntries.length > 0 ? latestEntries.map((entr: any, index: number) => {
-                let month = parseInt(Functions.toMonthAndYear(entr.entrieDtStart).month)
+            {ltsEntries.length > 0 ? ltsEntries.map((entr: any, index: number) => {
+                let month = entr.month
 
                 return (
                     <View style={styles.listView} key={index}>

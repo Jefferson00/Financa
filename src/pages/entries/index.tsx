@@ -63,7 +63,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             }
 
             <View style={styles.mainContainer}>
-                {!isRendered ?
+                {isEntriesDone ?
                     <EntriesResults/>
                     :
                     <Loader/>

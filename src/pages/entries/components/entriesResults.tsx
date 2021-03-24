@@ -28,10 +28,12 @@ export default function EntriesResults() {
     const {typeOfEntrie} = useContext(NewEntriesContext)
     const {entriePrimaryColor, showEntrieModal} = useContext(StylesContext)
 
+    let cont = 0
+
     const entriesByDateByType = allEntries.filter(entrie => entrie.type == typeOfEntrie)
     
     // order by days
-    entriesByDateByType.sort((a:EntriesData,b:EntriesData) => a.day - b.day)
+    allEntries.sort((a:EntriesData,b:EntriesData) => a.day - b.day)
 
     // order by not received entries
     /*entriesByDateByType.sort(function(a:EntriesData,b:EntriesData){
@@ -60,7 +62,7 @@ export default function EntriesResults() {
                     />
                 }
             >
-                {allEntries.length > 0 ? allEntries.map((entrie: EntriesData, index: number) => {
+                {allEntries.length > 0 && allEntries.map((entrie: EntriesData, index: number) => {
                     let totalValues = 0
                     let notReceived = false
                     let isLate = false
@@ -85,6 +87,7 @@ export default function EntriesResults() {
                         }else{
                             opacColor = entriePrimaryColor
                         }
+                        cont = cont +1
 
                         return (
                             <View key={index}>
@@ -123,12 +126,12 @@ export default function EntriesResults() {
 
                             </View>
                         )
+                    }else{
+                       
                     }
-                })
-                :
-                <NoResultsView/>
-                }
+                })}
 
+                {cont <= 0 && <NoResultsView/>}
 
             </ScrollView>
         </View>

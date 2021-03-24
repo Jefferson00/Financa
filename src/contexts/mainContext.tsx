@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import React, {createContext, useState, ReactNode, useEffect} from 'react';
 import Functions from "../utils"
 
@@ -57,6 +58,18 @@ export function MainProvider({children}:MainProviderProps){
         }
     }
 
+    async function getSeeBalanceValues (){
+        try {
+            const value = await AsyncStorage.getItem('SeeBalanceValues')
+            if(value !== null){
+                console.log(value)
+                return value
+            }else{
+            }
+        } catch (error) {
+        }
+    }
+
     function resetDate(){
         setSelectedMonth(currentMonth)
         setSelectedYear(currentYear)
@@ -105,11 +118,28 @@ export function MainProvider({children}:MainProviderProps){
 
     function handleSeeBalanceValues(){
         setSeeBalanceValues(!seeBalanceValues)
+        let stringSeeBalanceValues = String(!seeBalanceValues)
+        console.log('seeBalanceValues 111111111: '+stringSeeBalanceValues)
+        storeSeeBalanceValues(stringSeeBalanceValues)
+    }
+
+    async function storeSeeBalanceValues (value:string) {
+        try {
+            await AsyncStorage.setItem('SeeBalanceValues', value)
+        } catch (error) {
+            
+        }
     }
 
     useEffect(()=>{
         updateInitialDate()
         //console.log("dta inicial: "+initialDate)
+        let item = getSeeBalanceValues()
+        item.then((stringSeeBalanceValues)=>{
+           // console.log('seeBalanceValues: '+Boolean(stringSeeBalanceValues))
+            stringSeeBalanceValues == "true" ? setSeeBalanceValues(true) : setSeeBalanceValues(false)
+           // setSeeBalanceValues(Boolean(stringSeeBalanceValues))
+        })
     },[])
 
     return(

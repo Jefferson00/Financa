@@ -37,8 +37,13 @@ export default function ButtonSubmit() {
     }
 
     function handleEntrieUpdate(){
-        handleUpdate()
-        resetValuesForm()
+        if (verifyInputs()){
+            handleUpdate()
+            resetValuesForm()
+            navigation.navigate('Entries', { item: typeOfEntrie})
+        }else{
+            alert('Preencha todos os campos!')
+        }
     }
 
     return (
