@@ -70,8 +70,10 @@ export default function EntriesResults() {
                     let opacColor = "#ffffffAA"
                     if (Functions.isBetweenDates(selectedMonth,selectedYear,entrie.dtStart,entrie.dtEnd) && entrie.type == typeOfEntrie){
                         allEntriesValues.map((value)=>{
-                            if (entrie.id == value.entries_id){
+                            //console.log('TOTAL VALUE:: '+totalValues)
+                            if (entrie.id == value.entries_id && Functions.isBetweenDates(selectedMonth,selectedYear,value.dtStart,value.dtEnd)){
                                 totalValues = totalValues + value.amount
+                                //console.log('TOTAL VALUE:: '+totalValues)
                             }
                         })
                     

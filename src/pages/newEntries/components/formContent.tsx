@@ -34,6 +34,7 @@ export default function FormContent() {
            isEnabledMonthly,
            entrieFrequency,
            entrieValuesBeforeCreate,
+           typeOfEntrie,
            onChangeDate, 
            showDatepicker,
            setTitleInputEntrie,
@@ -87,17 +88,17 @@ export default function FormContent() {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <View>
                             <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
-                                Data de recebimento
+                                {typeOfEntrie == "Ganhos" ?"Data de recebimento" : "Data de pagamento"}
                             </Text>
                             <View style={styles.dateView}>
-                                <Text style={[styles.subTittleText, { color: entrieSecondaryColor }]} onPress={showDatepicker}>
+                                <Text style={[styles.tinyText, { color: entrieSecondaryColor }]} onPress={showDatepicker}>
                                     {calendarDate.getDate()} / {Functions.convertDtToStringMonth(calendarDate.getMonth() + 1)}
                                 </Text>
                             </View>
                         </View>
                         <View>
                             <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
-                                Recebido
+                                {typeOfEntrie == "Ganhos" ?"Recebido" : "Pago"}
                             </Text>
                             <Switch
                                 trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
@@ -105,6 +106,7 @@ export default function FormContent() {
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={toggleSwitchReceived}
                                 value={isEnabledReceived}
+                                style={{marginTop: 15}}
                             />
                         </View>
                     </View>
@@ -123,7 +125,7 @@ export default function FormContent() {
                     </Text>
 
                     <View style={styles.frequencyView}>
-                        <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>
+                        <Text style={[styles.tinyText, { color: entrieSecondaryColor }]}>
                             Mensal
                         </Text>
                         <Switch
@@ -144,7 +146,7 @@ export default function FormContent() {
                         <Feather name='chevron-right' size={30}
                             onPress={increaseEntrieFrequency}
                         />
-                        <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>
+                        <Text style={[styles.tinyText, { color: entrieSecondaryColor }]}>
                             Vezes
                         </Text>
                     </View>
@@ -154,7 +156,7 @@ export default function FormContent() {
                     </Text>
                     {!isValuesFormVisible && 
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={[styles.secondColorText, { color: entrieSecondaryColor, marginRight: 10, fontSize: 18 }]}>
+                            <Text style={[styles.tinyText, { color: entrieSecondaryColor, marginRight: 10, fontSize: 18 }]}>
                                 R$
                             </Text>
                             <TextInput
@@ -176,25 +178,27 @@ export default function FormContent() {
 const styles = StyleSheet.create({
     subTittleText: {
         fontFamily: 'Poppins_500Medium',
-        fontSize: 14,
-        marginTop: 13,
+        fontSize: 16,
+        marginTop: 10,
     },
     dateView: {
         borderWidth: 1,
         borderColor: '#d3d3d3',
-        width: 60,
+        width: 80,
+        minHeight:40,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#E9E9E9',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginTop: 15
     },
     frequencyView: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 19,
+        marginTop: 15,
     },
-    secondColorText: {
+    tinyText: {
         fontFamily: 'Poppins_500Medium',
         fontSize: 12,
     },

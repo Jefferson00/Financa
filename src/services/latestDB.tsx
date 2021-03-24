@@ -3,7 +3,7 @@ import db from './database'
 db.transaction((tx) => {
     //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
     //tx.executeSql("DROP TABLE earnings;");
-    tx.executeSql("DROP TABLE latest;");
+    //tx.executeSql("DROP TABLE latest;");
     //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(

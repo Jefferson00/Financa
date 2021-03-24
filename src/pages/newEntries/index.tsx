@@ -30,7 +30,7 @@ import { StylesContext } from '../../contexts/stylesContext';
 export default function NewEntries({ route }: { route: any }, { navigation }: { navigation: any }) {
     const { item } = route.params
 
-    const {updateTypeOfEntrie, entrieIdUpdate} = useContext(NewEntriesContext)
+    const {updateTypeOfEntrie, entrieIdUpdate, typeOfEntrie} = useContext(NewEntriesContext)
     const {entriePrimaryColor, isValuesFormVisible, showValuesForm, resetSelectedEntrieId} = useContext(StylesContext)
 
     useEffect(()=>{
@@ -52,7 +52,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
              <View style={styles.mainContainer}>
                 <View style={styles.tittleTextView}>
                     <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
-                        Novo Ganho
+                        {typeOfEntrie == "Ganhos" ? "Novo Ganho" : "Nova Despesa"}
                     </Text>
                 </View>
 

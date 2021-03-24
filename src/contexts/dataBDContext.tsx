@@ -109,7 +109,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
 
     function loadNotifications(){
-       if (entriesByCurrentDate.length > 0){
+        cancelAllNotification().then(value=>{
+            console.log(value)
+        })
+       /*if (entriesByCurrentDate.length > 0){
             dates.findByDate((todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
                 console.log('loadNotifications ---- já existe')
             }).catch(err => {
@@ -137,7 +140,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
                 thereAreLateEarnings && schedulePushNotification2('Ganhos não recebidos', 'Você possui ganhos para receber', 60* 60)
                 thereAreLateExpanses && schedulePushNotification2('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60* 60)
             })
-       }
+       }*/
+    }
+
+    async function cancelAllNotification(){
+        await Notifications.cancelAllScheduledNotificationsAsync()
     }
 
     async function cancelScheduleNotification(indentifier: string) {
@@ -245,37 +252,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
         latestDB.all().then((res:any)=>{
             setLatestEntries(res._array)
         })
-    }
-
-    function saveLatestTransation(ltsEntriesArray: LatestEntries[], id:string | undefined){
-                let totalValues = 0
-                allEntriesValues.map((value:EntriesValuesData) => {
-                    if (Number(id) === value.entries_id){
-                        totalValues = totalValues + value.amount
-                    }
-                })
-                entriesDB.findById(Number(id)).then((res:any)=>{
-                    let ltsEntriesObj = {
-                        title: res._array[0].title,
-                        day: res._array[0].day,
-                        month:3,
-                        type: res._array[0].type,
-                        amount: totalValues,
-                    }
-                    //ltsEntriesArray.push(ltsEntriesObj)
-                })       
-    }
-
-    async function getData (){
-        try {
-            const value = await AsyncStorage.getItem('latestEntries')
-            if(value !== null){
-                console.log(value)
-                return value
-            }else{
-            }
-        } catch (error) {
-        }
     }
 
     function defineDates(){

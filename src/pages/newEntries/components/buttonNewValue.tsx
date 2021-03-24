@@ -100,7 +100,7 @@ export default function ButtonNewValue() {
 const styles = StyleSheet.create({
     newValuesView: {
         alignItems: "center",
-        paddingVertical: 26,
+        //paddingVertical: 19,
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
