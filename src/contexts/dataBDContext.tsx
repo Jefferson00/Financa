@@ -59,6 +59,8 @@ interface DataBDContextData{
     loadAllEntriesResults: () => void;
     loadAllEntriesValuesResults: () => void;
     updateLoadAction: () => void;
+    loadNotifications: () => void;
+    loadEntriesByCurrentDate: () => void;
 
 }
 
@@ -98,49 +100,52 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setIsEntriesDone(true)
             if(res._array.length != allEntries.length){
                 setIsValuesUpdated(!isValuesUpdated)
-                console.log("loadAllEntriesResults ----  setIsValuesUpdated")
+               // console.log("loadAllEntriesResults ----  setIsValuesUpdated")
                 //console.log("loadAllEntriesResults")
             }
         }).catch(err=>{
             console.log(err)
             setIsEntriesDone(true)
-            console.log("err entradas")
+            //console.log("err entradas")
         })
     }
 
     function loadNotifications(){
         cancelAllNotification().then(value=>{
-            console.log(value)
+            console.log('cancelado!!!')
         })
-       /*if (entriesByCurrentDate.length > 0){
-            dates.findByDate((todayDate.getMonth()+1),todayDate.getFullYear()).then(() => {
-                console.log('loadNotifications ---- já existe')
-            }).catch(err => {
-                const DateObj = {
-                    day:todayDate.getDate(),
-                    month: todayDate.getMonth()+1,
-                    year: todayDate.getFullYear(),
-                }
-                dates.create(DateObj)
+
+        let currentDate
+        if (currentMonth < 10) {
+            currentDate = currentYear.toString() + '0' + currentMonth.toString()
+        } else {
+            currentDate = currentYear.toString() + currentMonth.toString()
+        }
+        setEntriesByCurrentDate([])
+        entriesDB.findByDate(parseInt(currentDate)).then((res:any)=>{
+            if (res._array.length > 0){
                 let thereAreLateEarnings = false
                 let thereAreLateExpanses = false
-                entriesByCurrentDate.map((entrie, index)=>{
+                res._array.map((entrie:any, index:number)=>{
                     if(entrie.day <= todayDate.getDate() && !entrie.received && entrie.type == "Ganhos"){
                         thereAreLateEarnings = true
-                        //schedulePushNotification(entrie.title, new Date())
                     }
                     if(entrie.day <= todayDate.getDate() && !entrie.received && entrie.type == "Despesas"){
                         thereAreLateExpanses = true
-                        //schedulePushNotification(entrie.title, new Date())
                     }
                     if(!entrie.received){ 
-                        schedulePushNotification(entrie.title, 'Você possui um(a)'+entrie.type+' próximo do vencimento!', 10*(index+1), entrie.day)
+                        schedulePushNotification(entrie.title, 'Você possui um(a)'+entrie.type+' próximo do vencimento!',  entrie.day)
                     }
                 })
-                thereAreLateEarnings && schedulePushNotification2('Ganhos não recebidos', 'Você possui ganhos para receber', 60* 60)
-                thereAreLateExpanses && schedulePushNotification2('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60* 60)
-            })
-       }*/
+                thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 30, false)
+                thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 30, false)
+                thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 86400, true)
+                thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 86400, true)
+            } 
+        }).catch(err=>{
+            console.log(err)
+     
+        })
     }
 
     async function cancelAllNotification(){
@@ -151,11 +156,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
         await Notifications.cancelScheduledNotificationAsync(indentifier)
     }
 
-    const schedulePushNotification = async (title: string, body: string, seconds:number, day:number) => {
+    const schedulePushNotification = async (title: string, body: string, day:number) => {
         const trigger = new Date()
-        trigger.setDate(day)
+        trigger.setDate(day-1)
         trigger.setHours(16)
-        trigger.setMinutes(32)
+        trigger.setMinutes(20)
         trigger.setSeconds(0)
         const identifier = await Notifications.scheduleNotificationAsync({
           content: {
@@ -173,7 +178,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         //cancelScheduleNotification(identifier)
     };
 
-      const schedulePushNotification2 = async (title: string, body: string, seconds:number) => {
+      const schedulePushNotificationLate = async (title: string, body: string, seconds:number, repeat:boolean) => {
         const identifier = await Notifications.scheduleNotificationAsync({
           content: {
               title: title,
@@ -183,7 +188,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
               }
             },
           trigger: {
-            repeats: true,
+            repeats: repeat,
             seconds: seconds,
           },
       
@@ -195,10 +200,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadEntriesValuesByDate(){
         valuesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesValuesByDate(res._array)
-            console.log('loadEntriesValuesByDate ---- ok')
+            //console.log('loadEntriesValuesByDate ---- ok')
         }).catch(err=>{
             console.log(err)
-            console.log('loadEntriesValuesByDate ---- erro')
+            //console.log('loadEntriesValuesByDate ---- erro')
             setEntriesValuesByDate([])
         })
     }
@@ -207,11 +212,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
         
         entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
-            console.log('loadEntriesByDate ---- ok')
+            //console.log('loadEntriesByDate ---- ok')
             
         }).catch(err=>{
             console.log(err)
-            console.log('loadEntriesByDate ---- erro')
+            //console.log('loadEntriesByDate ---- erro')
             setEntriesByDate([])
            
         })
@@ -226,11 +231,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
         }
         setEntriesByCurrentDate([])
         entriesDB.findByDate(parseInt(currentDate)).then((res:any)=>{
-            console.log('loadEntriesByCurrentDate ---- ok')
+            //console.log('loadEntriesByCurrentDate ---- ok')
             setEntriesByCurrentDate(res._array)
         }).catch(err=>{
             console.log(err)
-            console.log('loadEntriesByCurrentDate ---- erro')
+            //console.log('loadEntriesByCurrentDate ---- erro')
             setEntriesByCurrentDate([])
         })
     }
@@ -240,11 +245,11 @@ export function DataBDProvider({children}: DataBDProviderProps){
             setAllEntriesValues(res._array)
             if(res._array.length != allEntriesValues.length){
                 //setIsValuesUpdated(!isValuesUpdated)
-                console.log('loadAllEntriesValuesResults ---- ok')
+               // console.log('loadAllEntriesValuesResults ---- ok')
             }
         }).catch(err=>{
             console.log(err)
-            console.log('loadAllEntriesValuesResults ---- erro')
+            //console.log('loadAllEntriesValuesResults ---- erro')
         })
     }
 
@@ -337,7 +342,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         
         
         
-        loadNotifications()
+        //loadNotifications()
 
         //console.log("teste: ")
     },[isValuesUpdated])
@@ -345,7 +350,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     useEffect(()=>{
         loadAllEntriesValuesResults()
         setLatestTransations()
-        loadEntriesByCurrentDate()
+        
     },[allEntries])
 
     useEffect(()=>{
@@ -366,6 +371,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
 
     useEffect(()=>{
       defineDates()
+      loadEntriesByCurrentDate()
     },[isValuesUpdated])
 
     return(
@@ -380,8 +386,10 @@ export function DataBDProvider({children}: DataBDProviderProps){
             isEntriesDone,
             entriesByCurrentDate,
             loadAllEntriesResults,
+            loadNotifications,
             loadAllEntriesValuesResults,
             updateLoadAction,
+            loadEntriesByCurrentDate
         }}>
             {children}
         </DataBDContext.Provider>

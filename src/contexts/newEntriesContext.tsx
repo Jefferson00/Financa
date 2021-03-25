@@ -93,7 +93,7 @@ export const NewEntriesContext = createContext({} as NewEntriesContextData)
 
 export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
-    const {entriesByDate, entriesValuesByDate , allEntriesValues, updateLoadAction} = useContext(DataBDContext)
+    const {entriesByDate, entriesValuesByDate , allEntriesValues, updateLoadAction, loadNotifications, loadEntriesByCurrentDate} = useContext(DataBDContext)
     const {selectedYear, selectedMonth} = useContext(MainContext)
     //const {updateEntriesModalVisible} = useContext(StylesContext)
 
@@ -318,6 +318,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     //console.log("Create!")
                     //alert('valor cadastrado com sucesso!')
                     updateLoadAction()
+                    //loadEntriesByCurrentDate()
+                    
                     resetValues()
                 }).catch(err => {
                     console.log(err)
@@ -337,6 +339,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 latestDB.create(ltsObj)
             }
             updateLoadAction()
+            loadNotifications()
         }).catch(err => {
             console.log(err)
         })
@@ -411,6 +414,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             }
            
         })
+        loadNotifications()
     }
 
     function handleDeleteEntrie(entrieId:number){
@@ -451,6 +455,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 handleDeleteEntrieValues(entrieId, -1)
             }
         })
+        loadNotifications()
     }
 
     function handleDeleteEntrieValues(entrieId:number, valueId:number){
@@ -515,6 +520,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             latestDB.create(ltsObj)
             entriesDB.update(selectedId, obj).then(res => {
                 alert("Pago!")
+                loadNotifications()
                 updateLoadAction()
             }).catch(err => {
                 console.log(err)
