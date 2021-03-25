@@ -21,6 +21,9 @@ import { DataBDContext } from '../../contexts/dataBDContext';
 import ChartView from './components/chartView';
 import dates from '../../services/dates';
 import Functions from '../../utils'
+import BalanceLoader from './components/balanceLoader';
+import ChartLoader from './components/chartLoader';
+import LatestTransactionsLoader from './components/latestTransactionsLoader';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -81,7 +84,7 @@ export default function Main() {
   const [toBackgroundColor, setToBackgroundColor] = useState('#B26A15')
 
   const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear} = useContext(MainContext);
-  const {balances, entriesByCurrentDate } = useContext(DataBDContext)
+  const {balances, entriesByCurrentDate , isBalancesDone} = useContext(DataBDContext)
   const {hasNotifications } = useContext(StylesContext)
 
   const {updateMonthColorMainScreen, updateHasNotification} = useContext(StylesContext)
@@ -208,22 +211,35 @@ export default function Main() {
       <StatusBar style="light" translucent />
 
       <Header/>
+          {isBalancesDone ? 
+          <>
+              <ButtonsSelectors/>
 
-          <ButtonsSelectors/>
+              {isBalanceActive && <BalanceView values={balanceValuesProps}/>}
 
-          {isBalanceActive && <BalanceView values={balanceValuesProps}/>}
+              {isEarningsActive &&  <EarningsView values={earningsValuesProps}/>}
 
-          {isEarningsActive &&  <EarningsView values={earningsValuesProps}/>}
-
-          {isExpansesActive &&  <ExpansesView values={expansesValuesProps}/>}
+              {isExpansesActive &&  <ExpansesView values={expansesValuesProps}/>}
+          </>
+          : 
+          <BalanceLoader/>
+          }
 
       {/*Container Principal*/}
       <View style={styles.mainContainer}>
-          <ChartView/>
+          {isBalancesDone ? 
+            <ChartView/>
+          :
+            <ChartLoader/>
+          }
        
-          <View style={{flex:1}}>
-              <LatestTransations/>
-          </View>
+          {isBalancesDone ?
+            <View style={{flex:1}}>
+                <LatestTransations/>
+            </View>
+          :
+            <LatestTransactionsLoader/>
+          }
 
           <MenuFooter/>
 
