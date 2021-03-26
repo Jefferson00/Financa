@@ -9,6 +9,7 @@ import { NewEntriesContext } from "../../../contexts/newEntriesContext";
 import { MainContext } from "../../../contexts/mainContext";
 import { StylesContext } from "../../../contexts/stylesContext";
 import NoResultsView from "./noResultsView";
+import CategoryIcon from "./categoryIcon";
 
 interface EntriesData {
     id: number,
@@ -19,6 +20,7 @@ interface EntriesData {
     monthly: boolean,
     received: boolean,
     type: string,
+    category:string,
 }
 
 export default function EntriesResults() {
@@ -97,7 +99,8 @@ export default function EntriesResults() {
                                     style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
                                     onPress={()=> showEntrieModal(entrie.id, totalValues)}
                                 >
-                                    <MaterialIcons name="monetization-on" size={40} color={opacColor} />
+                                    <CategoryIcon category={entrie.category} opacColor={opacColor}/>
+                                    
 
                                     <View style={styles.earningTextView}>
                                         <Text numberOfLines={1} 

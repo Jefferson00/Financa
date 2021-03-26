@@ -15,6 +15,7 @@ interface EntriesData{
     monthly: boolean,
     received: boolean,
     type: string,
+    category:string,
 }
 
 interface BalanceData{

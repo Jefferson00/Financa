@@ -18,6 +18,7 @@ interface EntriesByDateData{
     monthly: boolean,
     received: boolean,
     type: string,
+    category:string,
 }
 
 interface EntriesData{
@@ -28,6 +29,7 @@ interface EntriesData{
     monthly: boolean,
     received: boolean,
     type: string,
+    category:string,
 }
 
 interface ValuesData{
@@ -60,7 +62,8 @@ interface NewEntriesContextData{
     isEnabledMonthly: boolean,
     entrieFrequency:number,
     entrieValuesBeforeCreate: ValuesData[];
-    typeOfEntrie:string
+    typeOfEntrie:string;
+    entrieCategory:string;
     entrieIdUpdate:number;
     onChangeDate: (event: any, selectedDate: any) => void;
     showDatepicker: () => void;
@@ -81,6 +84,7 @@ interface NewEntriesContextData{
     setEntrieValuesUpdate: (entrie:any)=> void;
     resetValues: ()=> void;
     setValuesUpdate: (valuesUpdate:EntriesValuesData[])=> void;
+    updateEntrieCategory: (category:string)=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -102,6 +106,11 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
     function setEntrieValuesUpdate(entrie:any){
         setTitleInputEntrie(entrie.title)
+        if(entrie.category !== undefined){
+            setEntrieCategory(entrie.category)
+        }else{
+            setEntrieCategory('others')
+        }
 
         entrie.received == 1 ? setIsEnabledReceived(true) : setIsEnabledReceived(false)
         
@@ -177,6 +186,12 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     //-------------------------------------//
 
     const [titleInputEntrie, setTitleInputEntrie] = useState('');
+    const [entrieCategory, setEntrieCategory] = useState("others");
+
+    function updateEntrieCategory (category:string){
+        setEntrieCategory(category)
+    }
+
     const [entrieFrequency, setEntrieFrequency] = useState(1);
 
     function decreaseEntrieFrequency(){
@@ -265,6 +280,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             monthly: isEnabledMonthly,
             received: isEnabledReceived,
             type: typeOfEntrie,
+            category: entrieCategory,
         }
 
         entriesDB.create(EntrieObj).then(()=>{
@@ -311,7 +327,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     day: new Date().getDate(),
                     month: new Date().getMonth() +1,
                     type: typeOfEntrie,
-                    category: 'teste',
+                    category: entrieCategory,
                     amount: totalValues,
                     entrie_id: res._array.slice(-1)[0].id,
                 }
@@ -322,6 +338,34 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             loadNotifications()
         }).catch(err => {
             console.log(err)
+        })
+    }
+
+    function updateLatestReceived(){
+        latestDB.all().then((res:any)=>{
+            res._array.map((ltsEntrie:any) =>{
+                if(ltsEntrie.entrie_id == entrieIdUpdate){
+                    console.log('ok')
+                    let totalValues = 0
+                    entrieValuesBeforeCreate.map((value: ValuesData) =>{
+                        let amount = String(value.amount)
+                        amount = amount.replace(/[.]/g, '')
+                        amount = amount.replace(/[,]/g, '')
+                        totalValues = totalValues + Number(amount)
+                    })
+                    let ltsObj = {
+                        title: titleInputEntrie,
+                        day: ltsEntrie.day,
+                        month: ltsEntrie.month,
+                        type: ltsEntrie.type,
+                        category: entrieCategory,
+                        amount: totalValues,
+                        entrie_id: entrieIdUpdate,
+                    }
+                    console.log('           '+ltsObj.category)
+                    latestDB.update(ltsEntrie.id,ltsObj)
+                }
+            })
         })
     }
 
@@ -340,7 +384,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     day: new Date().getDate(),
                     month: new Date().getMonth() +1,
                     type: typeOfEntrie,
-                    category: 'teste',
+                    category: entrieCategory,
                     amount: totalValues,
                     entrie_id: res._array.slice(-1)[0].id,
                 }
@@ -360,9 +404,11 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             monthly: isEnabledMonthly,
             received: isEnabledReceived,
             type: typeOfEntrie,
+            category:entrieCategory
         }
 
         createLatestReceivedOnUpdate()
+        updateLatestReceived()
 
         entriesDB.update(entrieIdUpdate, EntrieObj).then(()=>{
             alert("atualizado!")
@@ -437,7 +483,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                         dtEnd: Functions.setDtEnd(false, contRep, newDate),
                         monthly: false,
                         received: entrie.received,
-                        type: entrie.type
+                        type: entrie.type,
+                        category:entrie.category
                     }
                     
                     entriesDB.update(entrieId, entrieObj)
@@ -505,6 +552,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 monthly: res._array[0].monthly,
                 received: true,
                 type: res._array[0].type,
+                category:res._array[0].category,
             }
             let totalValues = 0
             allEntriesValues.map((value:EntriesValuesData) => {
@@ -517,7 +565,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 day: new Date().getDate(),
                 month: new Date().getMonth() +1,
                 type: res._array[0].type,
-                category: 'teste',
+                category: res._array[0].category,
                 amount: totalValues,
                 entrie_id: selectedId,
             }
@@ -543,6 +591,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             entrieValuesBeforeCreate,
             typeOfEntrie,
             entrieIdUpdate,
+            entrieCategory,
             onChangeDate,
             showDatepicker,
             setTitleInputEntrie,
@@ -562,6 +611,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             resetValues,
             setValuesUpdate,
             handleUpdate,
+            updateEntrieCategory,
         }}>
             {children}
         </NewEntriesContext.Provider>

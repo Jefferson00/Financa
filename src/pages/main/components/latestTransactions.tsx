@@ -4,6 +4,7 @@ import { Foundation , Ionicons, Entypo} from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
 import Functions from '../../../functions/index'
 import { DataBDContext } from '../../../contexts/dataBDContext';
+import CategoryIcon from './categoryIcon';
 
 
 export default function LatestTransactions() {
@@ -36,11 +37,9 @@ export default function LatestTransactions() {
                     <View style={styles.listView} key={index}>
                         {seeTransactions?
                         <>
-                            <Foundation 
-                                name="dollar" 
-                                size={30} 
-                                color={entr.type == 'Ganhos' ? '#136065' : '#CC3728'}/>
-                            
+                            <View style={{alignItems:'center',justifyContent:'center', marginVertical:2.5}}>
+                                <CategoryIcon category={entr.category} type={entr.type}/>
+                            </View>
                             <View style={styles.centerView}>
                                 <Text style={[
                                     styles.itemText,

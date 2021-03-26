@@ -7,7 +7,7 @@ db.transaction((tx) => {
     //<<<<<<<<<<<<<<<<<<<<<<<< USE ISSO APENAS DURANTE OS TESTES!!! >>>>>>>>>>>>>>>>>>>>>>>
   
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, day INT, dtStart INT, dtEnd INT, monthly BOOLEAN, received BOOLEAN, type TEXT);"
+      "CREATE TABLE IF NOT EXISTS entries (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, day INT, dtStart INT, dtEnd INT, monthly BOOLEAN, received BOOLEAN, type TEXT, category TEXT);"
     );
   });
 
@@ -15,8 +15,8 @@ db.transaction((tx) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
         tx.executeSql(
-          "INSERT INTO entries (title,day,dtStart,dtEnd,monthly,received,type) values (?,?,?,?,?,?,?);",
-          [obj.title,obj.day,obj.dtStart,obj.dtEnd,obj.monthly,obj.received,obj.type],
+          "INSERT INTO entries (title,day,dtStart,dtEnd,monthly,received,type,category) values (?,?,?,?,?,?,?,?);",
+          [obj.title,obj.day,obj.dtStart,obj.dtEnd,obj.monthly,obj.received,obj.type,obj.category],
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);
@@ -93,8 +93,8 @@ db.transaction((tx) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
         tx.executeSql(
-          "UPDATE entries SET title=?,day=?,dtStart=?,dtEnd=?,monthly=?,received=?,type=? Where id=?;",
-          [obj.title,obj.day,obj.dtStart,obj.dtEnd,obj.monthly,obj.received,obj.type, id],
+          "UPDATE entries SET title=?,day=?,dtStart=?,dtEnd=?,monthly=?,received=?,type=?,category=? Where id=?;",
+          [obj.title,obj.day,obj.dtStart,obj.dtEnd,obj.monthly,obj.received,obj.type,obj.category, id],
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);

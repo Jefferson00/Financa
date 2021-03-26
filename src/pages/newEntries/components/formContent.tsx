@@ -4,13 +4,14 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Functions from '../../../functions'
 
-import { Feather } from '@expo/vector-icons'
+import { Feather, Ionicons , FontAwesome5, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
 import { StylesContext } from "../../../contexts/stylesContext";
 import entriesDB from "../../../services/entriesDB";
 import valuesDB from "../../../services/valuesDB";
 import { DataBDContext } from "../../../contexts/dataBDContext";
 import LoaderUpdate from "./loaderUpdate";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 
 interface EntriesValuesData{
     id:number,
@@ -34,7 +35,9 @@ export default function FormContent() {
            isEnabledMonthly,
            entrieFrequency,
            entrieValuesBeforeCreate,
+           entrieIdUpdate,
            typeOfEntrie,
+           entrieCategory,
            onChangeDate, 
            showDatepicker,
            setTitleInputEntrie,
@@ -44,8 +47,8 @@ export default function FormContent() {
            decreaseEntrieFrequency,
            updateEntrieValuesBeforeCreate,
            setEntrieValuesUpdate,
-           entrieIdUpdate,
            setValuesUpdate,
+           updateEntrieCategory,
         } = useContext(NewEntriesContext)
 
         const {entriePrimaryColor, entrieSecondaryColor , isValuesFormVisible} = useContext(StylesContext)
@@ -67,6 +70,8 @@ export default function FormContent() {
             console.log("Entrie Update: "+entrieUpdate)
             setValuesUpdate(entrieUpdate)
             
+        }else{
+            updateEntrieCategory('others')
         }
     },[])
 
@@ -152,6 +157,163 @@ export default function FormContent() {
                     </View>
 
                     <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                        Categoria
+                    </Text>
+
+                    <ScrollView horizontal>
+                        <View style={{flexDirection:'row'}}>
+                            {typeOfEntrie == "Ganhos" &&
+                                <View style={styles.categoryView}>
+                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("pay")}>
+                                        <FontAwesome5 
+                                            name="money-bill-wave" 
+                                            size={24} 
+                                            color={entrieSecondaryColor} 
+                                            style={entrieCategory == 'pay' ? {opacity:1}: {opacity:0.3}}
+                                        />
+                                    </TouchableOpacity>
+                                    <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                        Salário
+                                    </Text>
+                                </View>
+                            }
+                            <View style={styles.categoryView}>
+                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("food")}>
+                                    <Ionicons 
+                                        name="restaurant" 
+                                        size={24} 
+                                        color={entrieSecondaryColor} 
+                                        style={entrieCategory == 'food' ? {opacity:1}: {opacity:0.3}}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                    Alimentação
+                                </Text>
+                            </View>
+                            <View  style={styles.categoryView}>
+                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("house")}>
+                                    <Ionicons 
+                                        name="home" 
+                                        size={24} 
+                                        color={entrieSecondaryColor} 
+                                        style={entrieCategory == 'house' ? {opacity:1}: {opacity:0.3}}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                    Casa
+                                </Text>
+                            </View>
+                            <View  style={styles.categoryView}>
+                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("transport")}>
+                                    <Ionicons 
+                                        name="bus" 
+                                        size={24} 
+                                        color={entrieSecondaryColor} 
+                                        style={entrieCategory == 'transport' ? {opacity:1}: {opacity:0.3}}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                    Transporte
+                                </Text>
+                            </View>
+                            <View  style={styles.categoryView}>
+                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("transfer")}>
+                                    <MaterialCommunityIcons 
+                                        name="bank-transfer" 
+                                        size={24} 
+                                        color={entrieSecondaryColor} 
+                                        style={entrieCategory == 'transfer' ? {opacity:1}: {opacity:0.3}}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                    Transferencias
+                                </Text>
+                            </View>
+                            {typeOfEntrie == "Despesas" &&
+                            <>
+                                <View  style={styles.categoryView}>
+                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("card")}>
+                                        <Ionicons 
+                                            name="card-outline" 
+                                            size={24} 
+                                            color={entrieSecondaryColor} 
+                                            style={entrieCategory == 'card' ? {opacity:1}: {opacity:0.3}}
+                                        />
+                                    </TouchableOpacity>
+                                    <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                        Cartão de crédito
+                                    </Text>
+                                </View>
+                                <View  style={styles.categoryView}>
+                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("education")}>
+                                        <Ionicons 
+                                            name="school" 
+                                            size={24} 
+                                            color={entrieSecondaryColor} 
+                                            style={entrieCategory == 'education' ? {opacity:1}: {opacity:0.3}}
+                                        />
+                                    </TouchableOpacity>
+                                    <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                        Educação
+                                    </Text>
+                                </View>
+                                <View  style={styles.categoryView}>
+                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("recreation")}>
+                                        <FontAwesome5 
+                                            name="theater-masks" 
+                                            size={24} 
+                                            color={entrieSecondaryColor} 
+                                            style={entrieCategory == 'recreation' ? {opacity:1}: {opacity:0.3}}
+                                        />
+                                    </TouchableOpacity>
+                                    <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                        Lazer
+                                    </Text>
+                                </View>
+                                <View  style={styles.categoryView}>
+                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("comunication")}>
+                                        <FontAwesome5 
+                                            name="phone" 
+                                            size={24} 
+                                            color={entrieSecondaryColor} 
+                                            style={entrieCategory == 'comunication' ? {opacity:1}: {opacity:0.3}}
+                                        />
+                                    </TouchableOpacity>
+                                    <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                        Comunicação
+                                    </Text>
+                                </View>
+                                <View  style={styles.categoryView}>
+                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("health")}>
+                                        <AntDesign 
+                                        name="medicinebox" 
+                                        size={24} color={entrieSecondaryColor} 
+                                        style={entrieCategory == 'health' ? {opacity:1}: {opacity:0.3}}
+                                        />
+                                    </TouchableOpacity>
+                                    <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                        Saúde
+                                    </Text>
+                                </View>
+                            </>
+                            }
+                            <View  style={styles.categoryView}>
+                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("others")}>
+                                    <Ionicons 
+                                        name="cash-outline" 
+                                        size={24} 
+                                        color={entrieSecondaryColor} 
+                                        style={entrieCategory == 'others' ? {opacity:1}: {opacity:0.3}}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={[styles.tinyText, {color:entrieSecondaryColor}]}>
+                                    Outros
+                                </Text>
+                            </View>
+                        </View>
+                    </ScrollView>
+
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                         Valor
                     </Text>
                     {!isValuesFormVisible && 
@@ -214,5 +376,10 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins_500Medium',
         fontSize: 18,
         width: '100%'
+    },
+    categoryView:{
+        alignItems:'center', 
+        justifyContent:'center',
+        margin:10
     },
 })
