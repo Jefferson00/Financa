@@ -78,7 +78,7 @@ db.transaction((tx) => {
       db.transaction((tx) => {
         //comando SQL modificável
         tx.executeSql(
-          "DELETE FROM latest WHERE id=?;",
+          "DELETE FROM latest WHERE entrie_id=?;",
           [id],
           //-----------------------
           (_, { rowsAffected }) => {

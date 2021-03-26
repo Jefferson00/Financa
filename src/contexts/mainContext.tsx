@@ -62,7 +62,6 @@ export function MainProvider({children}:MainProviderProps){
         try {
             const value = await AsyncStorage.getItem('SeeBalanceValues')
             if(value !== null){
-                console.log(value)
                 return value
             }else{
             }
@@ -74,7 +73,6 @@ export function MainProvider({children}:MainProviderProps){
         setSelectedMonth(currentMonth)
         setSelectedYear(currentYear)
         updateInitialDate()
-        //console.log("Data resetada: : ")
     }
 
     function handleNextMonth(){
@@ -119,7 +117,6 @@ export function MainProvider({children}:MainProviderProps){
     function handleSeeBalanceValues(){
         setSeeBalanceValues(!seeBalanceValues)
         let stringSeeBalanceValues = String(!seeBalanceValues)
-        console.log('seeBalanceValues 111111111: '+stringSeeBalanceValues)
         storeSeeBalanceValues(stringSeeBalanceValues)
     }
 
@@ -133,12 +130,9 @@ export function MainProvider({children}:MainProviderProps){
 
     useEffect(()=>{
         updateInitialDate()
-        //console.log("dta inicial: "+initialDate)
         let item = getSeeBalanceValues()
         item.then((stringSeeBalanceValues)=>{
-           // console.log('seeBalanceValues: '+Boolean(stringSeeBalanceValues))
             stringSeeBalanceValues == "true" ? setSeeBalanceValues(true) : setSeeBalanceValues(false)
-           // setSeeBalanceValues(Boolean(stringSeeBalanceValues))
         })
     },[])
 

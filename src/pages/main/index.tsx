@@ -14,12 +14,10 @@ import BalanceView from './components/balanceView';
 import EarningsView from './components/earningsView';
 import ExpansesView from './components/expansesView';
 import { MainContext} from '../../contexts/mainContext';
-import { NewEntriesContext } from '../../contexts/newEntriesContext';
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native'
 import { StylesContext } from '../../contexts/stylesContext';
 import { DataBDContext } from '../../contexts/dataBDContext';
 import ChartView from './components/chartView';
-import dates from '../../services/dates';
 import Functions from '../../utils'
 import BalanceLoader from './components/balanceLoader';
 import ChartLoader from './components/chartLoader';
@@ -75,23 +73,22 @@ declare type Subscription = {
 export default function Main() {
   const navigation = useNavigation()
   const isFocused = useIsFocused()
+
   const [expoPushToken, setExpoPushToken] = useState<any>('');
   const [notification, setNotification] = useState<any>(false);
- 
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
+
   const [fromBackgroundColor, setFromBackgroundColor] = useState('#F9CF3C')
   const [toBackgroundColor, setToBackgroundColor] = useState('#B26A15')
 
   const {isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear} = useContext(MainContext);
-  const {balances, entriesByCurrentDate , isBalancesDone} = useContext(DataBDContext)
-  const {hasNotifications } = useContext(StylesContext)
-
+  const {balances, entriesByCurrentDate , isBalancesDone, allEntriesValues} = useContext(DataBDContext)
   const {updateMonthColorMainScreen, updateHasNotification} = useContext(StylesContext)
   
   let latedEarningEntries
   let latedExpansesEntries
-  //const isFocused = useIsFocused()
+
   latedEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Ganhos")
   latedExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Despesas")
 
@@ -128,7 +125,6 @@ export default function Main() {
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
           console.log(response);
         });
-        //console.log("isbetween: "+Functions.isBetweenDates(12,2022,202003,202204))
   },[])
 
   const registerForPushNotificationsAsync = async () => {
@@ -161,9 +157,7 @@ export default function Main() {
   
     return token;
   };
-  
 
-  const {allEntriesValues} = useContext(DataBDContext)
 
   let earningsValuesArrays : Array<number> = []
   let expansesValuesArrays : Array<number> = []
@@ -179,7 +173,6 @@ export default function Main() {
             value.type == 'Ganhos' ? estimatedEarningsArrays.push(value.amount) : estimatedExpansesArrays.push(value.amount)  
           }
       }
-    //console.log(value.dtEnd)
   })
 
   let currentEarnings = earningsValuesArrays.reduce((a: any, b: any) => a + b, 0) 

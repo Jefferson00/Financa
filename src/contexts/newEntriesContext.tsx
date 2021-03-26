@@ -1,7 +1,6 @@
-import AsyncStorage from '@react-native-community/async-storage';
+
 import React, {createContext, useState, ReactNode, useContext} from 'react';
 import { Platform } from 'react-native';
-import functions from '../functions';
 import entriesDB from '../services/entriesDB';
 import latestDB from '../services/latestDB';
 import valuesDB from '../services/valuesDB';
@@ -93,9 +92,8 @@ export const NewEntriesContext = createContext({} as NewEntriesContextData)
 
 export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
-    const {entriesByDate, entriesValuesByDate , allEntriesValues, updateLoadAction, loadNotifications, loadEntriesByCurrentDate} = useContext(DataBDContext)
+    const {entriesByDate, entriesValuesByDate , allEntriesValues, updateLoadAction, loadNotifications} = useContext(DataBDContext)
     const {selectedYear, selectedMonth} = useContext(MainContext)
-    //const {updateEntriesModalVisible} = useContext(StylesContext)
 
     const [typeOfEntrie, setTypeOfEntrie] = useState('');
     const [entrieIdUpdate, setEntrieIdUpdate] = useState(0);
@@ -119,7 +117,6 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         let newDate = new Date()
         newDate.setMonth(Number(Functions.toMonthAndYear(entrie.dtStart).month)-1)
         newDate.setFullYear(Number(Functions.toMonthAndYear(entrie.dtStart).year))
-        //console.log("DIA: "+entrie.day)
         newDate.setDate(entrie.day)
         setCalendarDate(newDate)
     }
@@ -150,7 +147,6 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
     function updateTypeOfEntrie(type:string){
         setTypeOfEntrie(type)
-        //console.log("Atualizou o tipo da entrada")
     }
 
     //-------------------------------//
@@ -161,14 +157,11 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         const currentDate = selectedDate || calendarDate;
         setShowCalendar(Platform.OS === 'ios');
         setCalendarDate(currentDate);
-       // console.log("Atualizou a data do calendario")
     };
 
     const showDatepicker = () => {
         setShowCalendar(true);
     };
-
-    //TODO a data no cadastro tem que ser igual a data selecionada
 
     //----------------------//
 
@@ -178,9 +171,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     const toggleSwitchReceived = () => setIsEnabledReceived(previousState => !previousState);
 
     const toggleSwitchMonthly = () => {
-        //seta o switch mensal como true ou false
         setIsEnabledMonthly(previousState => !previousState)
-       // console.log("Mudou o switch mensal")
     };
 
     //-------------------------------------//
@@ -265,7 +256,6 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     function handleCreateNewEntrie(){
         let dtStart = Functions.setDtStart(calendarDate)
         let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
-       // console.log("******CADASTRO********** ")
 
         const EntrieObj : EntriesData = {
             title: titleInputEntrie,
@@ -277,19 +267,13 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             type: typeOfEntrie,
         }
 
-        ///console.log("Objeto: "+EntrieObj)
-
         entriesDB.create(EntrieObj).then(()=>{
-           // console.log("Create!")
             alert('cadastrado com sucesso!')
             updateLoadAction()
         }).catch(err=>{
             console.log(err)
         })
         entriesDB.all().then((res:any)=>{
-            //console.log(res)
-
-            //console.log("All!")
             let totalValues = 0
             entrieValuesBeforeCreate.map((value: ValuesData) =>{
                 let EntrieId = res._array.slice(-1)[0].id
@@ -315,11 +299,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     entries_id: EntrieId
                 }
                 valuesDB.create(ValueObj).then(()=>{
-                    //console.log("Create!")
-                    //alert('valor cadastrado com sucesso!')
                     updateLoadAction()
-                    //loadEntriesByCurrentDate()
-                    
                     resetValues()
                 }).catch(err => {
                     console.log(err)
@@ -345,6 +325,30 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         })
     }
 
+    function createLatestReceivedOnUpdate(){
+        entriesDB.findById(entrieIdUpdate).then((res:any)=>{
+            if (!res._array[0].received && isEnabledReceived){
+                let totalValues = 0
+                entrieValuesBeforeCreate.map((value: ValuesData) =>{
+                    let amount = String(value.amount)
+                    amount = amount.replace(/[.]/g, '')
+                    amount = amount.replace(/[,]/g, '')
+                    totalValues = totalValues + Number(amount)
+                })
+                let ltsObj = {
+                    title: titleInputEntrie,
+                    day: new Date().getDate(),
+                    month: new Date().getMonth() +1,
+                    type: typeOfEntrie,
+                    category: 'teste',
+                    amount: totalValues,
+                    entrie_id: res._array.slice(-1)[0].id,
+                }
+                latestDB.create(ltsObj)
+            }
+        })
+    }
+
     function handleUpdate(){
         let dtStart = Functions.setDtStart(calendarDate)
         let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
@@ -357,6 +361,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             received: isEnabledReceived,
             type: typeOfEntrie,
         }
+
+        createLatestReceivedOnUpdate()
+
         entriesDB.update(entrieIdUpdate, EntrieObj).then(()=>{
             alert("atualizado!")
             updateLoadAction()
@@ -376,9 +383,6 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 }else{
                     newDtEnd = Functions.setDtEnd(false, value.frequency, valueDate)
                 }
-                //console.log("VALUE PARA ATUALUZAR - description: "+value.description)
-                //console.log("VALUE PARA ATUALUZAR - dtStart: "+value.dtStart)
-                //console.log("VALUE PARA ATUALUZAR - dtEnd: "+newDtEnd)
                 const ValueObjUpdate:any = {
                     description: value.description,
                     amount: Number(amount),
@@ -399,10 +403,6 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 }else{
                     newDtEnd = Functions.setDtEnd(false, value.frequency, newDate)
                 }
-                
-                //console.log("VALUE PARA CRIAR - description: "+value.description)
-                //console.log("VALUE PARA CRIAR - dtStart: "+value.dtStart)
-                //console.log("VALUE PARA CRIAR - dtENd: "+newDtEnd)
                 const ValueObjCreate:any = {
                     description: value.description,
                     amount: Number(amount),
@@ -412,7 +412,6 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 }
                 valuesDB.create(ValueObjCreate)
             }
-           
         })
         loadNotifications()
     }
@@ -445,6 +444,11 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                     updateLoadAction()
                 } else {
                     entriesDB.remove2(entrieId).then(()=>{
+                        updateLoadAction()
+                    }).catch(err =>{
+                        console.log(err)
+                    })
+                    latestDB.remove(entrieId).then(()=>{
                         updateLoadAction()
                     }).catch(err =>{
                         console.log(err)

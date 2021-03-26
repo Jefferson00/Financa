@@ -11,7 +11,7 @@ export default function LatestTransactionsLoader() {
             width={'100%'}
             height={161}
             viewBox="0 0 400 150"
-            backgroundColor="rgba(60, 147, 249, 0.5)"
+            backgroundColor="rgba(180, 175, 175, 0.5)"
             foregroundColor="rgba(225, 225, 225, 0.5)"
             style={{borderRadius:20}}
             opacity='0.5'

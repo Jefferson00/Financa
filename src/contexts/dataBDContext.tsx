@@ -1,11 +1,9 @@
 import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
-import dates from '../services/dates';
 import entriesDB from '../services/entriesDB';
 import valuesDB from '../services/valuesDB';
 import Functions from "../utils"
 import { MainContext } from './mainContext';
 import * as Notifications from 'expo-notifications';
-import AsyncStorage from '@react-native-community/async-storage';
 import latestDB from '../services/latestDB';
 
 interface EntriesData{
@@ -73,7 +71,6 @@ export const DataBDContext = createContext({} as DataBDContextData)
 
 export function DataBDProvider({children}: DataBDProviderProps){
 
-    const [isValuesUpdated, setIsValuesUpdated] = useState(false)
     const {currentYear, selectedMonth, initialDate, currentMonth, todayDate} = useContext(MainContext)
 
     const [balances, setBalances] = useState<BalanceData[]>([])
@@ -83,7 +80,8 @@ export function DataBDProvider({children}: DataBDProviderProps){
     const [entriesValuesByDate, setEntriesValuesByDate] = useState<EntriesValuesData[]>([])
     const [allEntriesValues, setAllEntriesValues] = useState<EntriesValuesData[]>([])
     const [latestEntries, setLatestEntries] = useState<LatestEntries[]>([])
-
+    
+    const [isValuesUpdated, setIsValuesUpdated] = useState(false)
     const [isBalancesDone, setIsBalancesDone] = useState(false)
     const [isEntriesDone, setIsEntriesDone] = useState(false)
     
@@ -137,8 +135,8 @@ export function DataBDProvider({children}: DataBDProviderProps){
                         schedulePushNotification(entrie.title, 'Você possui um(a)'+entrie.type+' próximo do vencimento!',  entrie.day)
                     }
                 })
-                thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 30, false)
-                thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 30, false)
+                thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 60*60, false)
+                thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60*60, false)
                 thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 86400, true)
                 thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 86400, true)
             } 
@@ -152,10 +150,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
         await Notifications.cancelAllScheduledNotificationsAsync()
     }
 
-    async function cancelScheduleNotification(indentifier: string) {
-        await Notifications.cancelScheduledNotificationAsync(indentifier)
-    }
-
     const schedulePushNotification = async (title: string, body: string, day:number) => {
         const trigger = new Date()
         trigger.setDate(day-1)
@@ -166,16 +160,12 @@ export function DataBDProvider({children}: DataBDProviderProps){
           content: {
               title: title,
               body: body,
-              data: {
-              //more data here
-              }
             },
             trigger
       
         })
         console.log('identifier: '+identifier)
         console.log('trigger: '+trigger)
-        //cancelScheduleNotification(identifier)
     };
 
       const schedulePushNotificationLate = async (title: string, body: string, seconds:number, repeat:boolean) => {
@@ -183,9 +173,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
           content: {
               title: title,
               body: body,
-              data: {
-              //more data here
-              }
             },
           trigger: {
             repeats: repeat,
@@ -194,7 +181,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
       
         })
         console.log('identifier: '+identifier)
-        //cancelScheduleNotification(identifier)
       };
 
     function loadEntriesValuesByDate(){
@@ -209,16 +195,13 @@ export function DataBDProvider({children}: DataBDProviderProps){
     }
 
     function loadEntriesByDate(){
-        
         entriesDB.findByDate(parseInt(initialDate)).then((res:any)=>{
             setEntriesByDate(res._array)
             //console.log('loadEntriesByDate ---- ok')
-            
         }).catch(err=>{
             console.log(err)
             //console.log('loadEntriesByDate ---- erro')
             setEntriesByDate([])
-           
         })
     }
 
@@ -337,28 +320,15 @@ export function DataBDProvider({children}: DataBDProviderProps){
   
     useEffect(()=>{
         loadAllEntriesResults()
-        
-        
-        
-        
-        
+        defineDates()
+        loadEntriesByCurrentDate()
         //loadNotifications()
 
-        //console.log("teste: ")
     },[isValuesUpdated])
 
     useEffect(()=>{
         loadAllEntriesValuesResults()
         setLatestTransations()
-        
-    },[allEntries])
-
-    useEffect(()=>{
-        
-    },[allEntries, allEntriesValues])
-    
-    useEffect(()=>{
-       
     },[allEntries])
 
     useEffect(()=>{
@@ -369,10 +339,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
         loadEntriesByDate()
     },[selectedMonth, isValuesUpdated])
 
-    useEffect(()=>{
-      defineDates()
-      loadEntriesByCurrentDate()
-    },[isValuesUpdated])
 
     return(
         <DataBDContext.Provider value={{

@@ -96,7 +96,7 @@ export function StylesProvider({children}: StylesProviderProps){
     function updateMonthColorMainScreen(){
         setMonthColor('#3C93F9')
         updateTypeOfEntrie('')
-        console.log('updated!')
+        //console.log('updated!')
     }
 
     useEffect(()=>{
