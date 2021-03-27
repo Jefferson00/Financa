@@ -288,6 +288,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             updateLoadAction()
         }).catch(err=>{
             console.log(err)
+            alert('erro: '+err)
         })
         entriesDB.all().then((res:any)=>{
             let totalValues = 0
