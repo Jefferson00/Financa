@@ -5,6 +5,7 @@ import NumberFormat from 'react-number-format';
 import Functions from '../../../functions/index'
 import { DataBDContext } from '../../../contexts/dataBDContext';
 import CategoryIcon from './categoryIcon';
+import { MainContext } from '../../../contexts/mainContext';
 
 
 export default function LatestTransactions() {
@@ -12,6 +13,7 @@ export default function LatestTransactions() {
     const [seeTransactions, setSeeTransactions] = useState(true)
 
     const {latestEntries } = useContext(DataBDContext)
+    const {seeBalanceValues } = useContext(MainContext)
 
     const ltsEntries = latestEntries.slice(Math.max(latestEntries.length - 3, 0))
 
@@ -21,13 +23,15 @@ export default function LatestTransactions() {
                 <Text style={styles.title}>
                     Últimas Transações
                 </Text>
-                <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> setSeeTransactions(!seeTransactions)}>
-                    {seeTransactions?
-                    <Ionicons name="eye-off" size={30} color="#d2d2d2" />
-                    :
-                    <Ionicons name="eye" size={30} color="#d2d2d2"  />
-                    }
-                </TouchableOpacity>
+                {/*
+                    <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> setSeeTransactions(!seeTransactions)}>
+                        {seeTransactions?
+                        <Ionicons name="eye-off" size={30} color="#d2d2d2" />
+                        :
+                        <Ionicons name="eye" size={30} color="#d2d2d2"  />
+                        }
+                    </TouchableOpacity>                
+                */}
             </View>
 
             {ltsEntries.length > 0 ? ltsEntries.map((entr: any, index: number) => {
@@ -35,7 +39,7 @@ export default function LatestTransactions() {
 
                 return (
                     <View style={styles.listView} key={index}>
-                        {seeTransactions?
+                        {seeBalanceValues?
                         <>
                             <View style={{alignItems:'center',justifyContent:'center', marginVertical:2.5}}>
                                 <CategoryIcon category={entr.category} type={entr.type}/>

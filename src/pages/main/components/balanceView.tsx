@@ -176,8 +176,9 @@ const styles = StyleSheet.create({
     },
   
     censoredValue:{
-        height:25,
+        height:35,
         width:136,
+        borderRadius:5,
         backgroundColor:'rgba(247, 241, 241, 0.80)',
     },
   

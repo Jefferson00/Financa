@@ -136,8 +136,8 @@ export function DataBDProvider({children}: DataBDProviderProps){
                         schedulePushNotification(entrie.title, 'Você possui um(a)'+entrie.type+' próximo do vencimento!',  entrie.day)
                     }
                 })
-                thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 60*60, false)
-                thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60*60, false)
+                thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 60*5, false)
+                thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 60*5, false)
                 thereAreLateEarnings && schedulePushNotificationLate('Ganhos não recebidos', 'Você possui ganhos para receber', 86400, true)
                 thereAreLateExpanses && schedulePushNotificationLate('Despesas não pagas', 'Você possui despesas com o pagamento atrasado', 86400, true)
             } 
