@@ -96,9 +96,11 @@ export default function FormContent() {
                                 {typeOfEntrie == "Ganhos" ?"Data de recebimento" : "Data de pagamento"}
                             </Text>
                             <View style={styles.dateView}>
-                                <Text style={[styles.tinyText, { color: entrieSecondaryColor }]} onPress={showDatepicker}>
-                                    {calendarDate.getDate()} / {Functions.convertDtToStringMonth(calendarDate.getMonth() + 1)}
-                                </Text>
+                                <TouchableOpacity  onPress={showDatepicker} hitSlop={styles.hitSlop}>
+                                    <Text style={[styles.tinyText, { color: entrieSecondaryColor }]}>
+                                        {calendarDate.getDate()} / {Functions.convertDtToStringMonth(calendarDate.getMonth() + 1)}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
                         <View>
@@ -141,30 +143,35 @@ export default function FormContent() {
                             value={isEnabledMonthly}
                         />
 
-                        <Feather name='chevron-left' size={30}
-                            onPress={decreaseEntrieFrequency} />
+                        <TouchableOpacity onPress={decreaseEntrieFrequency} hitSlop={styles.hitSlop}>
+                            <Feather name='chevron-left' size={30}/>
+                        </TouchableOpacity>
 
                         <Text style={{ fontSize: 18 }}>
                             {isEnabledMonthly? '-' : entrieFrequency}
                         </Text>
 
-                        <Feather name='chevron-right' size={30}
-                            onPress={increaseEntrieFrequency}
-                        />
+                        <TouchableOpacity onPress={increaseEntrieFrequency} hitSlop={styles.hitSlop}>
+                            <Feather name='chevron-right' size={30}/>
+                        </TouchableOpacity>
                         <Text style={[styles.tinyText, { color: entrieSecondaryColor }]}>
                             Vezes
                         </Text>
                     </View>
 
-                    <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor, marginTop:10 }]}>
                         Categoria
                     </Text>
 
-                    <ScrollView horizontal>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         <View style={{flexDirection:'row'}}>
                             {typeOfEntrie == "Ganhos" &&
                                 <View style={styles.categoryView}>
-                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("pay")}>
+                                    <TouchableOpacity 
+                                        style={{margin:10}} 
+                                        onPress={()=> updateEntrieCategory("pay")}
+                                        hitSlop={styles.hitSlop}
+                                    >
                                         <FontAwesome5 
                                             name="money-bill-wave" 
                                             size={24} 
@@ -178,7 +185,11 @@ export default function FormContent() {
                                 </View>
                             }
                             <View style={styles.categoryView}>
-                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("food")}>
+                                <TouchableOpacity 
+                                    style={{margin:10}}
+                                    onPress={()=> updateEntrieCategory("food")}
+                                    hitSlop={styles.hitSlop}
+                                >
                                     <Ionicons 
                                         name="restaurant" 
                                         size={24} 
@@ -191,7 +202,11 @@ export default function FormContent() {
                                 </Text>
                             </View>
                             <View  style={styles.categoryView}>
-                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("house")}>
+                                <TouchableOpacity 
+                                    style={{margin:10}} 
+                                    onPress={()=> updateEntrieCategory("house")}
+                                    hitSlop={styles.hitSlop}
+                                >
                                     <Ionicons 
                                         name="home" 
                                         size={24} 
@@ -204,7 +219,11 @@ export default function FormContent() {
                                 </Text>
                             </View>
                             <View  style={styles.categoryView}>
-                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("transport")}>
+                                <TouchableOpacity 
+                                    style={{margin:10}}
+                                    onPress={()=> updateEntrieCategory("transport")}
+                                    hitSlop={styles.hitSlop}
+                                >
                                     <Ionicons 
                                         name="bus" 
                                         size={24} 
@@ -217,7 +236,11 @@ export default function FormContent() {
                                 </Text>
                             </View>
                             <View  style={styles.categoryView}>
-                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("transfer")}>
+                                <TouchableOpacity 
+                                    style={{margin:10}} 
+                                    onPress={()=> updateEntrieCategory("transfer")}
+                                    hitSlop={styles.hitSlop}
+                                >
                                     <MaterialCommunityIcons 
                                         name="bank-transfer" 
                                         size={24} 
@@ -232,7 +255,11 @@ export default function FormContent() {
                             {typeOfEntrie == "Despesas" &&
                             <>
                                 <View  style={styles.categoryView}>
-                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("card")}>
+                                    <TouchableOpacity 
+                                        style={{margin:10}} 
+                                        onPress={()=> updateEntrieCategory("card")}
+                                        hitSlop={styles.hitSlop}
+                                    >
                                         <Ionicons 
                                             name="card-outline" 
                                             size={24} 
@@ -245,7 +272,11 @@ export default function FormContent() {
                                     </Text>
                                 </View>
                                 <View  style={styles.categoryView}>
-                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("education")}>
+                                    <TouchableOpacity 
+                                        style={{margin:10}} 
+                                        onPress={()=> updateEntrieCategory("education")}
+                                        hitSlop={styles.hitSlop}
+                                    >
                                         <Ionicons 
                                             name="school" 
                                             size={24} 
@@ -258,7 +289,11 @@ export default function FormContent() {
                                     </Text>
                                 </View>
                                 <View  style={styles.categoryView}>
-                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("recreation")}>
+                                    <TouchableOpacity 
+                                        style={{margin:10}} 
+                                        onPress={()=> updateEntrieCategory("recreation")}
+                                        hitSlop={styles.hitSlop}
+                                    >
                                         <FontAwesome5 
                                             name="theater-masks" 
                                             size={24} 
@@ -271,7 +306,11 @@ export default function FormContent() {
                                     </Text>
                                 </View>
                                 <View  style={styles.categoryView}>
-                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("comunication")}>
+                                    <TouchableOpacity 
+                                        style={{margin:10}} 
+                                        onPress={()=> updateEntrieCategory("comunication")}
+                                        hitSlop={styles.hitSlop}
+                                    >
                                         <FontAwesome5 
                                             name="phone" 
                                             size={24} 
@@ -284,7 +323,11 @@ export default function FormContent() {
                                     </Text>
                                 </View>
                                 <View  style={styles.categoryView}>
-                                    <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("health")}>
+                                    <TouchableOpacity 
+                                        style={{margin:10}} 
+                                        onPress={()=> updateEntrieCategory("health")}
+                                        hitSlop={styles.hitSlop}
+                                    >
                                         <AntDesign 
                                         name="medicinebox" 
                                         size={24} color={entrieSecondaryColor} 
@@ -298,7 +341,11 @@ export default function FormContent() {
                             </>
                             }
                             <View  style={styles.categoryView}>
-                                <TouchableOpacity style={{margin:10}} onPress={()=> updateEntrieCategory("others")}>
+                                <TouchableOpacity 
+                                    style={{margin:10}} 
+                                    onPress={()=> updateEntrieCategory("others")}
+                                    hitSlop={styles.hitSlop}
+                                >
                                     <Ionicons 
                                         name="cash-outline" 
                                         size={24} 
@@ -352,7 +399,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#E9E9E9',
         flexDirection: 'row',
-        marginTop: 15
+        marginTop: 15,
+        borderRadius:5,
     },
     frequencyView: {
         flexDirection: 'row',
@@ -381,5 +429,11 @@ const styles = StyleSheet.create({
         alignItems:'center', 
         justifyContent:'center',
         margin:10
+    },
+    hitSlop:{
+        top:20,
+        bottom:20,
+        left:30,
+        right:30,
     },
 })

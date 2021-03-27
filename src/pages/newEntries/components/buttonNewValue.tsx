@@ -90,7 +90,7 @@ export default function ButtonNewValue() {
                 {isValuesFormVisible ?
                     <Feather name='plus' size={40} color={entriePrimaryColor} />
                     :
-                    <Feather name='chevron-up' size={40} color={entriePrimaryColor} />
+                    <Feather name='chevron-down' size={40} color={entriePrimaryColor} />
                 }
             </TouchableOpacity>
         </View>
