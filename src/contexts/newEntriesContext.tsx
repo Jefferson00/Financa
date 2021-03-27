@@ -532,11 +532,13 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                         dtEnd: Functions.setDtEnd(false, contRep, newDate),
                         entries_id: value.entries_id
                     }
-                    valuesDB.update(value.id, vlObj)
-                    updateLoadAction()
+                    valuesDB.update(value.id, vlObj).then(()=>{
+                        updateLoadAction()
+                    })
                 } else {
-                    valuesDB.remove(value.id)
-                    updateLoadAction()
+                    valuesDB.remove(value.id).then(()=>{
+                        updateLoadAction()
+                    })
                 }
                 updateLoadAction()
             }
@@ -544,6 +546,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
     }
 
     function updateEntrieReceived(selectedId: number) {
+        //console.log('selected ID: '+selectedId)
         entriesDB.findById(selectedId).then((res: any) => {
             let obj = {
                 title: res._array[0].title,
@@ -578,6 +581,8 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             }).catch(err => {
                 console.log(err)
             })
+        }).catch(err=>{
+            console.log(err)
         })
     }
 

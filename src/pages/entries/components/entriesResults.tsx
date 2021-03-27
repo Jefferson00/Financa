@@ -108,7 +108,7 @@ export default function EntriesResults() {
                                             {entrie.title}
                                         </Text>
                                         <Text style={[styles.earningDateText, {color:opacColor}]}>
-                                            {entrie.day}/{Functions.convertDtToStringMonth(3)}
+                                            {entrie.day}/{Functions.convertDtToStringMonth(selectedMonth)}
                                         </Text>
                                     </View>
 
