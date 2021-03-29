@@ -1,11 +1,14 @@
 import React, { useContext } from "react"
-import { StyleSheet, Text, View, TextInput, Switch } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Switch, Alert } from 'react-native'
+import { TouchableOpacity } from "react-native-gesture-handler"
 import { NewEntriesContext } from "../../../contexts/newEntriesContext"
 import { StylesContext } from "../../../contexts/stylesContext"
+import { Feather} from '@expo/vector-icons'
 
 import Functions from "../../../utils"
 
 interface ValuesData{
+    id:number,
     description: string,
     amount: number,
     monthly: boolean,
@@ -17,10 +20,33 @@ export default function FormContentCreate() {
 
     const {entrieValuesBeforeCreate, 
            updateEntrieValuesBeforeCreate,
-           isEnabledMonthly,
+           removeValueBeforeCreate,
+           handleDeleteEntrieValues
         } = useContext(NewEntriesContext)
 
     const {entriePrimaryColor, entrieSecondaryColor} = useContext(StylesContext)
+
+    function removeValue(index:number, valueId: number){
+        Alert.alert(
+            "Remover",
+            "Deseja mesmo remover?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK", onPress: () => {
+                        valueId == 0 ? removeValueBeforeCreate(index)
+                        : handleDeleteEntrieValues(-1, valueId)
+                        removeValueBeforeCreate(index)
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    }
 
         
     return(
@@ -29,6 +55,13 @@ export default function FormContentCreate() {
             
                 return (
                     <View style={styles.valuesViewItem} key={index}>
+                        {index > 0 &&
+                        <View style={styles.deleteButtonView}>
+                            <TouchableOpacity onPress={()=> removeValue(index,values.id)}>
+                                <Feather name="trash-2" size={20} color={"#CC3728"} />
+                            </TouchableOpacity>
+                        </View>
+                        }
                         <View style={styles.valuesView}>
                             <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
                                 Descrição
@@ -36,6 +69,7 @@ export default function FormContentCreate() {
                             <Text style={[styles.subTittleText, { color: entriePrimaryColor}]}>
                                 Valor
                             </Text>
+                            
                         </View>
                         <View style={styles.valuesView}>
     
@@ -116,6 +150,10 @@ const styles = StyleSheet.create({
     formView: {
         marginHorizontal: 43
     },
+    deleteButtonView:{
+        justifyContent:'flex-end',
+        flexDirection:'row'
+    },
     InputText: {
         height: 40,
         borderBottomWidth: 1,
@@ -139,7 +177,8 @@ const styles = StyleSheet.create({
 
     valuesView: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        alignItems:'center'
     },
   
     subTittleText: {

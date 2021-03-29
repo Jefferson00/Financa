@@ -52,6 +52,7 @@ interface DataBDContextData{
     entriesValuesByDate: EntriesValuesData[];
     entriesByDate: EntriesData[];
     entriesByCurrentDate: EntriesData[];
+    entriesByNextMonth: EntriesData[];
     balances: BalanceData[];
     isBalancesDone:boolean;
     isEntriesDone:boolean;
@@ -78,6 +79,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
     const [allEntries, setAllEntries] = useState<EntriesData[]>([])
     const [entriesByDate, setEntriesByDate] = useState<EntriesData[]>([])
     const [entriesByCurrentDate, setEntriesByCurrentDate] = useState<EntriesData[]>([])
+    const [entriesByNextMonth, setEntriesByNextMonth] = useState<EntriesData[]>([])
     const [entriesValuesByDate, setEntriesValuesByDate] = useState<EntriesValuesData[]>([])
     const [allEntriesValues, setAllEntriesValues] = useState<EntriesValuesData[]>([])
     const [latestEntries, setLatestEntries] = useState<LatestEntries[]>([])
@@ -224,6 +226,28 @@ export function DataBDProvider({children}: DataBDProviderProps){
         })
     }
 
+    function loadEntriesByNextMonth(){
+        let nextDate
+        let nextMonth = currentMonth + 1
+        let nextYear = currentYear
+        if(nextMonth > 12){
+            nextMonth = 1
+            nextYear = currentYear + 1
+        }
+        if(nextMonth < 10){
+            nextDate = nextYear.toString() + '0' + nextMonth.toString()
+        }else{
+            nextDate = nextYear.toString() + nextMonth.toString()
+        }
+        setEntriesByNextMonth([])
+        entriesDB.findByDate(parseInt(nextDate)).then((res:any)=>{
+            setEntriesByNextMonth(res._array)
+        }).catch(err=>{
+            console.log(err)
+            setEntriesByNextMonth([])
+        })
+    }
+
     function loadAllEntriesValuesResults(){
         valuesDB.all().then((res:any)=>{
             setAllEntriesValues(res._array)
@@ -323,6 +347,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         loadAllEntriesResults()
         defineDates()
         loadEntriesByCurrentDate()
+        loadEntriesByNextMonth()
         //loadNotifications()
 
     },[isValuesUpdated])
@@ -352,6 +377,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             isBalancesDone,
             isEntriesDone,
             entriesByCurrentDate,
+            entriesByNextMonth,
             loadAllEntriesResults,
             loadNotifications,
             loadAllEntriesValuesResults,

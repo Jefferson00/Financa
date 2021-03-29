@@ -1,9 +1,9 @@
 import React , {useContext, useEffect, useState} from 'react';
 import { StyleSheet, Text, TouchableOpacity, View ,ScrollView} from 'react-native';
-import { MaterialIcons,  Entypo  } from '@expo/vector-icons'
+import { MaterialIcons,  Entypo  , Octicons} from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import Functions from '../../../functions/index'
+import Functions from '../../../utils'
 import NumberFormat from 'react-number-format';
 
 
@@ -15,15 +15,12 @@ import { DataBDContext } from '../../../contexts/dataBDContext';
 
 export default function Results() {
 
-
-
-    //const [lateResults, setLateResults] = useState(0)
-    //const [nextDaysResults, setNextDaysResults] = useState(0)
-
-    let lateResults = 0
-    let nextDaysResults = 0
     const [itemSelected, setItemSelected] = useState('Ganhos')
-    const {entriesByCurrentDate} = useContext(DataBDContext)
+    const [hasLateEarnings, setHasLateEarnings] = useState(false)
+    const [hasLateExpanses, setHasLateExpanses] = useState(false)
+    const [hasNextDaysEarnings, setHasNextDaysEarnings] = useState(false)
+    const [hasNextDaysExpanses, setHasNextDaysExpanses] = useState(false)
+    const {entriesByCurrentDate, entriesByNextMonth} = useContext(DataBDContext)
 
     const todayDate = new Date()
     const CurrentMonth = todayDate.getMonth() + 1
@@ -37,9 +34,39 @@ export default function Results() {
         setItemSelected('Despesas')
     }
 
+    useEffect(()=>{
+        let lateEarningsInCurrentMonth = []
+        let lateExpansesInCurrentMonth = []
+        entriesByCurrentDate.map((entr,index)=>{
+            if (!entr.received && entr.type == "Ganhos" && entr.day <= todayDate.getDate()){
+                lateEarningsInCurrentMonth.push(entr)
+                setHasLateEarnings(true)
+            }
+            if (!entr.received && entr.type == "Despesas" && entr.day <= todayDate.getDate()){
+                lateExpansesInCurrentMonth.push(entr)
+                setHasLateExpanses(true)
+            }
+            if (!entr.received && entr.type == "Ganhos" && entr.day > todayDate.getDate() && entr.day <= (todayDate.getDate()+5)){
+                setHasNextDaysEarnings(true)
+            }
+            if (!entr.received && entr.type == "Despesas" && entr.day > todayDate.getDate() && entr.day <= (todayDate.getDate()+5)){
+                setHasNextDaysExpanses(true)
+            }
+        })
+
+        todayDate.getDate() >= 27 && entriesByNextMonth.map((entrie=>{
+            if (!entrie.received && entrie.type == "Ganhos" && entrie.day <= 5){
+                setHasNextDaysEarnings(true)
+            }
+            if (!entrie.received && entrie.type == "Despesas" && entrie.day <= 5){
+                setHasNextDaysExpanses(true)
+            }
+        }))
+    },[])
+
 
     return(
-        <View style={styles.container}>
+        <View style={[styles.container, itemSelected == 'Ganhos' ? {borderColor:'#1A8289'}: {borderColor:'#FFC8C2'}]}>
             <View style={styles.topSelectButtons}>
                 <TouchableOpacity 
                     style={[
@@ -56,6 +83,14 @@ export default function Results() {
                         ]}>
                             Ganhos
                         </Text>
+                        {hasLateEarnings && 
+                         <Octicons 
+                          name="primitive-dot"
+                          size={25} 
+                          color={itemSelected=='Ganhos'? 'transparent' : '#1A8289'} 
+                          style={{position:'absolute', right:15, top: -10}}
+                        />
+                        }
                 </TouchableOpacity>
 
                 <TouchableOpacity style={[
@@ -72,18 +107,25 @@ export default function Results() {
                     ]}>
                         Despesas
                     </Text>
+                    {hasLateEarnings && 
+                         <Octicons 
+                          name="primitive-dot"
+                          size={25} 
+                          color={itemSelected=='Despesas'? 'transparent' : '#FF4835'} 
+                          style={{position:'absolute', right:30, top: -10}}
+                        />
+                    }
                 </TouchableOpacity>
             </View>
 
             <ScrollView>
-            <Text style={styles.titleContainer}>
-                Atrasados
-            </Text>
+            {hasLateEarnings && itemSelected == "Ganhos" && <Text style={styles.titleContainer}>Atrasados</Text>}
+            {hasLateExpanses && itemSelected == "Despesas" && <Text style={styles.titleContainer}>Atrasados</Text>}
+            
 
             {entriesByCurrentDate.map((entr:any,index:number)=>{
                 //console.log(entr.received)
                 if (entr.received == 0 && entr.type == itemSelected && entr.day <= todayDate.getDate()){
-                    lateResults = lateResults + 1
                     let colorText = ''
                     let bgcolor = ''
                         entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
@@ -102,31 +144,19 @@ export default function Results() {
                                     {entr.title}
                                 </Text>
                                 <Text style={[styles.earningDateText, { color: colorText}]}>
-                                     
+                                     {entr.day}/ {Functions.convertDtToStringMonth(CurrentMonth)}
                                 </Text>
                             </View>
                         </View>
                     )
                 }
-
             })}
 
-            {lateResults == 0 && 
-                <View style={styles.noResultView}>
-                    <Text style={styles.noResultText}>Tudo certo!</Text>
-                    <Entypo name="emoji-flirt" size={40} color="#3C93F9" />
-                </View>
-            }   
-
-
-            <Text style={styles.titleContainer}>
-                Nos próximos dias...
-            </Text>
+            {hasNextDaysEarnings && itemSelected == "Ganhos" && <Text style={styles.titleContainer}>Nos próximos dias...</Text>}
+            {hasNextDaysExpanses && itemSelected == "Despesas" && <Text style={styles.titleContainer}>Nos próximos dias...</Text>}
 
             {entriesByCurrentDate.map((entr:any,index:number)=>{
-                //console.log(entr.received)
                 if (entr.received == 0 && entr.type == itemSelected && entr.day > todayDate.getDate() && entr.day <= (todayDate.getDate()+5)){
-                    nextDaysResults = nextDaysResults + 1
                     let colorText = ''
                     let bgcolor = ''
                         entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
@@ -145,7 +175,7 @@ export default function Results() {
                                     {entr.title}
                                 </Text>
                                 <Text style={[styles.earningDateText, { color: colorText}]}>
-                                     
+                                    {entr.day}/ {Functions.convertDtToStringMonth(CurrentMonth)}
                                 </Text>
                             </View>
                         </View>
@@ -153,16 +183,39 @@ export default function Results() {
                 }
 
             })}
-
-            {nextDaysResults == 0 && 
-                <View style={styles.noResultView}>
-                    <Text style={styles.noResultText}>Nada ainda</Text>
-                    <Entypo name="emoji-happy" size={40} color="#3C93F9" />
-                </View>
+            {todayDate.getDate() >= 27 &&
+                entriesByNextMonth.map((entrie,index)=>{
+                    if (!entrie.received && entrie.type == itemSelected && entrie.day <= 5){
+                        let colorText = ''
+                        let bgcolor = ''
+                        entrie.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
+                        entrie.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
+                        return(
+                            <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
+                                <MaterialIcons 
+                                    name="monetization-on" 
+                                    size={40} 
+                                    color={colorText} />
+                                
+                                <View>
+                                    <Text numberOfLines={1} style={[
+                                        styles.earningTittleText, { color: colorText, width: 150 }
+                                    ]}>
+                                        {entrie.title}
+                                    </Text>
+                                    <Text style={[styles.earningDateText, { color: colorText}]}>
+                                        {CurrentMonth + 1 > 12 ?
+                                            entrie.day +"/"+Functions.convertDtToStringMonth(1)
+                                            :
+                                            entrie.day +"/"+Functions.convertDtToStringMonth(CurrentMonth + 1)
+                                        }
+                                    </Text>
+                                </View>
+                            </View>
+                        )
+                    }
+                })
             }
-
-
-         
             </ScrollView>
         </View>
     )
@@ -180,6 +233,7 @@ const styles = StyleSheet.create({
         },
         topSelectButtons:{
             flexDirection:'row',
+
         },
         selectButton:{
             width:'50%',
@@ -206,6 +260,7 @@ const styles = StyleSheet.create({
             alignItems: 'center',
             justifyContent: 'space-around',
             borderRadius: 20,
+          
         },
 
         earningTittleText: {

@@ -85,6 +85,7 @@ interface NewEntriesContextData{
     resetValues: ()=> void;
     setValuesUpdate: (valuesUpdate:EntriesValuesData[])=> void;
     updateEntrieCategory: (category:string)=> void;
+    removeValueBeforeCreate: (index:number)=> void;
 }
 
 interface NewEntriesProviderProps{
@@ -219,6 +220,12 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
     function addNewValueBeforeCreate(newValue : ValuesData){
         setEntriesValuesBeforeCreate([...entrieValuesBeforeCreate, newValue])
+    }
+
+    function removeValueBeforeCreate(index:number){
+        let arr = entrieValuesBeforeCreate.slice()
+        arr.splice(index,1)
+        setEntriesValuesBeforeCreate(arr)
     }
 
     //----------------------------------------------//
@@ -618,6 +625,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             setValuesUpdate,
             handleUpdate,
             updateEntrieCategory,
+            removeValueBeforeCreate,
         }}>
             {children}
         </NewEntriesContext.Provider>
