@@ -20,7 +20,7 @@ export default function Footer(){
     const route = useRoute()
     const {resetDate, activeBalanceView} = useContext(MainContext)
     const {typeOfEntrie, updateEntrieIdUpdate, resetValues } = useContext(NewEntriesContext)
-    const {resetValuesForm, hasNotifications} = useContext(StylesContext)
+    const {resetValuesForm, hasNotifications, onUnmonted} = useContext(StylesContext)
 
    useEffect(()=>{
         if ((route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == 'Ganhos'){
@@ -41,11 +41,13 @@ export default function Footer(){
         activeBalanceView()
     }
     function handleEarnings(){
+        onUnmonted()
         navigation.navigate('Entries', { item: 'Ganhos'})
         updateEntrieIdUpdate(0)
         resetValues()
     }
     function handleExpanses(){
+        onUnmonted()
         navigation.navigate('Entries', { item: 'Despesas'})
         updateEntrieIdUpdate(0)
         resetValues()
@@ -54,6 +56,7 @@ export default function Footer(){
         navigation.navigate('Notifications')
         updateEntrieIdUpdate(0)
         resetValues()
+        
     }
 
 

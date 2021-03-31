@@ -86,7 +86,7 @@ export default function Main() {
 
   const { isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear,currentMonth,currentYear } = useContext(MainContext);
   const { balances, entriesByCurrentDate, isBalancesDone, allEntriesValues } = useContext(DataBDContext)
-  const { updateMonthColorMainScreen, updateHasNotification } = useContext(StylesContext)
+  const { updateMonthColorMainScreen, updateHasNotification, onUnmonted } = useContext(StylesContext)
 
   let latedEarningEntries
   let latedExpansesEntries
