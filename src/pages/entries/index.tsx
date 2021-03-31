@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, View, RefreshControl } from 'react-native'
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR';
 
@@ -31,6 +31,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
     const navigationScreen = useNavigation()
     const { item } = route.params
     const isFocused = useIsFocused()
+    const route1 = useRoute()
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
     const {isEntriesDone} = useContext(DataBDContext)
@@ -38,16 +39,13 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
-    },[item])
+    })
    
     useEffect(()=>{
-        onMonted()
-    },[])
+       console.log(Math.random()*10)
+       isEntriesDone ? onMonted() : onUnmonted()
+    },[route1.name,route1.params])
 
-    useEffect(()=>{
-        return onUnmonted()
-    })
-  
 
     return (
         <LinearGradient
@@ -56,14 +54,14 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
             style={styles.container}>
             <StatusBar style="light" translucent />
             <Header/>
-            {isEntriesDone ?
+            {isRendered ?
                 <Balance/>
                 :
                 <LoaderBalance/>
             }
 
             <View style={styles.mainContainer}>
-                {isEntriesDone ?
+                {isRendered ?
                     <EntriesResults/>
                     :
                     <Loader/>

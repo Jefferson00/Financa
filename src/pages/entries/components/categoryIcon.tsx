@@ -8,7 +8,7 @@ interface CategoryIconProps{
 }
 
 export default function CategoryIcon(props: CategoryIconProps){
-    console.log(props.category)
+    
     return(
         <>
             {props.category == "food" && <Ionicons  name="restaurant" size={40} color={props.opacColor}/>}
