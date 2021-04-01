@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import  {Ionicons } from '@expo/vector-icons'
 import { MainContext } from '../../../contexts/mainContext';
@@ -23,6 +23,19 @@ export default function BalanceView(props:BalanceProps) {
    const {seeBalanceValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeBalanceValues} = useContext(MainContext)
    
    const {isBalancesDone} = useContext(DataBDContext)
+
+   const [remain, setRemain] = useState(0)
+
+   useEffect(()=>{
+      if (selectedMonth == currentMonth && selectedYear == currentYear){
+        console.log("remain: "+props.values.remainingBalance)
+        console.log("current: "+ props.values.currentBalance)
+        setRemain(props.values.remainingBalance + props.values.currentBalance)
+        console.log("remain: "+remain)
+      }else{
+        setRemain(props.values.remainingBalance)
+      }
+   },[selectedMonth,props.values.remainingBalance])
 
     return(
         <>
@@ -109,13 +122,13 @@ export default function BalanceView(props:BalanceProps) {
                       <Text style={styles.currentBalanceText}>Atual</Text>
                   </View>
                 {seeBalanceValues?
-                  props.values.remainingBalance == 0 ?
+                  remain == 0 ?
                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                         <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
                     </View>
                   :
                   <NumberFormat
-                        value={props.values.remainingBalance}
+                        value={remain}
                         displayType={'text'}
                         thousandSeparator={true}
                         format={Functions.currencyFormatter}

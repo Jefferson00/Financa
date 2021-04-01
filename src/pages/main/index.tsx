@@ -210,8 +210,14 @@ export default function Main() {
 
   balances.map((bal: BalanceData, index: number) => {
     if (bal.year == selectedYear && bal.month == selectedMonth) {
-      remainingBalance = bal.amount - (estimatedEarnings - estimatedExpanses)
-      totalEstimatedBalance = bal.amount
+        if(index == 0){
+          remainingBalance = currentBalance
+          totalEstimatedBalance = bal.amount
+        }
+        else{
+          remainingBalance = bal.amount - (estimatedEarnings - estimatedExpanses)
+          totalEstimatedBalance = bal.amount
+        }
     }
   })
 

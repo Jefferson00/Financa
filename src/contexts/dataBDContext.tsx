@@ -98,15 +98,13 @@ export function DataBDProvider({children}: DataBDProviderProps){
         setIsEntriesDone(false)
         entriesDB.all().then((res:any)=>{
             setAllEntries(res._array)
-            setIsEntriesDone(true)
-            if(res._array.length != allEntries.length){
-                setIsValuesUpdated(!isValuesUpdated)
-               // console.log("loadAllEntriesResults ----  setIsValuesUpdated")
-                //console.log("loadAllEntriesResults")
-            }
+            loadAllEntriesValuesResults()
+            setLatestTransations()
+            
         }).catch(err=>{
             console.log(err)
             setIsEntriesDone(true)
+            defineDates()
             //console.log("err entradas")
         })
     }
@@ -251,13 +249,12 @@ export function DataBDProvider({children}: DataBDProviderProps){
     function loadAllEntriesValuesResults(){
         valuesDB.all().then((res:any)=>{
             setAllEntriesValues(res._array)
-            if(res._array.length != allEntriesValues.length){
-                //setIsValuesUpdated(!isValuesUpdated)
-               // console.log('loadAllEntriesValuesResults ---- ok')
-            }
+            defineDates()
+            setIsEntriesDone(true)
         }).catch(err=>{
             console.log(err)
-            //console.log('loadAllEntriesValuesResults ---- erro')
+            defineDates()
+            setIsEntriesDone(true)
         })
     }
 
@@ -285,6 +282,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
                     } else {
                         progressiveDate = year.toString() + i.toString()
                     }
+                   // console.log("progressive date: "+progressiveDate)
                     DatasArray.push(progressiveDate)
                   }
                 }
@@ -293,6 +291,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
             //console.log("carregou as datas")
             loadBalance()
         }).catch(err=>{
+            setBalances([])
             setIsBalancesDone(true)
         })
         DatasArray = []
@@ -304,6 +303,7 @@ export function DataBDProvider({children}: DataBDProviderProps){
         setBalances([])
 
         for (const [index, data] of DatasArray.entries()){
+           // console.log('date: '+data)
             await valuesDB.findByDate(parseInt(data)).then((res:any)=>{
                 let sumEarnings = 0
                 let sumExpenses = 0
@@ -351,11 +351,6 @@ export function DataBDProvider({children}: DataBDProviderProps){
         //loadNotifications()
 
     },[isValuesUpdated])
-
-    useEffect(()=>{
-        loadAllEntriesValuesResults()
-        setLatestTransations()
-    },[allEntries])
 
     useEffect(()=>{
         loadEntriesValuesByDate()

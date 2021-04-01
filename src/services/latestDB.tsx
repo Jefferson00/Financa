@@ -66,7 +66,7 @@ db.transaction((tx) => {
           //-----------------------
           (_, { rowsAffected, insertId }) => {
             if (rowsAffected > 0) resolve(insertId);
-            else reject("Error inserting obj: " + JSON.stringify(obj)); // insert falhou
+            else reject("Error update obj: " + JSON.stringify(obj)); // insert falhou
           },
         );
       });
