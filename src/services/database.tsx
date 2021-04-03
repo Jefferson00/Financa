@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite'
 
-const db = SQLite.openDatabase("financadb7.db")
+const db = SQLite.openDatabase("financadb5.db")
 
 db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () =>
   console.log('Foreign keys turned on')

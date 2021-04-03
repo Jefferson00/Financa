@@ -42,11 +42,14 @@ export default function ModalContent() {
         resetSelectedEntrieId,
     } = useContext(StylesContext)
 
-    const {entriesByDate, entriesValuesByDate, updateLoadAction} = useContext(DataBDContext)
+    const {allEntries, entriesValuesByDate, updateLoadAction} = useContext(DataBDContext)
     const {todayDate, selectedMonth, currentMonth, selectedYear, currentYear} = useContext(MainContext)
     const {handleDeleteEntrie, handleDeleteEntrieValues, updateEntrieReceived, updateEntrieIdUpdate, typeOfEntrie} = useContext(NewEntriesContext)
 
-    const entrieModal = entriesByDate.filter(entrie => entrie.id == selectedEntrieId)
+    const entrieModal = allEntries.filter(entrie => entrie.id == selectedEntrieId)
+
+    console.log("selectedEntrieId "+selectedEntrieId)
+    console.log("entrieModal "+entrieModal[0])
 
     if(entrieModal !=undefined){
         if (entrieModal[0].day <= todayDate.getDate() && !entrieModal[0].received){

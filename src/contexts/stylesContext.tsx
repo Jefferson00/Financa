@@ -83,6 +83,7 @@ export function StylesProvider({children}: StylesProviderProps){
     }
 
     function showEntrieModal(entrieId: number, totalValues:number){
+        console.log(entrieId)
         setIsEntriesModalVisible(true)
         setSelectedEntrieId(entrieId)
         setSelectedEntrieTotalValues(totalValues)

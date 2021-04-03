@@ -54,6 +54,12 @@ interface EntriesValuesData{
     received: boolean,
 }
 
+interface EntrieValuesUpdateProps{
+    entrieDtStartBeforeUpdate:number,
+    currentEntrieDtStart:number,
+    currentEntrieDtEnd:number,
+}
+
 interface NewEntriesContextData{
     calendarDate: Date;
     showCalendar:boolean;
@@ -97,24 +103,193 @@ export const NewEntriesContext = createContext({} as NewEntriesContextData)
 
 export function NewEntriesProvider({children}: NewEntriesProviderProps){
 
-    const {entriesByDate, entriesValuesByDate , allEntriesValues, updateLoadAction, loadNotifications} = useContext(DataBDContext)
-    const {selectedYear, selectedMonth} = useContext(MainContext)
+    const {
+        entriesByDate, 
+        entriesValuesByDate, 
+        allEntriesValues, 
+        updateLoadAction, 
+        loadNotifications
+    } = useContext(DataBDContext)
+    const {
+        selectedYear,
+        selectedMonth
+    } = useContext(MainContext)
 
+    /*
+        Tipo da entrada
+        "Ganhos" | "Despesas"
+    */
     const [typeOfEntrie, setTypeOfEntrie] = useState('');
+
+    /*
+        Id da entrie que deverá ser atualizada
+    */
     const [entrieIdUpdate, setEntrieIdUpdate] = useState(0);
 
+    /*
+        Determina se a frequencia dos valores foi alterado ou não
+    */
     const [valuesIsChanged, setValuesIsChanged] = useState(false);
 
+    /*
+        Define a data do calendario
+    */
+    const [calendarDate, setCalendarDate] = useState(new Date());
+
+    /*
+        Define se o calendario é visivel ou não
+    */
+    const [showCalendar, setShowCalendar] = useState(false);
+
+    /*
+        Define se o switch received está ativo ou não
+    */
+    const [isEnabledReceived, setIsEnabledReceived] = useState(false);
+
+    /*
+        Define se o switch mensal está ativo ou não
+    */
+    const [isEnabledMonthly, setIsEnabledMonthly] = useState(false);
+
+    /*
+        Define o valor do input de title da entrie
+    */
+    const [titleInputEntrie, setTitleInputEntrie] = useState('');
+
+    /*
+        Define a categoria selecionada
+    */
+    const [entrieCategory, setEntrieCategory] = useState("others");
+
+    /*
+        Define o valor da frequencia da entrada
+    */
+    const [entrieFrequency, setEntrieFrequency] = useState(1);
+
+    /*
+        Define a dtStart do initialValue
+    */
+    const dtStart = Functions.setDtStart(new Date())
+    const initialValue: ValuesData[] = [{
+        id:0,
+        description: '',
+        amount: 0,
+        monthly: false,
+        frequency: 1,
+        entries_id: 0,
+        dtStart:dtStart,
+    }]
+
+    /*
+        Array de valores antes de criar no banco 
+    */
+    const [entrieValuesBeforeCreate, setEntriesValuesBeforeCreate] = useState<ValuesData[]>(initialValue)
+
+
+    /*
+    FUNCTIONS UPDATE VALUES ON FORM
+    *
+        Muda a data do calendario
+    */
+    const onChangeDate = (event: any, selectedDate: any) => {
+        const currentDate = selectedDate || calendarDate;
+        setShowCalendar(Platform.OS === 'ios');
+        setCalendarDate(currentDate);
+    };
+    /*
+        Mostra o calendario
+    */
+    const showDatepicker = () => {
+        setShowCalendar(true);
+    };
+    /*
+        Muda o valor da switch received
+    */
+    const toggleSwitchReceived = () => setIsEnabledReceived(previousState => !previousState);
+    /*
+       Muda o valor da switch monthly
+    */
+    const toggleSwitchMonthly = () => {
+        setIsEnabledMonthly(previousState => !previousState)
+    };
+
+    /*
+       Muda o valor da categoria
+    */
+    function updateEntrieCategory (category:string){
+        setEntrieCategory(category)
+    }
+
+    /*
+       Muda o valor da frequencia
+    */
+    function decreaseEntrieFrequency(){
+        if(entrieFrequency > 1) setEntrieFrequency(entrieFrequency - 1)
+    }
+    function increaseEntrieFrequency(){
+        setEntrieFrequency(entrieFrequency + 1)
+    }
+
+    /*
+       Cria um novo valor na Array
+    */
+    function addNewValueBeforeCreate(newValue : ValuesData){
+        setEntriesValuesBeforeCreate([...entrieValuesBeforeCreate, newValue])
+    }
+
+    /*
+       remover valores
+    */
+    function removeValueBeforeCreate(index:number){
+        let arr = entrieValuesBeforeCreate.slice()
+        arr.splice(index,1)
+        setEntriesValuesBeforeCreate(arr)
+    }
+
+    /*
+       reseta os valores do formulario para os valores padrões
+    */
+    function resetValues(){
+        setEntriesValuesBeforeCreate(initialValue)
+        setEntrieFrequency(1)
+        setTitleInputEntrie('')
+        setIsEnabledMonthly(false)
+        setIsEnabledReceived(false)
+        setCalendarDate(new Date())
+        setEntrieCategory("others")
+    }
+
+    /*
+        Atualiza o id da entrada que será atualizada
+    */
+    function updateEntrieIdUpdate(idUpdate:number){
+        setEntrieIdUpdate(idUpdate)
+    }
+
+    /*
+        Atualiza o tipo da entrada
+    */
+    function updateTypeOfEntrie(type:string){
+        setTypeOfEntrie(type)
+    }
+
+    /*
+    FUNCTIONS UPDATE ACTIONS
+    *
+        Define o formulário das ENTRADAS com os valores da entrada que deverá ser atualizada
+    */
     function setEntrieValuesUpdate(entrie:any){
-        setTitleInputEntrie(entrie.title)
-        if(entrie.category !== undefined){
+        //define title
+        setTitleInputEntrie(entrie.title) 
+        // define category
+        if(entrie.category !== undefined){ 
             setEntrieCategory(entrie.category)
         }else{
             setEntrieCategory('others')
         }
-
+        //define received switch
         entrie.received == 1 ? setIsEnabledReceived(true) : setIsEnabledReceived(false)
-        
+        //define monthly switch
         if (entrie.monthly == 1){
             setIsEnabledMonthly(true) 
             setEntrieFrequency(1)
@@ -123,7 +298,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             let frequency = Functions.toFrequency(entrie.dtEnd, entrie.dtStart)+1
             setEntrieFrequency(frequency) 
         }
-
+        //define calendar date
         let newDate = new Date()
         newDate.setMonth(Number(Functions.toMonthAndYear(entrie.dtStart).month)-1)
         newDate.setFullYear(Number(Functions.toMonthAndYear(entrie.dtStart).year))
@@ -131,8 +306,13 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         setCalendarDate(newDate)
     }
 
+    /*
+        Define o formulário dos VALORES com os valores da entrada que deverá ser atualizada
+    */
     function setValuesUpdate(valuesUpdate:EntriesValuesData[]){
+        //create a new values array
         let valuesBeforeUpdate: ValuesData[] = []
+        //preenche a array com os valores da entrada
         valuesUpdate.map((value: EntriesValuesData, index: number)=>{
             let monthly 
             let frequency = Functions.toFrequency(value.dtEnd, value.dtStart) + 1
@@ -148,97 +328,13 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             }
             valuesBeforeUpdate.push(valueObj)
         })
+        //update values before create array
         setEntriesValuesBeforeCreate(valuesBeforeUpdate)
     }
 
-    function updateEntrieIdUpdate(idUpdate:number){
-        setEntrieIdUpdate(idUpdate)
-    }
-
-    function updateTypeOfEntrie(type:string){
-        setTypeOfEntrie(type)
-    }
-
-    //-------------------------------//
-    const [calendarDate, setCalendarDate] = useState(new Date());
-    const [showCalendar, setShowCalendar] = useState(false);
-
-    const onChangeDate = (event: any, selectedDate: any) => {
-        const currentDate = selectedDate || calendarDate;
-        setShowCalendar(Platform.OS === 'ios');
-        setCalendarDate(currentDate);
-    };
-
-    const showDatepicker = () => {
-        setShowCalendar(true);
-    };
-
-    //----------------------//
-
-    const [isEnabledReceived, setIsEnabledReceived] = useState(false);
-    const [isEnabledMonthly, setIsEnabledMonthly] = useState(false);
-
-    const toggleSwitchReceived = () => setIsEnabledReceived(previousState => !previousState);
-
-    const toggleSwitchMonthly = () => {
-        setIsEnabledMonthly(previousState => !previousState)
-    };
-
-    //-------------------------------------//
-
-    const [titleInputEntrie, setTitleInputEntrie] = useState('');
-    const [entrieCategory, setEntrieCategory] = useState("others");
-
-    function updateEntrieCategory (category:string){
-        setEntrieCategory(category)
-    }
-
-    const [entrieFrequency, setEntrieFrequency] = useState(1);
-
-    function decreaseEntrieFrequency(){
-        if(entrieFrequency > 1) setEntrieFrequency(entrieFrequency - 1)
-    }
-
-    function increaseEntrieFrequency(){
-        setEntrieFrequency(entrieFrequency + 1)
-    }
-
-    //----------------------------------------------//
-    //define dtStart of initalValue
-    const dtStart = Functions.setDtStart(new Date())
-    const initialValue: ValuesData[] = [{
-        id:0,
-        description: '',
-        amount: 0,
-        monthly: false,
-        frequency: 1,
-        entries_id: 0,
-        dtStart:dtStart,
-    }]
-
-    const [entrieValuesBeforeCreate, setEntriesValuesBeforeCreate] = useState<ValuesData[]>(initialValue)
-
-    function addNewValueBeforeCreate(newValue : ValuesData){
-        setEntriesValuesBeforeCreate([...entrieValuesBeforeCreate, newValue])
-    }
-
-    function removeValueBeforeCreate(index:number){
-        let arr = entrieValuesBeforeCreate.slice()
-        arr.splice(index,1)
-        setEntriesValuesBeforeCreate(arr)
-    }
-
-    //----------------------------------------------//
-
-    function resetValues(){
-        setEntriesValuesBeforeCreate(initialValue)
-        setEntrieFrequency(1)
-        setTitleInputEntrie('')
-        setIsEnabledMonthly(false)
-        setIsEnabledReceived(false)
-        setCalendarDate(new Date())
-    }
-    
+    /*
+       Atualiza os valores da array de valores
+    */
     function updateEntrieValuesBeforeCreate(subitem: string, index: number, e: any){
             let arrOfEntriesValues = entrieValuesBeforeCreate.map((entrieValue:ValuesData, i:number)=>{
                 if (index === i){    
@@ -275,81 +371,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             setEntriesValuesBeforeCreate(arrOfEntriesValues)
     }
 
-    function handleCreateNewEntrie(){
-        let dtStart = Functions.setDtStart(calendarDate)
-        let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
-
-        const EntrieObj : EntriesData = {
-            title: titleInputEntrie,
-            day: calendarDate.getDate(),
-            dtStart: dtStart,
-            dtEnd: dtEnd,
-            monthly: isEnabledMonthly,
-            received: isEnabledReceived,
-            type: typeOfEntrie,
-            category: entrieCategory,
-        }
-
-        entriesDB.create(EntrieObj).then(()=>{
-            alert('cadastrado com sucesso!')
-            updateLoadAction()
-        }).catch(err=>{
-            console.log(err)
-            alert('erro: '+err)
-        })
-        entriesDB.all().then((res:any)=>{
-            let totalValues = 0
-            entrieValuesBeforeCreate.map((value: ValuesData) =>{
-                let EntrieId = res._array.slice(-1)[0].id
-                let amount = String(value.amount)
-                amount = amount.replace(/[.]/g, '')
-                amount = amount.replace(/[,]/g, '')
-                let newDtEnd
-                if (valuesIsChanged){
-                    if (value.monthly){
-                        newDtEnd = 209912
-                    }else{
-                        newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
-                    }
-                }else{
-                    newDtEnd = dtEnd 
-                }
-                totalValues = totalValues + Number(amount)
-                const ValueObj:any = {
-                    description: value.description,
-                    amount: Number(amount),
-                    dtStart: dtStart,
-                    dtEnd: newDtEnd, 
-                    entries_id: EntrieId
-                }
-                console.log("New dt End "+newDtEnd)
-                valuesDB.create(ValueObj).then(()=>{
-                    updateLoadAction()
-                    resetValues()
-                }).catch(err => {
-                    console.log(err)
-                })
-            })
-            if(isEnabledReceived){
-                let ltsObj = {
-                    title: titleInputEntrie,
-                    day: new Date().getDate(),
-                    month: new Date().getMonth() +1,
-                    type: typeOfEntrie,
-                    category: entrieCategory,
-                    amount: totalValues,
-                    entrie_id: res._array.slice(-1)[0].id,
-                }
-                console.log('lts: '+ltsObj.amount)
-                latestDB.create(ltsObj)
-            }
-            updateLoadAction()
-            loadNotifications()
-        }).catch(err => {
-            console.log(err)
-        })
-    }
-
+    /*
+        Atualiza os dados das últimas transações quando é atualizado a entrada correspondente
+    */
     function updateLatestReceived(){
         latestDB.all().then((res:any)=>{
             res._array.map((ltsEntrie:any) =>{
@@ -379,6 +403,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         })
     }
 
+    /*
+        Cria um registro de última transação ao atualizar uma entrada com received = true
+    */
     function createLatestReceivedOnUpdate(){
         entriesDB.findById(entrieIdUpdate).then((res:any)=>{
             if (!res._array[0].received && isEnabledReceived){
@@ -406,84 +433,126 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         })
     }
 
+    /*
+        Atualiza uma entrada
+        VERIFICAR TODOS OS CENARIOS DE ATUALIZAÇÔES E DIVIDIR A FUNÇÃO EM PARTES
+    */
     function handleUpdate(){
-        
         entriesDB.findById(entrieIdUpdate).then((res:any)=>{
-            let dtStartBeforeUpdate:number
-            dtStartBeforeUpdate = res._array[0].dtStart
-            let dtStart = Functions.setDtStart(calendarDate)
-            let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
-            console.log("dtstart: "+dtStart)
-            console.log("dtend: "+dtEnd)
+            let entrieDtStartBeforeUpdate:number = res._array[0].dtStart
+            //dtStart baseado no calendario atual
+            let currentEntrieDtStart = Functions.setDtStart(calendarDate)
+            //dtEnd baseado no calendario atual e na periodicidade atual
+            let currentEntrieDtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
+            
+            let entrieValuesUpdateProps = {
+                entrieDtStartBeforeUpdate,
+                currentEntrieDtStart,
+                currentEntrieDtEnd,
+            }
+
             const EntrieObj : EntriesData = {
                 title: titleInputEntrie,
                 day: calendarDate.getDate(),
-                dtStart: dtStart,
-                dtEnd: dtEnd,
+                dtStart: currentEntrieDtStart,
+                dtEnd: currentEntrieDtEnd,
                 monthly: isEnabledMonthly,
                 received: isEnabledReceived,
                 type: typeOfEntrie,
                 category:entrieCategory
             }
     
-            createLatestReceivedOnUpdate()
-            isEnabledReceived && updateLatestReceived()
-    
+            //Atualiza a entrada
             entriesDB.update(entrieIdUpdate, EntrieObj).then(()=>{
+                createLatestReceivedOnUpdate()
+                isEnabledReceived && updateLatestReceived()
                 alert("atualizado!")
+                handleUpdateEntrieValues(entrieValuesUpdateProps)
                 updateLoadAction()
             })
-    
-            entrieValuesBeforeCreate.map((value: ValuesData) =>{
-                let amount = String(value.amount)
-                    amount = amount.replace(/[.]/g, '')
-                    amount = amount.replace(/[,]/g, '')
-                let newDtEnd
-               
-                if (value.id !=0){
-                    let valueBeforeUpdate = entriesValuesByDate.filter(vlu => vlu.id == value.id)
-                    let valueDate = new Date()
-                    let newDtStart
-                    
-                    if(dtStartBeforeUpdate == value.dtStart){
-                        newDtStart = dtStart
-                    }else{
+        })
+        loadNotifications()
+    }
+
+    function getSelectedDate(){
+        let selectedDate
+        if (selectedMonth < 10) {
+            selectedDate = selectedYear.toString() + '0' + selectedMonth.toString()
+        } else {
+            selectedDate = selectedYear.toString() + selectedMonth.toString()
+        }
+        return Number(selectedDate)
+    }
+
+    async function getAmountBeforeUpdate(id:number){
+        let selectedDate
+        let amountBeforeUpdate = "0"
+        selectedDate = getSelectedDate()
+        await valuesDB.findByDate(selectedDate).then((res:any)=>{
+            res._array.map((value:any)=>{
+                if(value.id == id){
+                    amountBeforeUpdate = String(value.amount)
+                    amountBeforeUpdate = amountBeforeUpdate.replace(/[.]/g, '')
+                    amountBeforeUpdate = amountBeforeUpdate.replace(/[,]/g, '')
+                }
+            })
+        })
+        return Number(amountBeforeUpdate)
+    }
+
+    function handleUpdateEntrieValues(entrieValuesUpdateProps: EntrieValuesUpdateProps){
+        entrieValuesBeforeCreate.map((value: ValuesData, index:number) =>{
+            let amount = String(value.amount)
+                amount = amount.replace(/[.]/g, '')
+                amount = amount.replace(/[,]/g, '')
+            let newDtEnd : number
+            let newDtStart : number
+            console.log("value.id : "+value.id )
+            // Se já existir no banco, ou seja, ID diferente de 0
+            if (value.id !=0){
+                let newDate = new Date()
+                newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month)-1)
+                newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
+                if (index == 0){
+                    // se for o primeiro valor, a frequencia deverá ser a mesma da entrada
+                    newDtEnd = entrieValuesUpdateProps.currentEntrieDtEnd
+                    newDtStart = entrieValuesUpdateProps.currentEntrieDtStart
+                   
+                }else{
+                    entrieValuesUpdateProps.currentEntrieDtStart > value.dtStart
+                    ? 
+                        newDtStart = entrieValuesUpdateProps.currentEntrieDtStart
+                    :
                         newDtStart = value.dtStart
-                    }
-                    console.log("valueBeforeUpdate[0].amount "+valueBeforeUpdate[0].amount)
-                    console.log("value.amount "+value.amount)
-                    valueDate.setMonth(Number(Functions.toMonthAndYear(newDtStart).month)-1)
-                    valueDate.setFullYear(Number(Functions.toMonthAndYear(newDtStart).year))
-                    let DtEnd
-                    if ((calendarDate.getMonth() + 1) < 10) {
-                        DtEnd = calendarDate.getFullYear().toString() + '0' + (calendarDate.getMonth() + 1).toString()
-                    } else {
-                        DtEnd = calendarDate.getFullYear().toString() + (calendarDate.getMonth() + 1).toString()
-                    }
-                    let contFreq = Functions.toFrequency(parseInt(DtEnd),newDtStart)
-                    if (valueBeforeUpdate[0].amount != Number(amount)){
-                        const ValueObjUpdate:any = {
-                            description: value.description,
-                            amount: valueBeforeUpdate[0].amount,
-                            dtStart: newDtStart,
-                            dtEnd: Functions.setDtEnd(false, contFreq, valueDate ), 
-                            entries_id: entrieIdUpdate
-                        }
-                        valuesDB.update(value.id, ValueObjUpdate)
-                        const NewValueObjUpdate:any = {
-                            description: value.description,
-                            amount:  Number(amount),
-                            dtStart: Functions.setDtStart(calendarDate),
-                            dtEnd: Functions.setDtEnd(true, 0, valueDate ), 
-                            entries_id: entrieIdUpdate
-                        }
-                        valuesDB.create(NewValueObjUpdate)
+                    if (value.monthly && isEnabledMonthly){
+                        newDtEnd = 209912
                     }else{
-                        if (value.monthly){
-                            newDtEnd = 209912
-                        }else{
-                            newDtEnd = Functions.setDtEnd(false, value.frequency, valueDate)
+                        // a frequencia do valor não pode ser maior que da entrada
+                        value.frequency <= entrieFrequency ?
+                            newDtEnd = Functions.setDtEnd(false, value.frequency, newDate)
+                        : 
+                        !isEnabledMonthly ? newDtEnd = Functions.setDtEnd(false, entrieFrequency, newDate)
+                        :  newDtEnd = Functions.setDtEnd(false, value.frequency, newDate)
+                        if (newDtEnd > entrieValuesUpdateProps.currentEntrieDtEnd ){
+                            newDtEnd = entrieValuesUpdateProps.currentEntrieDtEnd 
                         }
+                    }
+                }
+                let selectedDate = getSelectedDate()
+                let freqEntrieValue = Functions.toFrequency(selectedDate,newDtStart)
+                getAmountBeforeUpdate(value.id).then((amountBefUpdate:number)=>{
+                    console.log("amount before update: "+amountBefUpdate)
+                    console.log("freqEntrieValue: "+freqEntrieValue)
+                    if (freqEntrieValue > 0 && amountBefUpdate != Number(amount)){
+                        console.log("YES")
+                    let newDate = new Date()
+                    newDate.setMonth(parseInt(Functions.toMonthAndYear(newDtStart).month)-1)
+                    newDate.setFullYear(parseInt(Functions.toMonthAndYear(newDtStart).year))
+                    let newUpdatedDtEnd = Functions.setDtEnd(false, freqEntrieValue, newDate)
+                        updateValueWithAmountChanged(value, amountBefUpdate, newDtStart, newUpdatedDtEnd)
+                        createValueWithAmountChanged(value,Number(amount),selectedDate,newDtEnd)
+                    }else{
+                        console.log("NO")
                         const ValueObjUpdate:any = {
                             description: value.description,
                             amount: Number(amount),
@@ -491,35 +560,224 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                             dtEnd: newDtEnd, 
                             entries_id: entrieIdUpdate
                         }
-                        valuesDB.update(value.id, ValueObjUpdate).then(()=>{
-                        })
-
+                        valuesDB.update(value.id, ValueObjUpdate)
                     }
+                })
+
+            }else{
+                //cria um novo valor
+                let newDate = new Date()
+                newDate.setMonth(selectedMonth-1)
+                newDate.setFullYear(selectedYear)
+                let newDtStart = Functions.setDtStart(newDate)
+                
+                if (value.monthly){
+                    newDtEnd = 209912
                 }else{
-                    let newDate = new Date()
-                    newDate.setMonth(selectedMonth-1)
-                    newDate.setFullYear(selectedYear)
-                    let newDtStart = Functions.setDtStart(newDate)
-                    
+                    newDtEnd = Functions.setDtEnd(false, value.frequency, newDate)
+                }
+                if (newDtEnd > entrieValuesUpdateProps.currentEntrieDtEnd ){
+                    newDtEnd = entrieValuesUpdateProps.currentEntrieDtEnd 
+                }
+                const ValueObjCreate:any = {
+                    description: value.description,
+                    amount: Number(amount),
+                    dtStart: newDtStart,
+                    dtEnd: newDtEnd, 
+                    entries_id: entrieIdUpdate
+                }
+                valuesDB.create(ValueObjCreate)
+            }
+        })
+    }
+
+    function updateValueWithAmountChanged(value: ValuesData, amount:number, newDtStart:number, newDtEnd:number){
+        const ValueObjUpdate:any = {
+            description: value.description,
+            amount: amount,
+            dtStart: newDtStart,
+            dtEnd: newDtEnd, 
+            entries_id: entrieIdUpdate
+        }
+        valuesDB.update(value.id, ValueObjUpdate)
+    }
+
+    function createValueWithAmountChanged(value: ValuesData, amount:number, newDtStart:number, newDtEnd:number){
+        const ValueObjUpdate:any = {
+            description: value.description,
+            amount: amount,
+            dtStart: newDtStart,
+            dtEnd: newDtEnd, 
+            entries_id: entrieIdUpdate
+        }
+        valuesDB.create(ValueObjUpdate)
+    }
+
+    /*
+        Atualiza como recebido e cria um novo registro em ultimas transações
+    */
+    function updateEntrieReceived(selectedId: number) {
+        entriesDB.findById(selectedId).then((res: any) => {
+            let obj = {
+                title: res._array[0].title,
+                day: res._array[0].day,
+                dtStart: res._array[0].dtStart,
+                dtEnd: res._array[0].dtEnd,
+                monthly: res._array[0].monthly,
+                received: true,
+                type: res._array[0].type,
+                category:res._array[0].category,
+            }
+            let totalValues = 0
+            allEntriesValues.map((value:EntriesValuesData) => {
+                if (selectedId === value.entries_id){
+                    totalValues = totalValues + value.amount
+                }
+            })
+            let ltsObj = {
+                title: res._array[0].title,
+                day: new Date().getDate(),
+                month: new Date().getMonth() +1,
+                type: res._array[0].type,
+                category: res._array[0].category,
+                amount: totalValues,
+                entrie_id: selectedId,
+            }
+            latestDB.create(ltsObj)
+            entriesDB.update(selectedId, obj).then(res => {
+                alert("Pago!")
+                loadNotifications()
+                updateLoadAction()
+            }).catch(err => {
+                console.log(err)
+            })
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+
+
+
+    /*
+    FUNCTIONS CREATE ACTIONS
+    */
+    /*
+        Cria uma nova entrada
+    */
+    function handleCreateNewEntrie(){
+        let entrieObj = defineEntrieCreateObject()
+        entriesDB.create(entrieObj).then(()=>{
+            
+            //updateLoadAction() //TODO verificar se é necessário
+            handleCreateNewEntrieValue() //TODO verificar se mantem criando
+        }).catch(err=>{
+            console.log(err)
+            alert('erro: '+err)
+        }) 
+    }
+
+    /*
+        Cria um novo objeto de entrada para cadastro
+    */
+    function defineEntrieCreateObject(){
+        let dtStart = Functions.setDtStart(calendarDate)
+        let dtEnd = Functions.setDtEnd(isEnabledMonthly, entrieFrequency, calendarDate)
+
+        const EntrieObj : EntriesData = {
+            title: titleInputEntrie,
+            day: calendarDate.getDate(),
+            dtStart: dtStart,
+            dtEnd: dtEnd,
+            monthly: isEnabledMonthly,
+            received: isEnabledReceived,
+            type: typeOfEntrie,
+            category: entrieCategory,
+        }
+
+        return EntrieObj
+    }
+
+    /*
+        Cria novos valores para a entrada recém criada
+    */
+    //TODO melhorar cadastro e fazer testes
+    function handleCreateNewEntrieValue(){
+        let entrieObj = defineEntrieCreateObject()
+        entriesDB.all().then((res:any)=>{
+            let totalValues = 0
+            entrieValuesBeforeCreate.map((value: ValuesData) =>{
+                //define o id que faz a relação com a entrada que acabou de ser criada
+                let EntrieId = res._array.slice(-1)[0].id
+                let amount = String(value.amount)
+                amount = amount.replace(/[.]/g, '')
+                amount = amount.replace(/[,]/g, '')
+                totalValues = totalValues + Number(amount)
+                let newDtEnd
+                /*verifica se houve mudança na periodicidade dos valores
+                //se sim, cadastra de acordo com a frequencia, se não cadastra 
+                //com a mesma frequencia da entrada
+                */
+                if (valuesIsChanged){
                     if (value.monthly){
                         newDtEnd = 209912
                     }else{
-                        newDtEnd = Functions.setDtEnd(false, value.frequency, newDate)
+                        newDtEnd = Functions.setDtEnd(false, value.frequency, calendarDate)
                     }
-                    const ValueObjCreate:any = {
-                        description: value.description,
-                        amount: Number(amount),
-                        dtStart: newDtStart,
-                        dtEnd: newDtEnd, 
-                        entries_id: entrieIdUpdate
-                    }
-                    valuesDB.create(ValueObjCreate)
+                }else{
+                    newDtEnd = entrieObj.dtEnd 
                 }
+                const ValueObj:any = {
+                    description: value.description,
+                    amount: Number(amount),
+                    dtStart: entrieObj.dtStart,
+                    dtEnd: newDtEnd, 
+                    entries_id: EntrieId
+                }
+                console.log("ValueObj: "+ValueObj)
+                valuesDB.create(ValueObj).then(()=>{
+                    alert('Cadastrado com sucesso!') //TODO criar modal especifico
+                    updateLoadAction()
+                    resetValues()
+                }).catch(err => {
+                    console.log(err)
+                    alert('Erro no cadastr: '+err)
+                })
             })
+
+            /*
+                Se estiver marcado como recebido, cria um registro nas ultimas transações
+            */
+            if(isEnabledReceived){
+                let ltsObj = {
+                    title: titleInputEntrie,
+                    day: new Date().getDate(),
+                    month: new Date().getMonth() +1,
+                    type: typeOfEntrie,
+                    category: entrieCategory,
+                    amount: totalValues,
+                    entrie_id: res._array.slice(-1)[0].id,
+                }
+                latestDB.create(ltsObj).then(()=>{
+                    console.log('Cadastrado latest')
+                    updateLoadAction()
+                }).catch(err => {
+                    console.log(err)
+                })
+            }
+            //dispara a função de criar notificações
+            loadNotifications()
+        }).catch(err => {
+            console.log(err)
         })
-        loadNotifications()
     }
 
+
+    /*
+    FUNCTIONS DELETE ACTIONS
+    */
+    /*
+        Remove uma entrada
+    */
     function handleDeleteEntrie(entrieId:number){
         entriesByDate.map((entrie:EntriesByDateData)=>{
             if (entrie.id == entrieId){
@@ -567,6 +825,9 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         loadNotifications()
     }
 
+    /*
+        Remove um valor de entrada
+    */
     function handleDeleteEntrieValues(entrieId:number, valueId:number){
         entriesValuesByDate.map((value: EntriesValuesData)=>{
             if(value.entries_id == entrieId || value.id == valueId){
@@ -602,46 +863,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
         })
     }
 
-    function updateEntrieReceived(selectedId: number) {
-        //console.log('selected ID: '+selectedId)
-        entriesDB.findById(selectedId).then((res: any) => {
-            let obj = {
-                title: res._array[0].title,
-                day: res._array[0].day,
-                dtStart: res._array[0].dtStart,
-                dtEnd: res._array[0].dtEnd,
-                monthly: res._array[0].monthly,
-                received: true,
-                type: res._array[0].type,
-                category:res._array[0].category,
-            }
-            let totalValues = 0
-            allEntriesValues.map((value:EntriesValuesData) => {
-                if (selectedId === value.entries_id){
-                    totalValues = totalValues + value.amount
-                }
-            })
-            let ltsObj = {
-                title: res._array[0].title,
-                day: new Date().getDate(),
-                month: new Date().getMonth() +1,
-                type: res._array[0].type,
-                category: res._array[0].category,
-                amount: totalValues,
-                entrie_id: selectedId,
-            }
-            latestDB.create(ltsObj)
-            entriesDB.update(selectedId, obj).then(res => {
-                alert("Pago!")
-                loadNotifications()
-                updateLoadAction()
-            }).catch(err => {
-                console.log(err)
-            })
-        }).catch(err=>{
-            console.log(err)
-        })
-    }
+    
 
     return(
         <NewEntriesContext.Provider value={{

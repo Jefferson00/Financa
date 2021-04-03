@@ -27,14 +27,13 @@ export default function BalanceView(props:BalanceProps) {
    const [remain, setRemain] = useState(0)
 
    useEffect(()=>{
-      if (selectedMonth == currentMonth && selectedYear == currentYear){
+      /*if (selectedMonth == currentMonth && selectedYear == currentYear){
         console.log("remain: "+props.values.remainingBalance)
         console.log("current: "+ props.values.currentBalance)
         setRemain(props.values.remainingBalance + props.values.currentBalance)
         console.log("remain: "+remain)
-      }else{
+      }else{*/
         setRemain(props.values.remainingBalance)
-      }
    },[selectedMonth,props.values.remainingBalance])
 
     return(
