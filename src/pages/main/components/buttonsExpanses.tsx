@@ -1,15 +1,19 @@
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 
 import { Feather, Foundation } from '@expo/vector-icons'
+import { StylesContext } from '../../../contexts/stylesContext';
 
 
 export default function ButtonsExpanses() {
     const navigation = useNavigation()
+    const {onUnmonted} = useContext(StylesContext)
+
     function handleNavigateDespesas() {
+      onUnmonted()
       navigation.navigate('Entries', { item: 'Despesas'})
     }
     function handleNavigateNovoDespesas() {

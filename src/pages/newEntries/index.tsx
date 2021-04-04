@@ -47,12 +47,16 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
             style={styles.container}
             >
             <StatusBar style="light" translucent />  
-            <Header/>
+            {entrieIdUpdate == 0 && <Header/>}
 
              <View style={styles.mainContainer}>
                 <View style={styles.tittleTextView}>
                     <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
-                        {typeOfEntrie == "Ganhos" ? "Novo Ganho" : "Nova Despesa"}
+                        { entrieIdUpdate == 0 ?
+                            typeOfEntrie == "Ganhos" ? "Novo Ganho" : "Nova Despesa"
+                        :
+                            typeOfEntrie == "Ganhos" ? "Editar Ganho" : "Editar Despesa"
+                        }
                     </Text>
                 </View>
 

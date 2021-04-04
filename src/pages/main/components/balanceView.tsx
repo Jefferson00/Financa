@@ -25,6 +25,7 @@ export default function BalanceView(props:BalanceProps) {
    const {isBalancesDone} = useContext(DataBDContext)
 
    const [remain, setRemain] = useState(0)
+   const [isCurrentMonth, setIsCurrentMonth] = useState(true)
 
    useEffect(()=>{
       /*if (selectedMonth == currentMonth && selectedYear == currentYear){
@@ -33,6 +34,11 @@ export default function BalanceView(props:BalanceProps) {
         setRemain(props.values.remainingBalance + props.values.currentBalance)
         console.log("remain: "+remain)
       }else{*/
+        if(selectedMonth == currentMonth && selectedYear == currentYear){
+          setIsCurrentMonth(true)
+        }else{
+          setIsCurrentMonth(false)
+        }
         setRemain(props.values.remainingBalance)
    },[selectedMonth,props.values.remainingBalance])
 
@@ -52,37 +58,43 @@ export default function BalanceView(props:BalanceProps) {
           </View>
 
 
-          <View style={styles.balanceView}>
+          <View style={isCurrentMonth ? styles.balanceView : styles.alternativeBalanceView}>
+              {isCurrentMonth &&
+              <>
               <View style={styles.currentBalanceView}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                        <Text style={styles.currentBalanceText}>Atual</Text>
-                  </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                          <Text style={styles.currentBalanceText}>Atual</Text>
+                    </View>
 
-                  {seeBalanceValues?
-                      props.values.currentBalance == 0 || selectedMonth != currentMonth || selectedYear != currentYear?
-                        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                            <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
-                        </View>
+                    {seeBalanceValues?
+                        props.values.currentBalance == 0 ?
+                          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                              <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+                          </View>
+                        :
+                          <NumberFormat
+                          value={props.values.currentBalance}
+                          displayType={'text'}
+                          thousandSeparator={true}
+                          format={Functions.currencyFormatter}
+                          renderText={value =>
+                            <Text style={styles.currentBalanceTextValue}>
+                              {value}
+                            </Text> 
+                          }
+                          />
                       :
-                        <NumberFormat
-                        value={props.values.currentBalance}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        format={Functions.currencyFormatter}
-                        renderText={value =>
-                          <Text style={styles.currentBalanceTextValue}>
-                            {value}
-                          </Text> 
-                        }
-                        />
-                    :
-                    <View style={styles.censoredValue}/>
-                  }
+                      <View style={styles.censoredValue}/>
+                    }
               </View>
+              </>
+              }
 
               <View style={styles.currentBalanceView}>
                   <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <Text style={styles.estimatedBalanceText}>Estimado</Text>
+                      <Text style={styles.estimatedBalanceText}>
+                        {isCurrentMonth ? "Estimado" : "Saldo do mês"}
+                      </Text>
                   </View>
                   {seeBalanceValues?
                     props.values.estimatedBalance == 0 ?
@@ -115,37 +127,41 @@ export default function BalanceView(props:BalanceProps) {
             <BalanceLoader/>
           
           :
-          <View style={styles.balanceView}>
-              <View style={styles.currentBalanceView}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <Text style={styles.currentBalanceText}>Atual</Text>
-                  </View>
-                {seeBalanceValues?
-                  remain == 0 ?
-                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                        <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+          <View style={isCurrentMonth ? styles.balanceView : styles.alternativeBalanceView}>
+              {isCurrentMonth &&
+                <View style={styles.currentBalanceView}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                        <Text style={styles.currentBalanceText}>Atual</Text>
                     </View>
+                  {seeBalanceValues?
+                    remain == 0 ?
+                      <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                          <Text style={styles.currentBalanceTextValue}>R$ 0,00</Text>
+                      </View>
+                    :
+                    <NumberFormat
+                          value={remain}
+                          displayType={'text'}
+                          thousandSeparator={true}
+                          format={Functions.currencyFormatter}
+                          renderText={value =>
+                            <Text style={styles.currentBalanceTextValue}>
+                              {value}
+                            </Text> 
+                          }
+                    />
                   :
-                  <NumberFormat
-                        value={remain}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        format={Functions.currencyFormatter}
-                        renderText={value =>
-                          <Text style={styles.currentBalanceTextValue}>
-                            {value}
-                          </Text> 
-                        }
-                  />
-                :
-                  <View style={styles.censoredValue}/>
-                }
-              </View>
+                    <View style={styles.censoredValue}/>
+                  }
+                </View>
+              }
 
             
               <View style={styles.currentBalanceView}>
                   <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <Text style={styles.estimatedBalanceText}>Estimado</Text>
+                      <Text style={styles.estimatedBalanceText}>
+                        {isCurrentMonth ? "Estimado" : "Saldo total do mês"}
+                      </Text>
                   </View>
                   {seeBalanceValues?
                     props.values.totalEstimatedBalance == 0 ?
@@ -180,6 +196,12 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'center',
       paddingHorizontal: 26,
+      marginTop: 13,
+    },
+    alternativeBalanceView:{
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      paddingHorizontal: 10,
       marginTop: 13,
     },
     currentBalanceView: {

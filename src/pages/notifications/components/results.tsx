@@ -107,7 +107,7 @@ export default function Results() {
                     ]}>
                         Despesas
                     </Text>
-                    {hasLateEarnings && 
+                    {hasLateExpanses && 
                          <Octicons 
                           name="primitive-dot"
                           size={25} 

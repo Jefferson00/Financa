@@ -93,7 +93,11 @@ export default function FormContent() {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <View>
                             <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
-                                {typeOfEntrie == "Ganhos" ?"Data de recebimento" : "Data de pagamento"}
+                                {entrieIdUpdate == 0 ?
+                                    typeOfEntrie == "Ganhos" ?"Data de recebimento" : "Data de pagamento"
+                                :
+                                    "Data de Início"
+                                }
                             </Text>
                             <View style={styles.dateView}>
                                 <TouchableOpacity  onPress={showDatepicker} hitSlop={styles.hitSlop}>

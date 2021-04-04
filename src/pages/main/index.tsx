@@ -108,11 +108,11 @@ export default function Main() {
 
   useEffect(() => {
     if (selectedMonth == (todayDate.getMonth() + 1) && selectedYear == todayDate.getFullYear()) {
-      setFromBackgroundColor('#F9CF3C')
-      setToBackgroundColor('#B26A15')
+      setFromBackgroundColor('#FEBD1C')
+      setToBackgroundColor('#FF981E')
     } else {
-      setFromBackgroundColor('#ffefb5')
-      setToBackgroundColor('#3C93F9')
+      setFromBackgroundColor('#F9C33C')
+      setToBackgroundColor('#B26A15')
     }
   }, [selectedMonth, selectedYear])
 
@@ -212,12 +212,15 @@ export default function Main() {
     if (bal.year == selectedYear && bal.month == selectedMonth) {
         if(index == 0){
           remainingBalance = currentBalance
-          totalEstimatedBalance = bal.amount
         }
         else{
-          remainingBalance = bal.amount - (estimatedEarnings - estimatedExpanses)
-          totalEstimatedBalance = bal.amount
+          if (selectedMonth == currentMonth && selectedYear == currentYear){
+            remainingBalance = (bal.amount - estimatedBalance) + currentBalance
+          }else{
+            remainingBalance = bal.amount - (estimatedEarnings - estimatedExpanses)
+          }
         }
+        totalEstimatedBalance = bal.amount
     }
   })
 

@@ -64,6 +64,8 @@ export default function ButtonNewValue() {
         //console.log(entrie[0])
 
         entrie.length > 0 || entrieIdUpdate == 0 ? setHasResults(true) : setHasResults(false)
+
+        if(entrieIdUpdate != 0) setContPlusButtonPressed(1) 
        
         //console.log("Has results: "+hasResults)
     },[entrie])
