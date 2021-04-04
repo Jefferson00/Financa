@@ -513,7 +513,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 let newDate = new Date()
                 newDate.setMonth(parseInt(Functions.toMonthAndYear(value.dtStart).month)-1)
                 newDate.setFullYear(parseInt(Functions.toMonthAndYear(value.dtStart).year))
-                if (index == 0){
+                if (index == 0 && !isEnabledMonthly){
                     // se for o primeiro valor, a frequencia deverá ser a mesma da entrada
                     newDtEnd = entrieValuesUpdateProps.currentEntrieDtEnd
                     newDtStart = entrieValuesUpdateProps.currentEntrieDtStart
@@ -670,6 +670,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
             
             //updateLoadAction() //TODO verificar se é necessário
             handleCreateNewEntrieValue() //TODO verificar se mantem criando
+            alert('Cadastrado com sucesso!') //TODO criar modal especifico
         }).catch(err=>{
             console.log(err)
             alert('erro: '+err)
@@ -735,7 +736,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 }
                 console.log("ValueObj: "+ValueObj)
                 valuesDB.create(ValueObj).then(()=>{
-                    alert('Cadastrado com sucesso!') //TODO criar modal especifico
+                    
                     updateLoadAction()
                     resetValues()
                 }).catch(err => {

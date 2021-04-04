@@ -8,7 +8,15 @@ import { StylesContext } from "../../../contexts/stylesContext"
 export default function ButtonSubmit() {
     const navigation = useNavigation()
 
-    const {handleCreateNewEntrie, handleUpdate ,entrieIdUpdate, titleInputEntrie, entrieValuesBeforeCreate, typeOfEntrie} = useContext(NewEntriesContext)
+    const {
+        handleCreateNewEntrie, 
+        handleUpdate ,
+        resetValues,
+        entrieIdUpdate, 
+        titleInputEntrie, 
+        entrieValuesBeforeCreate, 
+        typeOfEntrie
+    } = useContext(NewEntriesContext)
     const {entrieButtonBorder, entrieButtonBackground,resetValuesForm} = useContext(StylesContext)
 
     function verifyInputs(){
@@ -30,6 +38,7 @@ export default function ButtonSubmit() {
         if (verifyInputs()){
             handleCreateNewEntrie()
             resetValuesForm()
+            resetValues()
             navigation.navigate('Entries', { item: typeOfEntrie})
         }else{
             alert('Preencha todos os campos!')
@@ -40,6 +49,7 @@ export default function ButtonSubmit() {
         if (verifyInputs()){
             handleUpdate()
             resetValuesForm()
+            resetValues()
             navigation.navigate('Entries', { item: typeOfEntrie})
         }else{
             alert('Preencha todos os campos!')

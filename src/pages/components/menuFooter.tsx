@@ -44,19 +44,21 @@ export default function Footer(){
         onUnmonted()
         navigation.navigate('Entries', { item: 'Ganhos'})
         updateEntrieIdUpdate(0)
+        resetValuesForm()
         resetValues()
     }
     function handleExpanses(){
         onUnmonted()
         navigation.navigate('Entries', { item: 'Despesas'})
         updateEntrieIdUpdate(0)
+        resetValuesForm()
         resetValues()
     }
     function handleNotification(){
         navigation.navigate('Notifications')
         updateEntrieIdUpdate(0)
         resetValues()
-        
+        resetValuesForm()
     }
 
 
