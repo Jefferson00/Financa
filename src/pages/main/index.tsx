@@ -93,12 +93,19 @@ export default function Main() {
 
   latedEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Ganhos")
   latedExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Despesas")
+  let nextDaysEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day > todayDate.getDate()  &&  entrie.day <= (todayDate.getDate()+5) && entrie.type == "Ganhos")
+  let nextDaysExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day > todayDate.getDate()  &&  entrie.day <= (todayDate.getDate()+5) && entrie.type == "Despesas")
 
   useEffect(() => {
     if (navigation.isFocused()) {
       updateMonthColorMainScreen()
 
-      if (latedEarningEntries.length > 0 || latedExpansesEntries.length > 0) {
+      if (
+           latedEarningEntries.length > 0
+        || latedExpansesEntries.length > 0 
+        || nextDaysExpansesEntries.length > 0
+        ||  nextDaysEarningEntries.length > 0
+        ) {
         updateHasNotification(true)
       } else {
         updateHasNotification(false)

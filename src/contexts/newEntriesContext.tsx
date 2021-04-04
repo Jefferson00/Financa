@@ -589,6 +589,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 valuesDB.create(ValueObjCreate)
             }
         })
+        updateEntrieIdUpdate(0)
     }
 
     function updateValueWithAmountChanged(value: ValuesData, amount:number, newDtStart:number, newDtEnd:number){
@@ -727,6 +728,7 @@ export function NewEntriesProvider({children}: NewEntriesProviderProps){
                 }else{
                     newDtEnd = entrieObj.dtEnd 
                 }
+                console.log("NEW DATEEND: "+newDtEnd)
                 const ValueObj:any = {
                     description: value.description,
                     amount: Number(amount),

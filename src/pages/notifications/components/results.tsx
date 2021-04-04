@@ -83,7 +83,7 @@ export default function Results() {
                         ]}>
                             Ganhos
                         </Text>
-                        {hasLateEarnings && 
+                        {hasLateEarnings || hasNextDaysEarnings && 
                          <Octicons 
                           name="primitive-dot"
                           size={25} 
@@ -107,7 +107,7 @@ export default function Results() {
                     ]}>
                         Despesas
                     </Text>
-                    {hasLateExpanses && 
+                    {hasLateExpanses || hasNextDaysExpanses && 
                          <Octicons 
                           name="primitive-dot"
                           size={25} 
