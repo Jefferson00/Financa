@@ -3,9 +3,10 @@ import React, { useContext } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import {MainContext} from "../../../contexts/mainContext"
+import { StylesContext } from '../../../contexts/stylesContext';
 
 export default function ButtonsSelectors() {
-
+    const {colorScheme} = useContext(StylesContext)
     const {
       activeBalanceView,
       isBalanceActive,
@@ -18,24 +19,35 @@ export default function ButtonsSelectors() {
 
     return(
         <View style={styles.selectValuesView}>
-        <TouchableOpacity style={isBalanceActive ? styles.activeButton : styles.nonActiveButton}
+        <TouchableOpacity style={isBalanceActive ? styles.activeButton: styles.nonActiveButton}
           onPress={activeBalanceView}
         >
-          <Text style={isBalanceActive ? styles.activeText : styles.nonActiveText}>
+          <Text style={isBalanceActive ? 
+            [styles.activeText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}] 
+            : 
+            [styles.nonActiveText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]}>
             Saldo
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={isEarningsActive ? styles.activeButton : styles.nonActiveButton}
           onPress={activeEarningsView}
         >
-          <Text style={isEarningsActive ? styles.activeText : styles.nonActiveText}>
+          <Text style={isEarningsActive ? 
+            [styles.activeText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}] 
+            : 
+            [styles.nonActiveText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]
+          }>
             Ganhos
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={isExpansesActive ? styles.activeButton : styles.nonActiveButton}
           onPress={activeExpansesView}
         >
-          <Text style={isExpansesActive ? styles.activeText : styles.nonActiveText}>
+          <Text style={isExpansesActive ? 
+            [styles.activeText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}] 
+            : 
+            [styles.nonActiveText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]
+          }>
             Despesas
           </Text>
         </TouchableOpacity>
@@ -48,12 +60,11 @@ const styles = StyleSheet.create({
     activeText:{
       fontSize: 14,
       fontFamily: 'Poppins_500Medium',
-      color:'#3C93F9'
     },
     nonActiveText:{
       fontSize: 14,
       fontFamily: 'Poppins_500Medium',
-      color:'rgba(60, 147, 249, 0.6)'
+      opacity:0.6
     },
     selectValuesView: {
       flexDirection: 'row',

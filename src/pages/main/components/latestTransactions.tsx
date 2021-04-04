@@ -6,6 +6,7 @@ import Functions from '../../../functions/index'
 import { DataBDContext } from '../../../contexts/dataBDContext';
 import CategoryIcon from './categoryIcon';
 import { MainContext } from '../../../contexts/mainContext';
+import { StylesContext } from '../../../contexts/stylesContext';
 
 
 export default function LatestTransactions() {
@@ -14,13 +15,25 @@ export default function LatestTransactions() {
 
     const {latestEntries } = useContext(DataBDContext)
     const {seeBalanceValues } = useContext(MainContext)
+    const {colorScheme } = useContext(StylesContext)
 
     const ltsEntries = latestEntries.slice(Math.max(latestEntries.length - 3, 0))
 
+    let expansesTextColor = ""
+    let earningsTextColor = ""
+
+    colorScheme == 'dark' ? expansesTextColor = '#FF4835' : expansesTextColor = '#CC3728'
+    colorScheme == 'dark' ? earningsTextColor = '#24DBBA' : earningsTextColor = '#1A8289'
+
     return (
-        <View style={styles.container}>
+        <View style={
+            [styles.container, 
+            colorScheme=='dark' ? 
+              {backgroundColor:'#2B2B2B'} 
+            : {backgroundColor:'#ffffff'}
+            ]}>
             <View style={styles.titleView}>
-                <Text style={styles.title}>
+                <Text style={[styles.title, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]}>
                     Últimas Transações
                 </Text>
                 {/*
@@ -47,7 +60,7 @@ export default function LatestTransactions() {
                             <View style={styles.centerView}>
                                 <Text style={[
                                     styles.itemText,
-                                    { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728' }
+                                    { color: entr.type == 'Ganhos' ? earningsTextColor : expansesTextColor }
                                     ]}
                                     numberOfLines={1}
                                 >
@@ -63,7 +76,7 @@ export default function LatestTransactions() {
                                         renderText={value => 
                                             <Text style={[
                                                 styles.itemText,
-                                                { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
+                                                { color: entr.type == 'Ganhos' ? earningsTextColor : expansesTextColor}
                                             ]}> 
                                             {entr.type == 'Despesas'? '- ' + value: value} 
                                             </Text>
@@ -72,7 +85,7 @@ export default function LatestTransactions() {
                                     :
                                     <Text style={[
                                         styles.itemText,
-                                        { color: entr.type == 'Ganhos' ? '#136065' : '#CC3728'}
+                                        { color: entr.type == 'Ganhos' ? earningsTextColor : expansesTextColor}
                                     ]}> 
                                     R$ 0,00 
                                     </Text>
@@ -80,12 +93,16 @@ export default function LatestTransactions() {
                             </View>
 
 
-                            <Text style={styles.dateText}>
+                            <Text style={[styles.dateText, colorScheme == 'dark' && {color:'#ffffff'}]}>
                                 {entr.day}/{Functions.convertDtToStringMonth(month)}
                             </Text>
                         </>
                         :
-                            <View style={styles.censoredValue}/>
+                            <View style={[styles.censoredValue, 
+                                colorScheme == 'dark' ? 
+                                {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                                {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                            ]}/>
                         }
                     </View>
                 )
@@ -117,7 +134,6 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },
     title: {
-        color: '#3C93F9',
         fontFamily: 'Poppins_600SemiBold',
         fontSize: 14,
     },

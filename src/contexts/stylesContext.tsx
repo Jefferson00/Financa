@@ -1,5 +1,8 @@
 import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
+import { useColorScheme } from 'react-native';
 import { NewEntriesContext } from './newEntriesContext';
+
+type ColorSchemeName = 'light' | 'dark' | null | undefined;
 
 interface StylesContextData{
     secondGradientColor:string;
@@ -17,6 +20,7 @@ interface StylesContextData{
     textAlertModal:string;
     hasNotifications:boolean;
     isRendered:boolean;
+    colorScheme:ColorSchemeName;
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
@@ -35,7 +39,7 @@ interface StylesProviderProps{
 export const StylesContext = createContext({} as StylesContextData)
 
 export function StylesProvider({children}: StylesProviderProps){
-
+    const colorScheme = useColorScheme()
     const {typeOfEntrie, updateTypeOfEntrie} = useContext(NewEntriesContext)
 
     const [firstGradientColor, setFirstGradientColor] = useState('#ffffff')
@@ -95,7 +99,11 @@ export function StylesProvider({children}: StylesProviderProps){
 
 
     function updateMonthColorMainScreen(){
-        setMonthColor('#3C93F9')
+        if (colorScheme == 'dark'){
+            setMonthColor('#ffffff')
+        }else{
+            setMonthColor('#3C93F9')
+        }
         updateTypeOfEntrie('')
         //console.log('updated!')
     }
@@ -104,29 +112,48 @@ export function StylesProvider({children}: StylesProviderProps){
         //console.log(" Tipo: "+typeOfEntrie)
     
         if(typeOfEntrie == "Ganhos"){
-            setFirstGradientColor("#155F69")
-            setSecondGradientColor("#F9CF3C")
-            setMonthColor("#F9CF3C")
-            setEntrieButtonBackground("rgba(26, 130, 137, 0.8)")
+            if (colorScheme == 'dark'){
+                setMonthColor('#ffffff')
+                setEntriePrimaryColor("#24DBBA")
+                setEntrieButtonBackground("rgba(26, 130, 137, 0.5)")
+                setFirstGradientColor("#136065")
+                setSecondGradientColor("#000000")
+            }else{
+                setMonthColor('#F9CF3C')
+                setEntriePrimaryColor("#1A8289")
+                setEntrieButtonBackground("rgba(26, 130, 137, 0.8)")
+                setFirstGradientColor("#155F69")
+                setSecondGradientColor("#F9CF3C")
+            }
             setEntrieButtonBorder("#24DBBA")
-            setEntriePrimaryColor("#1A8289")
             setEntrieSecondaryColor("#1B9F88")
             setTextAlertModal('Não recebido!')
             setTextModal('Esse ganho foi recebido?')
         }
         else if(typeOfEntrie == "Despesas"){
-            setFirstGradientColor("#CC3728")
-            setSecondGradientColor("#F9CF3C")
+            if (colorScheme == 'dark'){
+                setEntriePrimaryColor("#FF4835")
+                setEntrieButtonBackground("rgba(255, 72, 53, 0.5)")
+                setFirstGradientColor("#A5291D")
+                setSecondGradientColor("#000000")
+            }else{
+                setEntriePrimaryColor("#CC3728")
+                setEntrieButtonBackground("rgba(255, 72, 53, 0.8)")
+                setFirstGradientColor("#CC3728")
+                setSecondGradientColor("#F9CF3C")
+            }
             setMonthColor("#FFFFFF")
-            setEntrieButtonBackground("rgba(255, 72, 53, 0.8)")
             setEntrieButtonBorder("#CC3728")
-            setEntriePrimaryColor("#CC3728")
             setEntrieSecondaryColor("#FF4835")
             setTextAlertModal('Despesa não paga!')
             setTextModal('Essa despesa foi paga?')
         }
         else{
-            setMonthColor("#3C93F9")
+            if (colorScheme == 'dark'){
+                setMonthColor('#ffffff')
+            }else{
+                setMonthColor('#3C93F9')
+            }
         }
  
     },[typeOfEntrie])
@@ -148,6 +175,7 @@ export function StylesProvider({children}: StylesProviderProps){
             textAlertModal,
             hasNotifications,
             isRendered,
+            colorScheme,
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,

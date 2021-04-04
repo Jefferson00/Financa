@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Platform, View } from 'react-native';
+import { StyleSheet, Platform, View, useColorScheme } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
@@ -75,6 +75,7 @@ declare type Subscription = {
 export default function Main() {
   const navigation = useNavigation()
   const isFocused = useIsFocused()
+  const colorScheme = useColorScheme()
 
   const [expoPushToken, setExpoPushToken] = useState<any>('');
   const [notification, setNotification] = useState<any>(false);
@@ -84,7 +85,7 @@ export default function Main() {
   const [fromBackgroundColor, setFromBackgroundColor] = useState('#F9CF3C')
   const [toBackgroundColor, setToBackgroundColor] = useState('#B26A15')
 
-  const { isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear,currentMonth,currentYear } = useContext(MainContext);
+  const { isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear, currentMonth, currentYear } = useContext(MainContext);
   const { balances, entriesByCurrentDate, isBalancesDone, allEntriesValues } = useContext(DataBDContext)
   const { updateMonthColorMainScreen, updateHasNotification, onUnmonted } = useContext(StylesContext)
 
@@ -93,19 +94,28 @@ export default function Main() {
 
   latedEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Ganhos")
   latedExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day <= todayDate.getDate() && entrie.type == "Despesas")
-  let nextDaysEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day > todayDate.getDate()  &&  entrie.day <= (todayDate.getDate()+5) && entrie.type == "Ganhos")
-  let nextDaysExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day > todayDate.getDate()  &&  entrie.day <= (todayDate.getDate()+5) && entrie.type == "Despesas")
+  let nextDaysEarningEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day > todayDate.getDate() && entrie.day <= (todayDate.getDate() + 5) && entrie.type == "Ganhos")
+  let nextDaysExpansesEntries = entriesByCurrentDate.filter(entrie => !entrie.received && entrie.day > todayDate.getDate() && entrie.day <= (todayDate.getDate() + 5) && entrie.type == "Despesas")
 
+  let containerBgColor = "#ffffff"
+  ///colors schemes
+    
+  if (colorScheme == 'dark'){
+    containerBgColor = "#090909"
+  }else{
+    containerBgColor = "#ffffff"
+  }
+  
   useEffect(() => {
     if (navigation.isFocused()) {
       updateMonthColorMainScreen()
 
       if (
-           latedEarningEntries.length > 0
-        || latedExpansesEntries.length > 0 
+        latedEarningEntries.length > 0
+        || latedExpansesEntries.length > 0
         || nextDaysExpansesEntries.length > 0
-        ||  nextDaysEarningEntries.length > 0
-        ) {
+        || nextDaysEarningEntries.length > 0
+      ) {
         updateHasNotification(true)
       } else {
         updateHasNotification(false)
@@ -115,11 +125,22 @@ export default function Main() {
 
   useEffect(() => {
     if (selectedMonth == (todayDate.getMonth() + 1) && selectedYear == todayDate.getFullYear()) {
-      setFromBackgroundColor('#FEBD1C')
-      setToBackgroundColor('#FF981E')
+      if (colorScheme === "dark") {
+        setFromBackgroundColor('#0851A7')
+        setToBackgroundColor('#0A0500')
+      } else {
+        setFromBackgroundColor('#FEBD1C')
+        setToBackgroundColor('#FF981E')
+      }
     } else {
-      setFromBackgroundColor('#F9C33C')
-      setToBackgroundColor('#B26A15')
+      if (colorScheme === "dark") {
+        setFromBackgroundColor('#0851A7')
+        setToBackgroundColor('#0A0500')
+      } else {
+        setFromBackgroundColor('#F9C33C')
+        setToBackgroundColor('#B26A15')
+      }
+
     }
   }, [selectedMonth, selectedYear])
 
@@ -152,6 +173,8 @@ export default function Main() {
       })
       console.log('Mes criado: ' + currentMonth)
     })
+
+    
   }, [])
 
   const registerForPushNotificationsAsync = async () => {
@@ -217,17 +240,17 @@ export default function Main() {
 
   balances.map((bal: BalanceData, index: number) => {
     if (bal.year == selectedYear && bal.month == selectedMonth) {
-        if(index == 0){
-          remainingBalance = currentBalance
+      if (index == 0) {
+        remainingBalance = currentBalance
+      }
+      else {
+        if (selectedMonth == currentMonth && selectedYear == currentYear) {
+          remainingBalance = (bal.amount - estimatedBalance) + currentBalance
+        } else {
+          remainingBalance = bal.amount - (estimatedEarnings - estimatedExpanses)
         }
-        else{
-          if (selectedMonth == currentMonth && selectedYear == currentYear){
-            remainingBalance = (bal.amount - estimatedBalance) + currentBalance
-          }else{
-            remainingBalance = bal.amount - (estimatedEarnings - estimatedExpanses)
-          }
-        }
-        totalEstimatedBalance = bal.amount
+      }
+      totalEstimatedBalance = bal.amount
     }
   })
 
@@ -255,7 +278,7 @@ export default function Main() {
       }
 
       {/*Container Principal*/}
-      <View style={styles.mainContainer}>
+      <View style={[styles.mainContainer, {backgroundColor:containerBgColor}]}>
         {isBalancesDone ?
           <ChartView />
           :

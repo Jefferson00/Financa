@@ -6,6 +6,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { DataBDContext } from "../../../contexts/dataBDContext";
 import { MainContext } from "../../../contexts/mainContext";
+import { StylesContext } from "../../../contexts/stylesContext";
 import Functions from "../../../utils"
 
 interface BalanceData{
@@ -17,9 +18,20 @@ interface BalanceData{
 export default function ChartView() {
 
     const {balances} = useContext(DataBDContext)
+    const {colorScheme} = useContext(StylesContext)
     const {currentYear, currentMonth, seeBalanceValues} = useContext(MainContext)
     let balanceChart : number[]= [0,0,0,0]
     let months = ["Jan","Fec","Mar","Abr"]
+    let backgroundColor = "#ffffff"
+    let backgroundGradientFrom = "#3C93F9"
+    let backgroundGradientTo = "#63A9FA"
+
+    if(colorScheme == 'dark'){
+        backgroundColor = "#ffffff"
+        backgroundGradientFrom = "#17549B"
+        backgroundGradientTo = "#17549B"
+    }
+ 
     let indexOfFirstMonth = 0
     if (balances.length > 0){
         balances.map((bal, index)=>{
@@ -72,9 +84,9 @@ export default function ChartView() {
                     segments={2}
                     yAxisInterval={1} // optional, defaults to 1
                     chartConfig={{
-                        backgroundColor: "#ffffff",
-                        backgroundGradientFrom: "#3C93F9",
-                        backgroundGradientTo: "#63A9FA",
+                        backgroundColor: backgroundColor,
+                        backgroundGradientFrom: backgroundGradientFrom,
+                        backgroundGradientTo: backgroundGradientTo,
                         decimalPlaces: 2, // optional, defaults to 2dp
                         color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                         labelColor: (opacity = 0) => `rgba(255, 255, 255, ${opacity})`,
@@ -112,9 +124,11 @@ export default function ChartView() {
                 />
             </ScrollView>
         :
-            <View style={styles.censoredChart}>
-
-            </View>
+             <View style={[styles.censoredChart, 
+                colorScheme == 'dark' ? 
+                {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+              ]}/>
         }
         </>
     )

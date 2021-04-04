@@ -28,7 +28,7 @@ export default function EntriesResults() {
     const { entriesByDate, entriesValuesByDate, allEntries, allEntriesValues, updateLoadAction } = useContext(DataBDContext)
     const {todayDate, selectedMonth, selectedYear, resetDate} = useContext(MainContext)
     const {typeOfEntrie} = useContext(NewEntriesContext)
-    const {entriePrimaryColor, showEntrieModal} = useContext(StylesContext)
+    const {entriePrimaryColor, showEntrieModal, colorScheme} = useContext(StylesContext)
 
     let cont = 0
 
@@ -96,7 +96,9 @@ export default function EntriesResults() {
                         return (
                             <View key={index}>
                                 <TouchableOpacity
-                                    style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1}]}
+                                    style={[styles.earningsItemView, {borderColor:borderColor, borderWidth:1},
+                                    colorScheme == 'dark' && {backgroundColor: '#2B2B2B'}
+                                    ]}
                                     onPress={()=> showEntrieModal(entrie.id, totalValues)}
                                 >
                                     <CategoryIcon category={entrie.category} opacColor={opacColor}/>

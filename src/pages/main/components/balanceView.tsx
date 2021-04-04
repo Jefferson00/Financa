@@ -6,6 +6,7 @@ import { DataBDContext } from '../../../contexts/dataBDContext';
 import NumberFormat from 'react-number-format';
 import Functions from '../../../utils'
 import BalanceLoader from './balanceLoader';
+import { StylesContext } from '../../../contexts/stylesContext';
 
 interface BalanceValues{
   currentBalance:number,
@@ -23,6 +24,7 @@ export default function BalanceView(props:BalanceProps) {
    const {seeBalanceValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeBalanceValues} = useContext(MainContext)
    
    const {isBalancesDone} = useContext(DataBDContext)
+   const {colorScheme} = useContext(StylesContext)
 
    const [remain, setRemain] = useState(0)
    const [isCurrentMonth, setIsCurrentMonth] = useState(true)
@@ -84,7 +86,11 @@ export default function BalanceView(props:BalanceProps) {
                           }
                           />
                       :
-                      <View style={styles.censoredValue}/>
+                      <View style={[styles.censoredValue, 
+                        colorScheme == 'dark' ? 
+                        {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                        {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                      ]}/>
                     }
               </View>
               </>
@@ -114,7 +120,11 @@ export default function BalanceView(props:BalanceProps) {
                         }
                       />
                   :
-                  <View style={styles.censoredValue}/>
+                  <View style={[styles.censoredValue, 
+                    colorScheme == 'dark' ? 
+                    {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                    {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                  ]}/>
                   }
               </View>
           </View>
@@ -151,7 +161,11 @@ export default function BalanceView(props:BalanceProps) {
                           }
                     />
                   :
-                    <View style={styles.censoredValue}/>
+                  <View style={[styles.censoredValue, 
+                    colorScheme == 'dark' ? 
+                    {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                    {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                  ]}/>
                   }
                 </View>
               }
@@ -181,7 +195,11 @@ export default function BalanceView(props:BalanceProps) {
                         }
                       />
                   :
-                      <View style={styles.censoredValue}/>
+                  <View style={[styles.censoredValue, 
+                    colorScheme == 'dark' ? 
+                    {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                    {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                  ]}/>
                   }
               </View>
           </View>

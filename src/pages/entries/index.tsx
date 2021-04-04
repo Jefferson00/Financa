@@ -38,7 +38,18 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
     const {isEntriesDone} = useContext(DataBDContext)
-    const {selectedEntrieId, onMonted, onUnmonted, isRendered} = useContext(StylesContext)
+    const {selectedEntrieId, onMonted, onUnmonted, isRendered, colorScheme} = useContext(StylesContext)
+
+    let earningsGradientColors = [""]
+    let expansesGradientColors = [""]
+
+    if(colorScheme == 'dark'){
+        earningsGradientColors = ["#136065","#000000"]
+        expansesGradientColors = ["#A5291D","#000000"]
+    }else{
+        earningsGradientColors = ["#155F69","#F9CF3C"]
+        expansesGradientColors = ["#CC3728","#F9CF3C"]
+    }
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
@@ -53,7 +64,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     return (
         <LinearGradient
-            colors={item == "Ganhos" ? ["#155F69","#F9CF3C"] : ["#CC3728","#F9CF3C"]}
+            colors={item == "Ganhos" ? earningsGradientColors : expansesGradientColors}
             start={{ x: -0.4, y: 0.1 }}
             style={styles.container}>
             <StatusBar style="light" translucent />
@@ -68,7 +79,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 <LoaderBalance/>
             }
 
-            <View style={styles.mainContainer}>
+            <View style={[styles.mainContainer, colorScheme == 'dark' && {backgroundColor:"#090909"}]}>
                 {isRendered && isEntriesDone?
                     <EntriesResults/>
                     :

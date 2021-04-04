@@ -6,6 +6,7 @@ import ButtonsEarnings from "./buttonsEarnings"
 import { MainContext } from '../../../contexts/mainContext';
 import NumberFormat from 'react-number-format';
 import Functions from '../../../utils'
+import { StylesContext } from '../../../contexts/stylesContext';
 
 interface EarningsValues{
   currentEarnings:number,
@@ -20,6 +21,14 @@ interface EarningProps{
 export default function EarningsView(props:EarningProps) {
   
   const {seeEarningsValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeEarningsValues} = useContext(MainContext)
+  const {colorScheme} = useContext(StylesContext)
+
+  let colorText = ''
+  if (colorScheme == 'dark'){
+    colorText = '#24DBBA'
+  }else{
+    colorText = '#1A8289'
+  }
 
   return (
     <>
@@ -38,18 +47,18 @@ export default function EarningsView(props:EarningProps) {
       <View style={styles.balanceView}>
           <View style={styles.currentBalanceView}>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                  <Text style={styles.earningsText}>Recebido</Text>
+                  <Text style={[styles.earningsText, {color:colorText}]}>Recebido</Text>
               </View>
               {seeEarningsValues ?
                 props.values.currentEarnings == 0 || selectedMonth != currentMonth || selectedYear != currentYear ?
-                    <Text style={styles.earningsTextValue}>R$ 0,00</Text>
+                    <Text style={[styles.earningsTextValue, {color:colorText}]}>R$ 0,00</Text>
                 :
                     <NumberFormat
                     value={props.values.currentEarnings}
                     displayType={'text'}
                     thousandSeparator={true}
                     format={Functions.currencyFormatter}
-                    renderText={value => <Text style={styles.earningsTextValue}> {value} </Text>}
+                    renderText={value => <Text style={[styles.earningsTextValue, {color:colorText}]}> {value} </Text>}
                     />
                 :
                 <View style={styles.censoredValue} />

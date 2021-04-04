@@ -1,8 +1,15 @@
-import React from "react"
+import React, { useContext } from "react"
 import ContentLoader, { Rect, Circle, Path } from "react-content-loader/native"
 import {View} from "react-native"
+import { StylesContext } from "../../../../contexts/stylesContext"
 
 export default function LoaderMenu() {
+    const {colorScheme} = useContext(StylesContext)
+    let backgroundColor = "#ffffff"
+
+    if (colorScheme == 'dark'){
+        backgroundColor = '#181818'
+    }
     const props: any = {}
     return (
         <View style={{
@@ -17,7 +24,7 @@ export default function LoaderMenu() {
             shadowOffset: { width: 0, height: 3 },
             shadowOpacity: 0.5,
             shadowRadius: 4.65,
-            backgroundColor:"#ffffff",
+            backgroundColor:backgroundColor,
             flexDirection: 'row',
             }}>
             <ContentLoader
