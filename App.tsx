@@ -35,6 +35,7 @@ export default function App() {
           <NewEntriesProvider>
             <StylesProvider>
             <Routes/>
+            
             </StylesProvider>
           </NewEntriesProvider>
         </DataBDProvider>

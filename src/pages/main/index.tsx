@@ -24,6 +24,8 @@ import ChartLoader from './components/chartLoader';
 import LatestTransactionsLoader from './components/latestTransactionsLoader';
 import dates from '../../services/dates';
 import entriesDB from '../../services/entriesDB';
+import { ScrollView } from 'react-native-gesture-handler';
+
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -259,6 +261,7 @@ export default function Main() {
   let expansesValuesProps: ExpansesValues = { currentExpanses, estimatedExpanses }
 
   return (
+    <>
     <LinearGradient colors={[fromBackgroundColor, toBackgroundColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
       <StatusBar style="light" translucent />
 
@@ -279,25 +282,29 @@ export default function Main() {
 
       {/*Container Principal*/}
       <View style={[styles.mainContainer, {backgroundColor:containerBgColor}]}>
-        {isBalancesDone ?
-          <ChartView />
-          :
-          <ChartLoader />
-        }
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {isBalancesDone ?
+            <ChartView />
+            :
+            <ChartLoader />
+          }
 
-        {isBalancesDone ?
-          <View style={{ flex: 1 }}>
-            <LatestTransations />
-          </View>
-          :
-          <LatestTransactionsLoader />
-        }
+          {isBalancesDone ?
+            <View style={{ flex: 1 }}>
+              <LatestTransations />
+            </View>
+            :
+            <LatestTransactionsLoader />
+          }
+        </ScrollView>
 
         <MenuFooter />
 
       </View>
 
     </LinearGradient>
+
+    </>
   )
 }
 

@@ -21,6 +21,7 @@ interface StylesContextData{
     hasNotifications:boolean;
     isRendered:boolean;
     colorScheme:ColorSchemeName;
+    isDarkTheme:boolean;
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
@@ -30,6 +31,8 @@ interface StylesContextData{
     onMonted: ()=> void;
     onUnmonted: ()=> void;
     updateHasNotification: (value:boolean)=> void;
+    setDarkTheme: ()=> void;
+    changeTheme: ()=> void;
 }
 
 interface StylesProviderProps{
@@ -49,6 +52,8 @@ export function StylesProvider({children}: StylesProviderProps){
     const [entriePrimaryColor, setEntriePrimaryColor] = useState('#ffffff')
     const [entrieSecondaryColor, setEntrieSecondaryColor] = useState('#ffffff')
     const [monthColor, setMonthColor] = useState('#3C93F9')
+    const [theme, setTheme] = useState('automatic')
+    const [isDarkTheme, setIsDarkTheme] = useState(false)
 
     const [isEntriesModalVisible, setIsEntriesModalVisible] = useState(false)
     const [selectedEntrieId, setSelectedEntrieId] = useState(0)
@@ -67,6 +72,22 @@ export function StylesProvider({children}: StylesProviderProps){
 
     function onUnmonted(){
         setIsRendered(false)
+    }
+
+    function setDarkTheme(){
+        setTheme('dark')
+    }
+
+    function setLightTheme(){
+        setTheme('light')
+    }
+
+    function setAutomaticTheme(){
+        setTheme('automatic')
+    }
+
+    function changeTheme(){
+        setIsDarkTheme(previousState => !previousState)
     }
 
 
@@ -99,7 +120,7 @@ export function StylesProvider({children}: StylesProviderProps){
 
 
     function updateMonthColorMainScreen(){
-        if (colorScheme == 'dark'){
+        if (colorScheme == 'dark' || theme == 'dark'){
             setMonthColor('#ffffff')
         }else{
             setMonthColor('#3C93F9')
@@ -109,10 +130,10 @@ export function StylesProvider({children}: StylesProviderProps){
     }
 
     useEffect(()=>{
-        //console.log(" Tipo: "+typeOfEntrie)
+        console.log(" Tipo: "+typeOfEntrie)
     
         if(typeOfEntrie == "Ganhos"){
-            if (colorScheme == 'dark'){
+            if (colorScheme == 'dark' || isDarkTheme){
                 setMonthColor('#ffffff')
                 setEntriePrimaryColor("#24DBBA")
                 setEntrieButtonBackground("rgba(26, 130, 137, 0.5)")
@@ -131,7 +152,7 @@ export function StylesProvider({children}: StylesProviderProps){
             setTextModal('Esse ganho foi recebido?')
         }
         else if(typeOfEntrie == "Despesas"){
-            if (colorScheme == 'dark'){
+            if (colorScheme == 'dark' || isDarkTheme){
                 setEntriePrimaryColor("#FF4835")
                 setEntrieButtonBackground("rgba(255, 72, 53, 0.5)")
                 setFirstGradientColor("#A5291D")
@@ -149,14 +170,14 @@ export function StylesProvider({children}: StylesProviderProps){
             setTextModal('Essa despesa foi paga?')
         }
         else{
-            if (colorScheme == 'dark'){
+            if (colorScheme == 'dark' || isDarkTheme){
                 setMonthColor('#ffffff')
             }else{
                 setMonthColor('#3C93F9')
             }
         }
  
-    },[typeOfEntrie])
+    },[typeOfEntrie, isDarkTheme])
 
     return(
         <StylesContext.Provider value={{
@@ -176,6 +197,7 @@ export function StylesProvider({children}: StylesProviderProps){
             hasNotifications,
             isRendered,
             colorScheme,
+            isDarkTheme,
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,
@@ -184,7 +206,9 @@ export function StylesProvider({children}: StylesProviderProps){
             resetValuesForm,
             updateHasNotification,
             onMonted,
-            onUnmonted
+            onUnmonted,
+            setDarkTheme,
+            changeTheme,
         }}>
             {children}
         </StylesContext.Provider>
