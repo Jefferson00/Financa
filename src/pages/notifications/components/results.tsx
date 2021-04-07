@@ -84,7 +84,8 @@ export default function Results() {
     return(
         <View style={[
             styles.container,
-            {backgroundColor:containerBgColor}
+            {backgroundColor:containerBgColor},
+            (colorScheme == 'dark' || isDarkTheme) && {borderWidth:0}
         ]}>
             <View style={styles.topSelectButtons}>
                 <TouchableOpacity 

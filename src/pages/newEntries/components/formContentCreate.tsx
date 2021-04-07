@@ -24,7 +24,7 @@ export default function FormContentCreate() {
            handleDeleteEntrieValues
         } = useContext(NewEntriesContext)
 
-    const {entriePrimaryColor, entrieSecondaryColor} = useContext(StylesContext)
+    const {entriePrimaryColor, entrieSecondaryColor, colorScheme, isDarkTheme} = useContext(StylesContext)
 
     function removeValue(index:number, valueId: number){
         Alert.alert(
@@ -54,7 +54,9 @@ export default function FormContentCreate() {
          {entrieValuesBeforeCreate.map((values:ValuesData, index:number) => {
             
                 return (
-                    <View style={styles.valuesViewItem} key={index}>
+                    <View style={[styles.valuesViewItem, 
+                        (isDarkTheme || colorScheme == 'dark') && {backgroundColor:'#454545'}
+                        ]} key={index}>
                         {index > 0 &&
                         <View style={styles.deleteButtonView}>
                             <TouchableOpacity onPress={()=> removeValue(index,values.id)}>
@@ -63,10 +65,14 @@ export default function FormContentCreate() {
                         </View>
                         }
                         <View style={styles.valuesView}>
-                            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor },
+                            (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                            ]}>
                                 Descrição
                             </Text>
-                            <Text style={[styles.subTittleText, { color: entriePrimaryColor}]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor},
+                            (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                            ]}>
                                 Valor
                             </Text>
                             
@@ -76,7 +82,9 @@ export default function FormContentCreate() {
                             <TextInput
                                 onChange={e => updateEntrieValuesBeforeCreate('description', index, e)}
                                 value={values.description}
-                                style={[styles.InputText, { width: 150 }]}
+                                style={[styles.InputText, { width: 150 },
+                                (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                                ]}
                                 multiline={true}
                                 maxLength={30}
                             />
@@ -89,14 +97,18 @@ export default function FormContentCreate() {
                                     placeholder='R$ 0,00'
                                     onChange={e => updateEntrieValuesBeforeCreate('amount', index, e)}
                                     value={Functions.formatCurrency(values.amount)}
-                                    style={styles.InputTextValue}
+                                    style={[styles.InputTextValue,
+                                        (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                                    ]}
                                     maxLength={10}
                                 />
                             </View>
     
                         </View>
                         <View style={styles.valuesView}>
-                            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor },
+                            (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                            ]}>
                                 Periodicidade
                             </Text>
                         </View>
@@ -104,7 +116,7 @@ export default function FormContentCreate() {
                             <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>Mensal</Text>
                             <Switch
                                 trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
-                                thumbColor={values.monthly ? 'd2d2d2' : entriePrimaryColor}
+                                thumbColor={values.monthly ? entrieSecondaryColor : entriePrimaryColor}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={e=> updateEntrieValuesBeforeCreate('monthly', index, e)}
                                 value={values.monthly}
@@ -116,7 +128,9 @@ export default function FormContentCreate() {
                             <TextInput
                                 onChange={e => updateEntrieValuesBeforeCreate('frequency', index, e)}
                                 value={values.frequency.toString()}
-                                style={styles.InputText}
+                                style={[styles.InputText,
+                                    (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                                ]}
                                 keyboardType='numeric'
                                 maxLength={2}
                             />
@@ -142,6 +156,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         borderColor: '#eaeaea',
         borderWidth: 1,
+        borderRadius:20,
     },
     tittleTextView: {
         alignItems: 'center',

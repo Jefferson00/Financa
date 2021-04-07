@@ -28,7 +28,8 @@
       },
       "useNextNotificationsApi": true,
       "package":"com.jeffersoncsilva.financaapp",
-      "googleServicesFile":"./google-services.json"
+      "googleServicesFile":"./google-services.json",
+      "softwareKeyboardLayoutMode": "pan"
     }
   }
 }

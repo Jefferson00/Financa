@@ -125,10 +125,16 @@ export default function ModalContent() {
                <View style={[styles.modalContent, (colorScheme == 'dark' || isDarkTheme) && {backgroundColor:'#181818'}]}>
                     <View style={[styles.headerModal, (colorScheme == 'dark' || isDarkTheme) && {backgroundColor:'#2C2C2C'}]}>
                         <TouchableOpacity onPress={handleToUpdate}>
-                            <Feather name="edit-2" size={30} color={entriePrimaryColor} />
+                            <Feather 
+                            name="edit-2" 
+                            size={30} 
+                            color={isDarkTheme || colorScheme == 'dark' ? "#FFFFFF" : entriePrimaryColor} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={closeModal}>
-                            <Feather name="x" size={30} color={entriePrimaryColor} />
+                            <Feather 
+                            name="x" 
+                            size={30} 
+                            color={isDarkTheme || colorScheme == 'dark' ? "#FFFFFF" : entriePrimaryColor} />
                         </TouchableOpacity>
                     </View>
                     <View style={{flex:1}}>
@@ -149,11 +155,15 @@ export default function ModalContent() {
                                     thousandSeparator={true}
                                     format={Functions.currencyFormatter}
                                     renderText={value => 
-                                        <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                                        <Text style={[styles.subTittleText, { color: entriePrimaryColor },
+                                            (colorScheme == 'dark' || isDarkTheme) && {color:'#FFFFFF'}
+                                        ]}>
                                              {value} 
                                         </Text>}
                                 />
-                                <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                                <Text style={[styles.subTittleText, { color: entriePrimaryColor },
+                                    (colorScheme == 'dark' || isDarkTheme) && {color:'#FFFFFF'}
+                                ]}>
                                     {entrieModal[0].day} {Functions.convertDtToStringMonth(selectedMonth)}
                                 </Text>
                             </View>
@@ -181,7 +191,9 @@ export default function ModalContent() {
                                                     thousandSeparator={true}
                                                     format={Functions.currencyFormatter}
                                                     renderText={value => 
-                                                        <Text style={[styles.valuesListText, { color: entriePrimaryColor }]}> 
+                                                        <Text style={[styles.valuesListText, { color: entriePrimaryColor },
+                                                            (colorScheme == 'dark' || isDarkTheme) && {color:'#FFFFFF'}
+                                                        ]}> 
                                                             {value} 
                                                         </Text>}
                                                 />
@@ -196,19 +208,25 @@ export default function ModalContent() {
                         </ScrollView>
                     </View>
 
-                    <View style={{marginBottom:59}}>
-                        {!entrieModal[0].received && selectedMonth == currentMonth && selectedYear == currentYear &&
-                        <>
-                            <View style={{ paddingHorizontal: 26 ,marginTop:32}}>
+                    {!entrieModal[0].received && selectedMonth == currentMonth && selectedYear == currentYear &&
+                    <>
+                    <View style={[{marginBottom:50, marginHorizontal:20, borderRadius:20, padding:20},
+                        (isDarkTheme || colorScheme == 'dark') && {backgroundColor:'#454545'}
+                    ]}>
+                            <View>
                                 {isLate &&
                                     <View style={{flexDirection:'row',alignItems:'center'}}>
                                         <Ionicons name="alert-circle" size={40} color={entriePrimaryColor}/>
-                                        <Text style={[styles.tittleText, { color: entrieSecondaryColor , marginLeft:5}]}>
+                                        <Text style={[styles.tittleText, { color: entrieSecondaryColor , marginLeft:5},
+                                        (isDarkTheme || colorScheme == 'dark') && {color:"#FFFFFF"}
+                                        ]}>
                                             {textAlertModal}
                                         </Text>
                                     </View>
                                 }
-                                    <Text style={[styles.subTittleText, { color: entriePrimaryColor , marginTop:15}]}>
+                                    <Text style={[styles.subTittleText, { color: entriePrimaryColor , marginTop:15},
+                                       (isDarkTheme || colorScheme == 'dark') && {color:"#FFFFFF"}
+                                    ]}>
                                           {textModal}
                                     </Text>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
@@ -220,9 +238,9 @@ export default function ModalContent() {
                                         </TouchableOpacity>
                                     </View>
                             </View>
-                        </>
-                        }
                     </View>
+                    </>
+                    }
                </View>
             </View>
         </Modal>

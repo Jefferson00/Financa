@@ -68,8 +68,9 @@ export default function EntriesResults() {
                     let totalValues = 0
                     let notReceived = false
                     let isLate = false
-                    let borderColor = "#ffffff"
+                    let borderColor = "transparent"
                     let opacColor = "#ffffffAA"
+                    let textColor = "#444444"
                     if (Functions.isBetweenDates(selectedMonth,selectedYear,entrie.dtStart,entrie.dtEnd) && entrie.type == typeOfEntrie){
                         allEntriesValues.map((value)=>{
                             //console.log('TOTAL VALUE:: '+totalValues)
@@ -88,8 +89,16 @@ export default function EntriesResults() {
 
                         if (notReceived || selectedMonth != (todayDate.getMonth()+1) || selectedYear != todayDate.getFullYear()) {
                             opacColor = entriePrimaryColor+"AA"
+                            isDarkTheme || colorScheme == 'dark' ?
+                                textColor = "rgba(255, 255, 255, 0.6)"
+                            :
+                                textColor = "rgba(63, 61, 86, 0.6)"
                         }else{
                             opacColor = entriePrimaryColor
+                            isDarkTheme || colorScheme == 'dark' ?
+                                textColor = "#FFFFFF"
+                            :
+                                textColor = "#444444"
                         }
                         cont = cont +1
 
@@ -106,11 +115,11 @@ export default function EntriesResults() {
 
                                     <View style={styles.earningTextView}>
                                         <Text numberOfLines={1} 
-                                            style={[styles.earningTittleText, {color:opacColor, width:150}]}>
+                                            style={[styles.earningTittleText, {color:textColor, width:150}]}>
                                             {entrie.title}
                                         </Text>
-                                        <Text style={[styles.earningDateText, {color:opacColor}]}>
-                                            {entrie.day}/{Functions.convertDtToStringMonth(selectedMonth)}
+                                        <Text style={[styles.earningDateText, {color:textColor}]}>
+                                            {entrie.day}  {Functions.convertDtToStringMonth(selectedMonth)}
                                         </Text>
                                     </View>
 

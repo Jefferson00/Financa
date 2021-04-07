@@ -21,19 +21,24 @@ export default function LatestTransactions() {
     let earningsTextColor = ""
     let containerBgColor = ""
     let textColor = ""
+    let titleTextColor = ""
     let dateTextColor = ""
     let censoredBgColor = ""
 
     colorScheme == 'dark' || isDarkTheme ? expansesTextColor = '#FF4835' : expansesTextColor = '#CC3728'
     colorScheme == 'dark' || isDarkTheme ? earningsTextColor = '#24DBBA' : earningsTextColor = '#1A8289'
-    colorScheme == 'dark' || isDarkTheme ? containerBgColor =  '#2B2B2B' : containerBgColor = '#ffffff'
+    colorScheme == 'dark' || isDarkTheme ? containerBgColor =  '#292929' : containerBgColor = '#ffffff'
     colorScheme == 'dark' || isDarkTheme ? textColor = '#FFFFFF' : textColor = '#3C93F9'
-    colorScheme == 'dark' || isDarkTheme ? dateTextColor = '#FFFFFF' : dateTextColor = '#444444'
+    colorScheme == 'dark' || isDarkTheme ? titleTextColor = 'rgba(255, 255, 255, 0.8)' : titleTextColor = '#444444'
+    colorScheme == 'dark' || isDarkTheme ? dateTextColor = 'rgba(255, 255, 255, 0.8)' : dateTextColor = '#444444'
     colorScheme == 'dark' || isDarkTheme ? censoredBgColor = 'rgba(247, 241, 241, 0.40)' : censoredBgColor = 'rgba(247, 241, 241, 0.80)'
 
     return (
         <View style={
-            [styles.container, {backgroundColor:containerBgColor}]}>
+            [styles.container, 
+            {backgroundColor:containerBgColor},
+            (colorScheme == 'dark' || isDarkTheme) && {borderWidth:0}
+            ]}>
             <View style={styles.titleView}>
                 <Text style={[styles.title, {color:textColor}]}>
                     Últimas Transações
@@ -53,7 +58,7 @@ export default function LatestTransactions() {
                             <View style={styles.centerView}>
                                 <Text style={[
                                     styles.itemText,
-                                    { color: entr.type == 'Ganhos' ? earningsTextColor : expansesTextColor }
+                                    { color: titleTextColor }
                                     ]}
                                     numberOfLines={1}
                                 >

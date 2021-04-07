@@ -51,7 +51,7 @@ export default function FormContent() {
            updateEntrieCategory,
         } = useContext(NewEntriesContext)
 
-        const {entriePrimaryColor, entrieSecondaryColor , isValuesFormVisible} = useContext(StylesContext)
+        const {entriePrimaryColor, entrieSecondaryColor , isValuesFormVisible, colorScheme, isDarkTheme} = useContext(StylesContext)
         const {entriesValuesByDate} = useContext(DataBDContext)
 
         const [loadingActive, setLoadingActive] = useState(false)
@@ -81,25 +81,31 @@ export default function FormContent() {
                 <LoaderUpdate/>
             :
                 <>
-                    <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor },
+                    (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                    ]}>
                         Título
                     </Text>
                     <TextInput
                         onChangeText={text => setTitleInputEntrie(text)}
                         value={titleInputEntrie}
-                        style={styles.InputText}
+                        style={[styles.InputText,
+                        (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}]}
                         maxLength={30}
                     />
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' , marginTop:30}}>
                         <View>
-                            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor },
+                            (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}]}>
                                 {entrieIdUpdate == 0 ?
                                     typeOfEntrie == "Ganhos" ?"Data de recebimento" : "Data de pagamento"
                                 :
                                     "Data de Início"
                                 }
                             </Text>
-                            <View style={styles.dateView}>
+                            <View style={[styles.dateView,
+                                (colorScheme == 'dark' || isDarkTheme) && {backgroundColor: '#454545', borderWidth:0}
+                            ]}>
                                 <TouchableOpacity  onPress={showDatepicker} hitSlop={styles.hitSlop}>
                                     <Text style={[styles.tinyText, { color: entrieSecondaryColor }]}>
                                         {calendarDate.getDate()} / {Functions.convertDtToStringMonth(calendarDate.getMonth() + 1)}
@@ -108,12 +114,13 @@ export default function FormContent() {
                             </View>
                         </View>
                         <View>
-                            <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                            <Text style={[styles.subTittleText, { color: entriePrimaryColor },
+                            (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}]}>
                                 {typeOfEntrie == "Ganhos" ?"Recebido" : "Pago"}
                             </Text>
                             <Switch
-                                trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
-                                thumbColor={isEnabledReceived ? 'd2d2d2' : entriePrimaryColor}
+                                trackColor={{ false: '#454545', true: entriePrimaryColor }}
+                                thumbColor={isEnabledReceived ? entrieSecondaryColor : entriePrimaryColor}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={toggleSwitchReceived}
                                 value={isEnabledReceived}
@@ -131,7 +138,8 @@ export default function FormContent() {
                         />
                     }
 
-                    <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor, marginTop:30 },
+                    (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}]}>
                         Periodicidade
                     </Text>
 
@@ -140,30 +148,42 @@ export default function FormContent() {
                             Mensal
                         </Text>
                         <Switch
-                            trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
-                            thumbColor={isEnabledMonthly ? 'd2d2d2' : entriePrimaryColor}
+                            trackColor={{ false: '#454545', true: entriePrimaryColor }}
+                            thumbColor={isEnabledMonthly ? entrieSecondaryColor : entriePrimaryColor}
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={toggleSwitchMonthly}
                             value={isEnabledMonthly}
                         />
 
                         <TouchableOpacity onPress={decreaseEntrieFrequency} hitSlop={styles.hitSlop}>
-                            <Feather name='chevron-left' size={30}/>
+                            <Feather 
+                            name='chevron-left' 
+                            size={30}
+                            color={colorScheme == 'dark' || isDarkTheme ?'#FFFFFF' : '#080808'}
+                            />
                         </TouchableOpacity>
 
-                        <Text style={{ fontSize: 18 }}>
+                        <Text style={[{ fontSize: 18 },
+                            (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}
+                        ]}>
                             {isEnabledMonthly? '-' : entrieFrequency}
                         </Text>
 
                         <TouchableOpacity onPress={increaseEntrieFrequency} hitSlop={styles.hitSlop}>
-                            <Feather name='chevron-right' size={30}/>
+                            <Feather 
+                            name='chevron-right' 
+                            size={30}
+                            color={colorScheme == 'dark' || isDarkTheme ?'#FFFFFF' : '#080808'}
+                            />
                         </TouchableOpacity>
+
                         <Text style={[styles.tinyText, { color: entrieSecondaryColor }]}>
                             Vezes
                         </Text>
                     </View>
 
-                    <Text style={[styles.subTittleText, { color: entriePrimaryColor, marginTop:10 }]}>
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor, marginTop:30 },
+                    (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}]}>
                         Categoria
                     </Text>
 
@@ -364,7 +384,8 @@ export default function FormContent() {
                         </View>
                     </ScrollView>
 
-                    <Text style={[styles.subTittleText, { color: entriePrimaryColor }]}>
+                    <Text style={[styles.subTittleText, { color: entriePrimaryColor, marginTop:30 },
+                    (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}]}>
                         Valor
                     </Text>
                     {!isValuesFormVisible && 
@@ -374,7 +395,8 @@ export default function FormContent() {
                             </Text>
                             <TextInput
                                 keyboardType='numeric'
-                                style={styles.InputTextValue}
+                                style={[styles.InputTextValue,
+                                    (colorScheme == 'dark' || isDarkTheme) && {color: '#FFFFFF'}]}
                                 onChange={e => updateEntrieValuesBeforeCreate('amount', 0 , e)}
                                 value={entrieValuesBeforeCreate[0].amount.toString()}
                             />

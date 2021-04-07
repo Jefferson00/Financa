@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react"
 import { StyleSheet, Text, View } from 'react-native'
-import { Feather, Ionicons , FontAwesome5, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons'
+import { MaterialIcons, Ionicons , FontAwesome5, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons'
 import { StylesContext } from "../../../contexts/stylesContext"
 
 interface CategoryIconProps{
@@ -15,8 +15,8 @@ export default function CategoryIcon(props: CategoryIconProps){
     let expansesTextColor = ""
     let earningsTextColor = ""
 
-    colorScheme == 'dark' || isDarkTheme ? expansesTextColor = '#FF4835' : expansesTextColor = '#CC3728'
-    colorScheme == 'dark' || isDarkTheme ? earningsTextColor = '#24DBBA' : earningsTextColor = '#1A8289'
+    colorScheme == 'dark' || isDarkTheme ? expansesTextColor = '#C0C0C0' : expansesTextColor = '#3C93F9'
+    colorScheme == 'dark' || isDarkTheme ? earningsTextColor = '#C0C0C0' : earningsTextColor = '#3C93F9'
 
     return(
         <>
@@ -30,7 +30,7 @@ export default function CategoryIcon(props: CategoryIconProps){
             {props.category == "recreation" && <FontAwesome5  name="theater-masks" size={24} color={props.type == 'Ganhos' ? earningsTextColor : expansesTextColor}/>}
             {props.category == "comunication" && <FontAwesome5  name="phone" size={24} color={props.type == 'Ganhos' ? earningsTextColor : expansesTextColor}/>}
             {props.category == "health" && <AntDesign  name="medicinebox" size={24} color={props.type == 'Ganhos' ? earningsTextColor : expansesTextColor}/>}
-            {props.category == "others" && <Ionicons  name="cash-outline" size={24} color={props.type == 'Ganhos' ? earningsTextColor : expansesTextColor}/>}
+            {props.category == "others" && <MaterialIcons  name="monetization-on" size={24} color={props.type == 'Ganhos' ? earningsTextColor : expansesTextColor}/>}
             {props.category == "" || props.category == undefined  || props.category == null && <Ionicons  name="cash-outline" size={24} color={props.type == 'Ganhos' ? earningsTextColor : expansesTextColor}/>}
         </>
     )

@@ -24,8 +24,13 @@ export default function Footer(){
 
    useEffect(()=>{
         if ((route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == 'Ganhos'){
-            setActiveItemColor('#155F69')
-            setNonActiveItemColor('rgba(26, 130, 137, 0.5)')
+            if (isDarkTheme || colorScheme == 'dark'){
+                setActiveItemColor('#24DBBA')
+                setNonActiveItemColor(' rgba(36, 219, 186, 0.5)')
+            }else{
+                setActiveItemColor('#155F69')
+                setNonActiveItemColor('rgba(26, 130, 137, 0.5)')
+            }
         }else if((route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == 'Despesas'){
             setActiveItemColor('#CC3728')
             setNonActiveItemColor('"rgba(255, 72, 53, 0.5)')
