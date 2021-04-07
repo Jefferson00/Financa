@@ -38,12 +38,12 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
 
     const {updateTypeOfEntrie} = useContext(NewEntriesContext)
     const {isEntriesDone} = useContext(DataBDContext)
-    const {selectedEntrieId, onMonted, onUnmonted, isRendered, colorScheme} = useContext(StylesContext)
+    const {selectedEntrieId, onMonted, onUnmonted, isRendered, colorScheme, isDarkTheme} = useContext(StylesContext)
 
     let earningsGradientColors = [""]
     let expansesGradientColors = [""]
 
-    if(colorScheme == 'dark'){
+    if(colorScheme == 'dark' || isDarkTheme){
         earningsGradientColors = ["#136065","#000000"]
         expansesGradientColors = ["#A5291D","#000000"]
     }else{
@@ -79,7 +79,7 @@ export default function Entries({ route }: { route: any }, { navigation }: { nav
                 <LoaderBalance/>
             }
 
-            <View style={[styles.mainContainer, colorScheme == 'dark' && {backgroundColor:"#090909"}]}>
+            <View style={[styles.mainContainer, (colorScheme == 'dark' || isDarkTheme)  && {backgroundColor:"#090909"}]}>
                 {isRendered && isEntriesDone?
                     <EntriesResults/>
                     :

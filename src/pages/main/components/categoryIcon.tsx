@@ -10,13 +10,13 @@ interface CategoryIconProps{
 
 export default function CategoryIcon(props: CategoryIconProps){
     //console.log(props.category)
-    const {colorScheme } = useContext(StylesContext)
+    const {colorScheme , isDarkTheme} = useContext(StylesContext)
 
     let expansesTextColor = ""
     let earningsTextColor = ""
 
-    colorScheme == 'dark' ? expansesTextColor = '#FF4835' : expansesTextColor = '#CC3728'
-    colorScheme == 'dark' ? earningsTextColor = '#24DBBA' : earningsTextColor = '#1A8289'
+    colorScheme == 'dark' || isDarkTheme ? expansesTextColor = '#FF4835' : expansesTextColor = '#CC3728'
+    colorScheme == 'dark' || isDarkTheme ? earningsTextColor = '#24DBBA' : earningsTextColor = '#1A8289'
 
     return(
         <>

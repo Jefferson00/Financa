@@ -20,7 +20,7 @@ export default function Footer(){
     const route = useRoute()
     const {resetDate, activeBalanceView} = useContext(MainContext)
     const {typeOfEntrie, updateEntrieIdUpdate, resetValues } = useContext(NewEntriesContext)
-    const {resetValuesForm, hasNotifications, onUnmonted, colorScheme} = useContext(StylesContext)
+    const {resetValuesForm, hasNotifications, onUnmonted, colorScheme, isDarkTheme} = useContext(StylesContext)
 
    useEffect(()=>{
         if ((route.name=="Entries" || route.name=="NewEntries") && typeOfEntrie == 'Ganhos'){
@@ -61,9 +61,12 @@ export default function Footer(){
         resetValuesForm()
     }
 
+    let containerBgColor = ""
+
+    colorScheme == 'dark' || isDarkTheme ? containerBgColor = '#181818' : containerBgColor = '#ffffff'
 
     return(
-        <View style={[styles.container, colorScheme == 'dark' ? {backgroundColor:'#181818'} : {backgroundColor:'#ffffff'}]}>
+        <View style={[styles.container, {backgroundColor:containerBgColor}]}>
             <TouchableOpacity onPress={handleHome}>
                  <Entypo name="home" size={40} color={route.name=="Main"?activeItemColor:nonActiveItemColor}/>
             </TouchableOpacity>

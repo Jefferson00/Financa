@@ -24,7 +24,7 @@ export default function BalanceView(props:BalanceProps) {
    const {seeBalanceValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeBalanceValues} = useContext(MainContext)
    
    const {isBalancesDone} = useContext(DataBDContext)
-   const {colorScheme} = useContext(StylesContext)
+   const {colorScheme, isDarkTheme} = useContext(StylesContext)
 
    const [remain, setRemain] = useState(0)
    const [isCurrentMonth, setIsCurrentMonth] = useState(true)
@@ -87,7 +87,7 @@ export default function BalanceView(props:BalanceProps) {
                           />
                       :
                       <View style={[styles.censoredValue, 
-                        colorScheme == 'dark' ? 
+                        colorScheme == 'dark' || isDarkTheme ? 
                         {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
                         {backgroundColor:'rgba(247, 241, 241, 0.80)'}
                       ]}/>
@@ -121,7 +121,7 @@ export default function BalanceView(props:BalanceProps) {
                       />
                   :
                   <View style={[styles.censoredValue, 
-                    colorScheme == 'dark' ? 
+                    colorScheme == 'dark' || isDarkTheme ? 
                     {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
                     {backgroundColor:'rgba(247, 241, 241, 0.80)'}
                   ]}/>
@@ -162,7 +162,7 @@ export default function BalanceView(props:BalanceProps) {
                     />
                   :
                   <View style={[styles.censoredValue, 
-                    colorScheme == 'dark' ? 
+                    colorScheme == 'dark' || isDarkTheme ? 
                     {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
                     {backgroundColor:'rgba(247, 241, 241, 0.80)'}
                   ]}/>
@@ -196,7 +196,7 @@ export default function BalanceView(props:BalanceProps) {
                       />
                   :
                   <View style={[styles.censoredValue, 
-                    colorScheme == 'dark' ? 
+                    colorScheme == 'dark' || isDarkTheme ? 
                     {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
                     {backgroundColor:'rgba(247, 241, 241, 0.80)'}
                   ]}/>

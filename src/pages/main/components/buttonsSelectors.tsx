@@ -6,7 +6,7 @@ import {MainContext} from "../../../contexts/mainContext"
 import { StylesContext } from '../../../contexts/stylesContext';
 
 export default function ButtonsSelectors() {
-    const {colorScheme} = useContext(StylesContext)
+    const {colorScheme, isDarkTheme} = useContext(StylesContext)
     const {
       activeBalanceView,
       isBalanceActive,
@@ -23,9 +23,9 @@ export default function ButtonsSelectors() {
           onPress={activeBalanceView}
         >
           <Text style={isBalanceActive ? 
-            [styles.activeText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}] 
+            [styles.activeText, colorScheme == 'dark' || isDarkTheme ? {color:'#ffffff'} : {color:'#3C93F9'}] 
             : 
-            [styles.nonActiveText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]}>
+            [styles.nonActiveText, colorScheme == 'dark' || isDarkTheme ? {color:'#ffffff'} : {color:'#3C93F9'}]}>
             Saldo
           </Text>
         </TouchableOpacity>
@@ -33,9 +33,9 @@ export default function ButtonsSelectors() {
           onPress={activeEarningsView}
         >
           <Text style={isEarningsActive ? 
-            [styles.activeText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}] 
+            [styles.activeText, colorScheme == 'dark' || isDarkTheme ? {color:'#ffffff'} : {color:'#3C93F9'}] 
             : 
-            [styles.nonActiveText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]
+            [styles.nonActiveText, colorScheme == 'dark' || isDarkTheme ? {color:'#ffffff'} : {color:'#3C93F9'}]
           }>
             Ganhos
           </Text>
@@ -44,9 +44,9 @@ export default function ButtonsSelectors() {
           onPress={activeExpansesView}
         >
           <Text style={isExpansesActive ? 
-            [styles.activeText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}] 
+            [styles.activeText, colorScheme == 'dark' || isDarkTheme ? {color:'#ffffff'} : {color:'#3C93F9'}] 
             : 
-            [styles.nonActiveText, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]
+            [styles.nonActiveText, colorScheme == 'dark' || isDarkTheme ? {color:'#ffffff'} : {color:'#3C93F9'}]
           }>
             Despesas
           </Text>

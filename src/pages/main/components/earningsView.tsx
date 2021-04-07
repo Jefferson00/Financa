@@ -21,10 +21,10 @@ interface EarningProps{
 export default function EarningsView(props:EarningProps) {
   
   const {seeEarningsValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeEarningsValues} = useContext(MainContext)
-  const {colorScheme} = useContext(StylesContext)
+  const {colorScheme, isDarkTheme} = useContext(StylesContext)
 
   let colorText = ''
-  if (colorScheme == 'dark'){
+  if (colorScheme == 'dark' || isDarkTheme){
     colorText = '#24DBBA'
   }else{
     colorText = '#1A8289'
@@ -61,7 +61,11 @@ export default function EarningsView(props:EarningProps) {
                     renderText={value => <Text style={[styles.earningsTextValue, {color:colorText}]}> {value} </Text>}
                     />
                 :
-                <View style={styles.censoredValue} />
+                <View style={[styles.censoredValue, 
+                  colorScheme == 'dark' || isDarkTheme ? 
+                  {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                  {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                ]}/>
               }
           </View>
 
@@ -87,7 +91,11 @@ export default function EarningsView(props:EarningProps) {
                           </Text>}
                       />
                   :
-                  <View style={styles.censoredValue} />
+                  <View style={[styles.censoredValue, 
+                    colorScheme == 'dark' || isDarkTheme ? 
+                    {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                    {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                  ]}/>
               }
           </View>
       </View>
@@ -110,9 +118,10 @@ const styles = StyleSheet.create({
   },
 
   censoredValue: {
-    height: 25,
-    width: 136,
-    backgroundColor: 'rgba(247, 241, 241, 0.80)',
+    height:35,
+        width:136,
+        borderRadius:5,
+        backgroundColor:'rgba(247, 241, 241, 0.80)',
   },
 
   balanceTitleView: {

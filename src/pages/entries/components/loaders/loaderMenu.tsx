@@ -4,10 +4,10 @@ import {View} from "react-native"
 import { StylesContext } from "../../../../contexts/stylesContext"
 
 export default function LoaderMenu() {
-    const {colorScheme} = useContext(StylesContext)
+    const {colorScheme, isDarkTheme} = useContext(StylesContext)
     let backgroundColor = "#ffffff"
 
-    if (colorScheme == 'dark'){
+    if (colorScheme == 'dark' || isDarkTheme){
         backgroundColor = '#181818'
     }
     const props: any = {}

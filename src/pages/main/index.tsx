@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Platform, View, useColorScheme } from 'react-native';
+import { StyleSheet, Platform, View, useColorScheme, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
@@ -87,7 +87,7 @@ export default function Main() {
 
   const { isBalanceActive, isExpansesActive, isEarningsActive, selectedMonth, todayDate, selectedYear, currentMonth, currentYear } = useContext(MainContext);
   const { balances, entriesByCurrentDate, isBalancesDone, allEntriesValues } = useContext(DataBDContext)
-  const { updateMonthColorMainScreen, updateHasNotification, onUnmonted } = useContext(StylesContext)
+  const { updateMonthColorMainScreen, updateHasNotification, isDarkTheme } = useContext(StylesContext)
 
   let latedEarningEntries
   let latedExpansesEntries
@@ -100,7 +100,7 @@ export default function Main() {
   let containerBgColor = "#ffffff"
   ///colors schemes
     
-  if (colorScheme == 'dark'){
+  if (colorScheme == 'dark' || isDarkTheme){
     containerBgColor = "#090909"
   }else{
     containerBgColor = "#ffffff"
@@ -125,7 +125,7 @@ export default function Main() {
 
   useEffect(() => {
     if (selectedMonth == (todayDate.getMonth() + 1) && selectedYear == todayDate.getFullYear()) {
-      if (colorScheme === "dark") {
+      if (colorScheme === "dark" || isDarkTheme) {
         setFromBackgroundColor('#0851A7')
         setToBackgroundColor('#0A0500')
       } else {
@@ -133,7 +133,7 @@ export default function Main() {
         setToBackgroundColor('#FF981E')
       }
     } else {
-      if (colorScheme === "dark") {
+      if (colorScheme === "dark" || isDarkTheme) {
         setFromBackgroundColor('#0851A7')
         setToBackgroundColor('#0A0500')
       } else {
@@ -142,7 +142,7 @@ export default function Main() {
       }
 
     }
-  }, [selectedMonth, selectedYear])
+  }, [selectedMonth, selectedYear, isDarkTheme])
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token)).then(res => {
@@ -279,19 +279,21 @@ export default function Main() {
 
       {/*Container Principal*/}
       <View style={[styles.mainContainer, {backgroundColor:containerBgColor}]}>
-        {isBalancesDone ?
-          <ChartView />
-          :
-          <ChartLoader />
-        }
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {isBalancesDone ?
+            <ChartView />
+            :
+            <ChartLoader />
+          }
 
-        {isBalancesDone ?
-          <View style={{ flex: 1 }}>
-            <LatestTransations />
-          </View>
-          :
-          <LatestTransactionsLoader />
-        }
+          {isBalancesDone ?
+            <View style={{ flex: 1 }}>
+              <LatestTransations />
+            </View>
+            :
+            <LatestTransactionsLoader />
+          }
+        </ScrollView>
 
         <MenuFooter />
 

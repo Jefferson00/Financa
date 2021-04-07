@@ -1,6 +1,7 @@
 import React, {createContext, useState, ReactNode, useEffect, useContext} from 'react';
 import { useColorScheme } from 'react-native';
 import { NewEntriesContext } from './newEntriesContext';
+import AsyncStorage from '@react-native-community/async-storage';
 
 type ColorSchemeName = 'light' | 'dark' | null | undefined;
 
@@ -21,6 +22,7 @@ interface StylesContextData{
     hasNotifications:boolean;
     isRendered:boolean;
     colorScheme:ColorSchemeName;
+    isDarkTheme:boolean;
     updateMonthColorMainScreen: ()=> void;
     updateEntriesModalVisible: ()=> void;
     showEntrieModal: (entrieId: number, totalValues:number)=> void;
@@ -30,6 +32,7 @@ interface StylesContextData{
     onMonted: ()=> void;
     onUnmonted: ()=> void;
     updateHasNotification: (value:boolean)=> void;
+    changeTheme: ()=> void;
 }
 
 interface StylesProviderProps{
@@ -60,6 +63,32 @@ export function StylesProvider({children}: StylesProviderProps){
     const [textModal, setTextModal] = useState('')
     const [hasNotifications, setHasNotifications] = useState(false)
     const [isRendered, setIsRendered] = useState(false)
+    const [isDarkTheme, setIsDarkTheme] = useState(false)
+
+    function changeTheme(){
+        setIsDarkTheme(previousState => !previousState)
+        let stringIsDarkThemeActivated = String(!isDarkTheme)
+        storeTheme(stringIsDarkThemeActivated)
+    }
+
+    async function getTheme (){
+        try {
+            const value = await AsyncStorage.getItem('IsDarkThemeActivated')
+            if(value !== null){
+                return value
+            }else{
+            }
+        } catch (error) {
+        }
+    }
+
+    async function storeTheme (value:string) {
+        try {
+            await AsyncStorage.setItem('IsDarkThemeActivated', value)
+        } catch (error) {
+            
+        }
+    }
 
     function onMonted(){
         setIsRendered(true)
@@ -99,7 +128,7 @@ export function StylesProvider({children}: StylesProviderProps){
 
 
     function updateMonthColorMainScreen(){
-        if (colorScheme == 'dark'){
+        if (colorScheme == 'dark' || isDarkTheme){
             setMonthColor('#ffffff')
         }else{
             setMonthColor('#3C93F9')
@@ -108,11 +137,18 @@ export function StylesProvider({children}: StylesProviderProps){
         //console.log('updated!')
     }
 
+    useEffect(() =>{
+        let item = getTheme()
+        item.then((stringIsDarkThemeActivated)=>{
+            stringIsDarkThemeActivated == "true" ? setIsDarkTheme(true) : setIsDarkTheme(false)
+        })
+    },[])
+
     useEffect(()=>{
         //console.log(" Tipo: "+typeOfEntrie)
     
         if(typeOfEntrie == "Ganhos"){
-            if (colorScheme == 'dark'){
+            if (colorScheme == 'dark' || isDarkTheme){
                 setMonthColor('#ffffff')
                 setEntriePrimaryColor("#24DBBA")
                 setEntrieButtonBackground("rgba(26, 130, 137, 0.5)")
@@ -131,7 +167,7 @@ export function StylesProvider({children}: StylesProviderProps){
             setTextModal('Esse ganho foi recebido?')
         }
         else if(typeOfEntrie == "Despesas"){
-            if (colorScheme == 'dark'){
+            if (colorScheme == 'dark' || isDarkTheme){
                 setEntriePrimaryColor("#FF4835")
                 setEntrieButtonBackground("rgba(255, 72, 53, 0.5)")
                 setFirstGradientColor("#A5291D")
@@ -149,14 +185,14 @@ export function StylesProvider({children}: StylesProviderProps){
             setTextModal('Essa despesa foi paga?')
         }
         else{
-            if (colorScheme == 'dark'){
+            if (colorScheme == 'dark' || isDarkTheme){
                 setMonthColor('#ffffff')
             }else{
                 setMonthColor('#3C93F9')
             }
         }
  
-    },[typeOfEntrie])
+    },[typeOfEntrie, isDarkTheme])
 
     return(
         <StylesContext.Provider value={{
@@ -176,6 +212,7 @@ export function StylesProvider({children}: StylesProviderProps){
             hasNotifications,
             isRendered,
             colorScheme,
+            isDarkTheme,
             updateMonthColorMainScreen,
             updateEntriesModalVisible,
             showEntrieModal,
@@ -184,7 +221,8 @@ export function StylesProvider({children}: StylesProviderProps){
             resetValuesForm,
             updateHasNotification,
             onMonted,
-            onUnmonted
+            onUnmonted,
+            changeTheme,
         }}>
             {children}
         </StylesContext.Provider>

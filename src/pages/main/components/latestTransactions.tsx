@@ -10,41 +10,34 @@ import { StylesContext } from '../../../contexts/stylesContext';
 
 
 export default function LatestTransactions() {
-    
-    const [seeTransactions, setSeeTransactions] = useState(true)
 
     const {latestEntries } = useContext(DataBDContext)
     const {seeBalanceValues } = useContext(MainContext)
-    const {colorScheme } = useContext(StylesContext)
+    const {colorScheme, isDarkTheme } = useContext(StylesContext)
 
     const ltsEntries = latestEntries.slice(Math.max(latestEntries.length - 3, 0))
 
     let expansesTextColor = ""
     let earningsTextColor = ""
+    let containerBgColor = ""
+    let textColor = ""
+    let dateTextColor = ""
+    let censoredBgColor = ""
 
-    colorScheme == 'dark' ? expansesTextColor = '#FF4835' : expansesTextColor = '#CC3728'
-    colorScheme == 'dark' ? earningsTextColor = '#24DBBA' : earningsTextColor = '#1A8289'
+    colorScheme == 'dark' || isDarkTheme ? expansesTextColor = '#FF4835' : expansesTextColor = '#CC3728'
+    colorScheme == 'dark' || isDarkTheme ? earningsTextColor = '#24DBBA' : earningsTextColor = '#1A8289'
+    colorScheme == 'dark' || isDarkTheme ? containerBgColor =  '#2B2B2B' : containerBgColor = '#ffffff'
+    colorScheme == 'dark' || isDarkTheme ? textColor = '#FFFFFF' : textColor = '#3C93F9'
+    colorScheme == 'dark' || isDarkTheme ? dateTextColor = '#FFFFFF' : dateTextColor = '#444444'
+    colorScheme == 'dark' || isDarkTheme ? censoredBgColor = 'rgba(247, 241, 241, 0.40)' : censoredBgColor = 'rgba(247, 241, 241, 0.80)'
 
     return (
         <View style={
-            [styles.container, 
-            colorScheme=='dark' ? 
-              {backgroundColor:'#2B2B2B'} 
-            : {backgroundColor:'#ffffff'}
-            ]}>
+            [styles.container, {backgroundColor:containerBgColor}]}>
             <View style={styles.titleView}>
-                <Text style={[styles.title, colorScheme == 'dark' ? {color:'#ffffff'} : {color:'#3C93F9'}]}>
+                <Text style={[styles.title, {color:textColor}]}>
                     Últimas Transações
                 </Text>
-                {/*
-                    <TouchableOpacity style={{ marginLeft: 5 }} onPress={()=> setSeeTransactions(!seeTransactions)}>
-                        {seeTransactions?
-                        <Ionicons name="eye-off" size={30} color="#d2d2d2" />
-                        :
-                        <Ionicons name="eye" size={30} color="#d2d2d2"  />
-                        }
-                    </TouchableOpacity>                
-                */}
             </View>
 
             {ltsEntries.length > 0 ? ltsEntries.map((entr: any, index: number) => {
@@ -93,16 +86,12 @@ export default function LatestTransactions() {
                             </View>
 
 
-                            <Text style={[styles.dateText, colorScheme == 'dark' && {color:'#ffffff'}]}>
+                            <Text style={[styles.dateText, {color:dateTextColor}]}>
                                 {entr.day}/{Functions.convertDtToStringMonth(month)}
                             </Text>
                         </>
                         :
-                            <View style={[styles.censoredValue, 
-                                colorScheme == 'dark' ? 
-                                {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
-                                {backgroundColor:'rgba(247, 241, 241, 0.80)'}
-                            ]}/>
+                            <View style={[styles.censoredValue, {backgroundColor:censoredBgColor}]}/>
                         }
                     </View>
                 )

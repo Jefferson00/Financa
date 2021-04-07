@@ -6,6 +6,7 @@ import ButtonsExpanses from "./buttonsExpanses"
 import { MainContext } from '../../../contexts/mainContext';
 import NumberFormat from 'react-number-format';
 import Functions from '../../../utils'
+import { StylesContext } from '../../../contexts/stylesContext';
 
 interface ExpansesValues{
   currentExpanses:number,
@@ -19,7 +20,7 @@ interface ExpansesProps{
 export default function ExpansesView(props:ExpansesProps) {
 
   const {seeExpansesValues, selectedMonth, selectedYear, currentMonth, currentYear, handleSeeExpansesValues} = useContext(MainContext)
-
+  const {colorScheme, isDarkTheme} = useContext(StylesContext)
   return (
     <>
         <View style={styles.balanceTitleView}>
@@ -54,7 +55,11 @@ export default function ExpansesView(props:ExpansesProps) {
                       renderText={value => <Text style={styles.expensesTextValue}> {value} </Text>}
                     />
                   :
-                  <View style={styles.censoredValue} />
+                  <View style={[styles.censoredValue, 
+                    colorScheme == 'dark' || isDarkTheme ? 
+                    {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                    {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                  ]}/>
               }
             </View>
 
@@ -80,7 +85,11 @@ export default function ExpansesView(props:ExpansesProps) {
                           </Text>}
                     />
                   :
-                  <View style={styles.censoredValue} />
+                  <View style={[styles.censoredValue, 
+                    colorScheme == 'dark' || isDarkTheme ? 
+                    {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
+                    {backgroundColor:'rgba(247, 241, 241, 0.80)'}
+                  ]}/>
               }
           </View>
 
@@ -108,9 +117,10 @@ const styles = StyleSheet.create({
   },
 
   censoredValue: {
-    height: 25,
-    width: 136,
-    backgroundColor: 'rgba(247, 241, 241, 0.80)',
+    height:35,
+    width:136,
+    borderRadius:5,
+    backgroundColor:'rgba(247, 241, 241, 0.80)',
   },
 
   balanceTitleView: {

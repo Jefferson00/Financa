@@ -31,7 +31,22 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     const { item } = route.params
 
     const {updateTypeOfEntrie, entrieIdUpdate, typeOfEntrie} = useContext(NewEntriesContext)
-    const {entriePrimaryColor, isValuesFormVisible, showValuesForm, resetSelectedEntrieId} = useContext(StylesContext)
+    const {entriePrimaryColor, isValuesFormVisible, showValuesForm, resetSelectedEntrieId, isDarkTheme, colorScheme} = useContext(StylesContext)
+
+    let containerBgColor = ""
+    let earningsGradientColors = [""]
+    let expansesGradientColors = [""]
+
+    colorScheme == "dark" || isDarkTheme ? containerBgColor = "#080808" : containerBgColor = "#FFFFFF"
+    
+    if(colorScheme == 'dark' || isDarkTheme){
+        earningsGradientColors = ["#136065","#000000"]
+        expansesGradientColors = ["#A5291D","#000000"]
+    }else{
+        earningsGradientColors = ["#155F69","#F9CF3C"]
+        expansesGradientColors = ["#CC3728","#F9CF3C"]
+    }
+    
 
     useEffect(()=>{
         updateTypeOfEntrie(item)
@@ -42,14 +57,14 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
            <LinearGradient 
-            colors={[entriePrimaryColor, '#F9CF3C']} 
+            colors={item == "Ganhos" ? earningsGradientColors : expansesGradientColors} 
             start={{ x: -0.4, y: 0.1 }} 
             style={styles.container}
             >
             <StatusBar style="light" translucent />  
             {entrieIdUpdate == 0 && <Header/>}
 
-             <View style={styles.mainContainer}>
+             <View style={[styles.mainContainer, {backgroundColor:containerBgColor}]}>
                 <View style={styles.tittleTextView}>
                     <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
                         { entrieIdUpdate == 0 ?

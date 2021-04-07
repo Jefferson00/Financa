@@ -5,12 +5,20 @@ import { StylesContext } from '../../contexts/stylesContext';
 import { MainContext } from '../../contexts/mainContext';
 import Functions from "../../utils"
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
+import { useNavigation } from '@react-navigation/core';
+import { DrawerActions } from '@react-navigation/native'
 
 export default function Header() {
 
   const {monthColor, selectedEntrieId} = useContext(StylesContext)
   const {selectedYear, selectedMonth, handleNextMonth, handlePrevMonth} = useContext(MainContext)
   const {calendarDate, entrieIdUpdate} = useContext(NewEntriesContext)
+
+  const navigation = useNavigation()
+
+  function openSidebar(){
+    navigation.dispatch(DrawerActions.openDrawer())
+  }
 
   function nextMonth(){
     handleNextMonth()
@@ -25,28 +33,39 @@ export default function Header() {
   },[selectedYear, selectedMonth])
 
   return (
-    <View style={styles.monthView}>
-      <TouchableOpacity onPress={handlePrevMonth} hitSlop={styles.hitSlop}>
-        <Feather name="chevron-left" size={40} color={monthColor} />
-      </TouchableOpacity>
-      <Text style={[styles.monthText, { color: monthColor }]}>
-          {Functions.convertDtToStringMonth(selectedMonth)} { selectedYear}
-      </Text>
-      <TouchableOpacity onPress={nextMonth} hitSlop={styles.hitSlop}>
-        <Feather name="chevron-right" size={40} color={monthColor} />
-      </TouchableOpacity>
+    <View style={styles.headerView}>
+        <View style={styles.monthView}>
+          <TouchableOpacity onPress={handlePrevMonth} hitSlop={styles.hitSlop}>
+            <Feather name="chevron-left" size={40} color={monthColor} />
+          </TouchableOpacity>
+          <Text style={[styles.monthText, { color: monthColor }]}>
+              {Functions.convertDtToStringMonth(selectedMonth)} { selectedYear}
+          </Text>
+          <TouchableOpacity onPress={nextMonth} hitSlop={styles.hitSlop}>
+            <Feather name="chevron-right" size={40} color={monthColor} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.monthView}>
+          <TouchableOpacity onPress={openSidebar} hitSlop={styles.hitSlop}>
+            <Feather name="menu" size={25} color={monthColor} />
+          </TouchableOpacity>
+        </View>
     </View>
   )
 
 }
 
 const styles = StyleSheet.create({
-  monthView: {
+  headerView: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 26,
     marginTop: 13,
+  },
+  monthView:{
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   hitSlop:{
     top:20,

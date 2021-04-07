@@ -18,7 +18,7 @@ interface BalanceData{
 export default function ChartView() {
 
     const {balances} = useContext(DataBDContext)
-    const {colorScheme} = useContext(StylesContext)
+    const {colorScheme, isDarkTheme} = useContext(StylesContext)
     const {currentYear, currentMonth, seeBalanceValues} = useContext(MainContext)
     let balanceChart : number[]= [0,0,0,0]
     let months = ["Jan","Fec","Mar","Abr"]
@@ -26,7 +26,7 @@ export default function ChartView() {
     let backgroundGradientFrom = "#3C93F9"
     let backgroundGradientTo = "#63A9FA"
 
-    if(colorScheme == 'dark'){
+    if(colorScheme == 'dark' || isDarkTheme){
         backgroundColor = "#ffffff"
         backgroundGradientFrom = "#17549B"
         backgroundGradientTo = "#17549B"
@@ -60,7 +60,7 @@ export default function ChartView() {
         {seeBalanceValues ?
             <ScrollView 
                 horizontal
-                disableScrollViewPanResponder
+                showsHorizontalScrollIndicator={false}
                 style={{
                 marginTop:23,
                 maxHeight:115,
@@ -79,7 +79,7 @@ export default function ChartView() {
                     width={(Dimensions.get("screen").width-50)} // from react-native
                     height={115}
                     yAxisLabel="R$ "
-                    //yLabelsOffset={5}
+                    yLabelsOffset={5}
                     xLabelsOffset={-13}
                     segments={2}
                     yAxisInterval={1} // optional, defaults to 1
@@ -125,7 +125,7 @@ export default function ChartView() {
             </ScrollView>
         :
              <View style={[styles.censoredChart, 
-                colorScheme == 'dark' ? 
+                colorScheme == 'dark' || isDarkTheme? 
                 {backgroundColor:'rgba(247, 241, 241, 0.40)'} : 
                 {backgroundColor:'rgba(247, 241, 241, 0.80)'}
               ]}/>

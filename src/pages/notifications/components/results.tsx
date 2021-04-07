@@ -10,21 +10,37 @@ import NumberFormat from 'react-number-format';
 import EntriesDB from '../../../services/entriesDB'
 import ValuesDB from '../../../services/valuesDB'
 import { DataBDContext } from '../../../contexts/dataBDContext';
+import { StylesContext } from '../../../contexts/stylesContext';
 
 
 
 export default function Results() {
-
+    
     const [itemSelected, setItemSelected] = useState('Ganhos')
     const [hasLateEarnings, setHasLateEarnings] = useState(false)
     const [hasLateExpanses, setHasLateExpanses] = useState(false)
     const [hasNextDaysEarnings, setHasNextDaysEarnings] = useState(false)
     const [hasNextDaysExpanses, setHasNextDaysExpanses] = useState(false)
     const {entriesByCurrentDate, entriesByNextMonth} = useContext(DataBDContext)
+    const {colorScheme, isDarkTheme} = useContext(StylesContext)
 
     const todayDate = new Date()
     const CurrentMonth = todayDate.getMonth() + 1
     const CurrentYear = todayDate.getFullYear()
+
+    let containerBgColor = ""
+    let textColor = ""
+    let earningsColorText = ""
+    let expansesColorText = ""
+    let earningsColorBg = ""
+    let expansesColorBg = ""
+
+    colorScheme == "dark" || isDarkTheme ? containerBgColor = "#2A2A2A" : containerBgColor = "#ffffff"
+    colorScheme == "dark" || isDarkTheme ? textColor = "#ffffff" : textColor = "#080808"
+    colorScheme == "dark" || isDarkTheme ? earningsColorText = "#ffffff" : earningsColorText = "#13585C"
+    colorScheme == "dark" || isDarkTheme ? expansesColorText = "#ffffff" : expansesColorText = "#972A1F"
+    colorScheme == "dark" || isDarkTheme ? earningsColorBg = "rgba(26, 130, 137, 0.4)" : earningsColorBg = "rgba(26, 130, 137, 0.4)"
+    colorScheme == "dark" || isDarkTheme ? expansesColorBg = "rgba(255, 72, 53, 0.4)" : expansesColorBg = "rgba(255, 72, 53, 0.4)"
 
     function handleEarnings(){
         setItemSelected('Ganhos')
@@ -66,7 +82,10 @@ export default function Results() {
 
 
     return(
-        <View style={[styles.container, itemSelected == 'Ganhos' ? {borderColor:'#1A8289'}: {borderColor:'#FFC8C2'}]}>
+        <View style={[
+            styles.container,
+            {backgroundColor:containerBgColor}
+        ]}>
             <View style={styles.topSelectButtons}>
                 <TouchableOpacity 
                     style={[
@@ -119,8 +138,10 @@ export default function Results() {
             </View>
 
             <ScrollView>
-            {hasLateEarnings && itemSelected == "Ganhos" && <Text style={styles.titleContainer}>Atrasados</Text>}
-            {hasLateExpanses && itemSelected == "Despesas" && <Text style={styles.titleContainer}>Atrasados</Text>}
+            {hasLateEarnings && itemSelected == "Ganhos" && 
+                <Text style={[styles.titleContainer, {color:textColor}]}>Atrasados</Text>}
+            {hasLateExpanses && itemSelected == "Despesas" && 
+                <Text style={[styles.titleContainer, {color:textColor}]}>Atrasados</Text>}
             
 
             {entriesByCurrentDate.map((entr:any,index:number)=>{
@@ -128,8 +149,8 @@ export default function Results() {
                 if (entr.received == 0 && entr.type == itemSelected && entr.day <= todayDate.getDate()){
                     let colorText = ''
                     let bgcolor = ''
-                        entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
-                        entr.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
+                        entr.type == 'Ganhos' ? colorText = earningsColorText : colorText = expansesColorText
+                        entr.type == 'Ganhos' ? bgcolor = earningsColorBg : bgcolor = expansesColorBg
                     return(
                         <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
                             <MaterialIcons 
@@ -152,15 +173,17 @@ export default function Results() {
                 }
             })}
 
-            {hasNextDaysEarnings && itemSelected == "Ganhos" && <Text style={styles.titleContainer}>Nos próximos dias...</Text>}
-            {hasNextDaysExpanses && itemSelected == "Despesas" && <Text style={styles.titleContainer}>Nos próximos dias...</Text>}
+            {hasNextDaysEarnings && itemSelected == "Ganhos" && 
+            <Text style={[styles.titleContainer, {color:textColor}]}>Nos próximos dias...</Text>}
+            {hasNextDaysExpanses && itemSelected == "Despesas" &&
+             <Text style={[styles.titleContainer, {color:textColor}]}>Nos próximos dias...</Text>}
 
             {entriesByCurrentDate.map((entr:any,index:number)=>{
                 if (entr.received == 0 && entr.type == itemSelected && entr.day > todayDate.getDate() && entr.day <= (todayDate.getDate()+5)){
                     let colorText = ''
                     let bgcolor = ''
-                        entr.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
-                        entr.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
+                        entr.type == 'Ganhos' ? colorText = earningsColorText : colorText = expansesColorText
+                        entr.type == 'Ganhos' ? bgcolor = earningsColorBg : bgcolor = expansesColorBg
                     return(
                         <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
                             <MaterialIcons 
@@ -188,8 +211,8 @@ export default function Results() {
                     if (!entrie.received && entrie.type == itemSelected && entrie.day <= 5){
                         let colorText = ''
                         let bgcolor = ''
-                        entrie.type == 'Ganhos' ? colorText = '#13585C' : colorText = '#972A1F'
-                        entrie.type == 'Ganhos' ? bgcolor = 'rgba(26, 130, 137, 0.4)' : bgcolor = 'rgba(255, 72, 53, 0.4)'
+                        entrie.type == 'Ganhos' ? colorText = earningsColorText : colorText = expansesColorText
+                        entrie.type == 'Ganhos' ? bgcolor = earningsColorBg : bgcolor = expansesColorBg
                         return(
                             <View style={[styles.resultItem, { backgroundColor: bgcolor}]} key={index}>
                                 <MaterialIcons 

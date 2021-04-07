@@ -39,6 +39,7 @@ export default function ModalContent() {
         textAlertModal,
         textModal,
         colorScheme,
+        isDarkTheme,
         updateEntriesModalVisible,
         resetSelectedEntrieId,
     } = useContext(StylesContext)
@@ -121,8 +122,8 @@ export default function ModalContent() {
     return (
         <Modal animationType="slide" visible={isEntriesModalVisible} transparent>
             <View style={styles.modalContainer}>
-               <View style={[styles.modalContent, colorScheme == 'dark' && {backgroundColor:'#181818'}]}>
-                    <View style={styles.headerModal}>
+               <View style={[styles.modalContent, (colorScheme == 'dark' || isDarkTheme) && {backgroundColor:'#181818'}]}>
+                    <View style={[styles.headerModal, (colorScheme == 'dark' || isDarkTheme) && {backgroundColor:'#2C2C2C'}]}>
                         <TouchableOpacity onPress={handleToUpdate}>
                             <Feather name="edit-2" size={30} color={entriePrimaryColor} />
                         </TouchableOpacity>
