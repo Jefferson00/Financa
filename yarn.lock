@@ -6566,6 +6566,11 @@ react-native-linear-gradient@^2.5.6:
   resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
   integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
 
+react-native-pin-view@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-pin-view/-/react-native-pin-view-3.0.2.tgz#cc233c4b7da7f69ad3817b631e3e7f2a14198e0d"
+  integrity sha512-6lu/TCRgT7SjFPLdb7nCScAgJPLeeUU3k3qBoqn3oz8eTOUKcZnT4lWm22z5V+OLreL6BDCz7xFzvOLwUoI3ow==
+
 react-native-reanimated@~1.13.0:
   version "1.13.3"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.13.3.tgz#fb0e1d582c8866015140f2159e147ffe6e798a3a"

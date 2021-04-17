@@ -6,16 +6,19 @@ import MenuFooter from '../components/menuFooter'
 import { StylesContext } from '../../contexts/stylesContext';
 import Header from './components/header';
 import { SecurityContext } from '../../contexts/securityContext';
+import ReactNativePinView from "react-native-pin-view"
+import { Ionicons } from '@expo/vector-icons'
+import * as SecureStore from 'expo-secure-store';
 
 export default function Security() {
     const colorScheme = useColorScheme()
-    const { isDarkTheme, entriePrimaryColor, entrieSecondaryColor} = useContext(StylesContext)
-    const {isSecurityEnable,toggleSwitchSecurity} = useContext(SecurityContext)
+    const { isDarkTheme, entriePrimaryColor, entrieSecondaryColor } = useContext(StylesContext)
+    const { isSecurityEnable, toggleSwitchSecurity, hasPin, savePin } = useContext(SecurityContext)
 
     let containerBgColor = "#ffffff"
     let fromBackgroundColor
     let toBackgroundColor
-    let textColor
+    let textColor: string
     let subTextColor
     ///colors schemes
 
@@ -37,7 +40,79 @@ export default function Security() {
         subTextColor = "rgba(63, 61, 86, 0.8)"
     }
 
+    const pinView = useRef<any>(null)
+    const comparePinView = useRef<any>(null)
+    const userPinView = useRef<any>(null)
+    const [showRemoveButton, setShowRemoveButton] = useState(false)
+    const [showComparePinView, setShowComparePinView] = useState(false)
+    const [enteredPin, setEnteredPin] = useState("")
+    const [userPin, setUserPin] = useState("")
+    const [isPinCorrect, setIsPinCorrect] = useState(false)
+    const [comparePin, setComparePin] = useState("")
+    const [showCompletedButton, setShowCompletedButton] = useState(false)
     
+    const [showUserRemoveButton, setShowUserRemoveButton] = useState(false)
+    const [showUserCompletedButton, setShowUserCompletedButton] = useState(false)
+
+    useEffect(() => {
+        if (enteredPin.length > 0) {
+            setShowRemoveButton(true)
+        } else {
+            setShowRemoveButton(false)
+        }
+        if (enteredPin.length === 6) {
+            setShowCompletedButton(true)
+        } else {
+            setShowCompletedButton(false)
+        }
+    }, [enteredPin, comparePin])
+
+    useEffect(() => {
+        if (userPin.length > 0) {
+            setShowUserRemoveButton(true)
+        } else {
+            setShowUserRemoveButton(false)
+        }
+        if (userPin.length === 6) {
+            setShowUserCompletedButton(true)
+        } else {
+            setShowUserCompletedButton(false)
+        }
+    }, [userPin])
+
+    useEffect(() => {
+        if (showComparePinView) {
+            pinView.current.clearAll()
+        } 
+    }, [showComparePinView])
+
+    function verifyPin() {
+        if (enteredPin === comparePin) {
+            alert('Senha definida co successo!')
+            savePin(enteredPin)
+            setComparePin('')
+            setEnteredPin('')
+            setIsPinCorrect(false)
+            setShowComparePinView(false)
+        } else {
+            alert('Pin incorreto!')
+        }
+    }
+
+    async function validatePin(){
+        let result = await SecureStore.getItemAsync('SecurePin');
+        if (userPin === result){
+            setIsPinCorrect(true)
+        }else{
+            setIsPinCorrect(false)
+            alert('Senha incorreta!')
+        }
+    }
+
+    const LeftButton: React.FunctionComponent<any> = () => (
+        <Ionicons name={"ios-backspace"} size={36} color={textColor} />
+    )
+
 
     return (
         <LinearGradient colors={[fromBackgroundColor, toBackgroundColor]} start={{ x: -0.8, y: 0.1 }} style={styles.container}>
@@ -50,10 +125,10 @@ export default function Security() {
                 <View style={styles.mainContent}>
                     <View style={styles.itemContent}>
                         <View>
-                            <Text style={[styles.itemContentText, {color:textColor}]}>
+                            <Text style={[styles.itemContentText, { color: textColor }]}>
                                 Proteção do aplicativo
                             </Text>
-                            <Text style={[styles.itemContentSubText, {color:subTextColor}]}>
+                            <Text style={[styles.itemContentSubText, { color: subTextColor }]}>
                                 Usar senha para acessar o aplicativo?
                             </Text>
                         </View>
@@ -66,6 +141,141 @@ export default function Security() {
                             style={{ marginTop: 15 }}
                         />
                     </View>
+                    {!hasPin || isPinCorrect?
+                        <>
+                            {showComparePinView
+                                ?
+                                <Text style={[styles.itemContentText, { color: textColor, textAlign: 'center', marginTop: 35 }]}>
+                                    Repita a senha
+                                </Text>
+                                :
+                                <Text style={[styles.itemContentText, { color: textColor, textAlign: 'center', marginTop: 35 }]}>
+                                    Defina um PIN de acesso!
+                                </Text>
+                            }
+                        </>
+                        :
+                        <>
+                        <Text style={[styles.itemContentText, { color: textColor, textAlign: 'center', marginTop: 35 }]}>
+                            Insira a senha atual para alterar
+                        </Text>
+                        <ReactNativePinView
+                                style={{ marginTop: 10 }}
+                                inputSize={20}
+                                ref={userPinView}
+                                pinLength={6}
+                                buttonSize={60}
+                                onValueChange={value => setUserPin(value)}
+                                buttonAreaStyle={{
+                                    marginTop: 24,
+                                }}
+                                inputAreaStyle={{
+                                    marginBottom: 24,
+                                }}
+                                inputViewEmptyStyle={{
+                                    backgroundColor: "transparent",
+                                    borderWidth: 1,
+                                    borderColor: textColor,
+                                }}
+                                inputViewFilledStyle={{
+                                    backgroundColor: textColor,
+                                }}
+
+                                buttonTextStyle={{
+                                    color: textColor,
+                                }}
+                                onButtonPress={key => {
+                                    if (key === "custom_left") {
+                                        userPinView.current.clear()
+                                    }
+                                    if (key === "custom_right") {
+                                        validatePin()
+                                    }
+                                }}
+                                customLeftButton={showUserRemoveButton ? <LeftButton /> : undefined}
+                                customRightButton={showUserCompletedButton ? <Ionicons name={"lock-open"} size={36} color={textColor} /> : undefined}
+                            />
+                        </>
+                    }
+                    {
+                        showComparePinView ?
+                            <ReactNativePinView
+                                style={{ marginTop: 10 }}
+                                inputSize={20}
+                                ref={comparePinView}
+                                pinLength={6}
+                                buttonSize={60}
+                                onValueChange={value => setComparePin(value)}
+                                buttonAreaStyle={{
+                                    marginTop: 24,
+                                }}
+                                inputAreaStyle={{
+                                    marginBottom: 24,
+                                }}
+                                inputViewEmptyStyle={{
+                                    backgroundColor: "transparent",
+                                    borderWidth: 1,
+                                    borderColor: textColor,
+                                }}
+                                inputViewFilledStyle={{
+                                    backgroundColor: textColor,
+                                }}
+
+                                buttonTextStyle={{
+                                    color: textColor,
+                                }}
+                                onButtonPress={key => {
+                                    if (key === "custom_left") {
+                                        comparePinView.current.clear()
+                                    }
+                                    if (key === "custom_right") {
+                                        verifyPin()
+                                    }
+                                }}
+                                customLeftButton={showRemoveButton ? <LeftButton /> : undefined}
+                                customRightButton={showCompletedButton ? <Ionicons name={"lock-open"} size={36} color={textColor} /> : undefined}
+                            />
+                            :
+                            !hasPin || isPinCorrect ?
+                            <ReactNativePinView
+                            style={{marginTop:10}}
+                            inputSize={20}
+                            ref={pinView}
+                            pinLength={6}
+                            buttonSize={60}
+                            onValueChange={value => setEnteredPin(value)}
+                            buttonAreaStyle={{
+                                marginTop: 24,
+                            }}
+                            inputAreaStyle={{
+                                marginBottom: 24,
+                            }}
+                            inputViewEmptyStyle={{
+                                backgroundColor: "transparent",
+                                borderWidth: 1,
+                                borderColor: textColor,
+                            }}
+                            inputViewFilledStyle={{
+                                backgroundColor: textColor,
+                            }}
+    
+                            buttonTextStyle={{
+                                color: textColor,
+                            }}
+                            onButtonPress={key => {
+                                if (key === "custom_left") {
+                                    pinView.current.clear()
+                                }
+                                if (key === "custom_right") {
+                                    setShowComparePinView(true)
+                                    console.log('jdvif')
+                                }
+                            }}
+                            customLeftButton={showRemoveButton ?  <LeftButton/>: undefined}
+                            customRightButton={showCompletedButton ? <Ionicons name={"lock-open"} size={36} color={textColor} /> : undefined}
+                        />
+                        :null
+                    }
                 </View>
 
                 <MenuFooter />
@@ -90,21 +300,21 @@ const styles = StyleSheet.create({
         marginVertical: 30,
         borderRadius: 20,
     },
-    itemContent:{
-        borderBottomWidth:1,
-        borderBottomColor:"#d2d2d2",
-        justifyContent:'space-between',
-        alignItems:'center',
-        flexDirection:'row',
-        marginHorizontal:25,
-        marginTop:35,
-        paddingBottom:10,
+    itemContent: {
+        borderBottomWidth: 1,
+        borderBottomColor: "#d2d2d2",
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginHorizontal: 25,
+        marginTop: 35,
+        paddingBottom: 10,
     },
-    itemContentText:{
+    itemContentText: {
         fontFamily: 'Poppins_500Medium',
         fontSize: 14,
     },
-    itemContentSubText:{
+    itemContentSubText: {
         fontFamily: 'Poppins_500Medium',
         fontSize: 12,
     },

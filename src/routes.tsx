@@ -221,24 +221,9 @@ const SecurityNav = () =>{
 }
 
 const DrawerNav = () =>{
-    const {isSecurityEnable, getSecurityActive} = useContext(SecurityContext)
-    const [isScanned, setIsScanned] = useState(false)
-    useEffect(()=>{
-        let item = getSecurityActive()
-        item.then((stringIsSecurityActive)=>{
-            if(stringIsSecurityActive == "true"){
-                if(!isScanned) handleAuthentication()
-            }else{
-                setIsScanned(true)
-            }
-        })
-    })
-    async function handleAuthentication(){
-        let result = await LocalAuthentication.authenticateAsync()
-        if(result.success){
-            setIsScanned(true)
-        }else alert ('Authentication Failed')
-    }
+    const {isSecurityEnable, getSecurityActive, isScanned} = useContext(SecurityContext)
+
+    
 
     return(
         <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
