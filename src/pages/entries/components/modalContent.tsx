@@ -9,7 +9,6 @@ import { MainContext } from '../../../contexts/mainContext';
 
 import Functions from "../../../utils"
 import { NewEntriesContext } from '../../../contexts/newEntriesContext';
-import functions from '../../../functions';
 import { useNavigation } from '@react-navigation/native';
 
 interface EntriesValuesData{
@@ -26,7 +25,6 @@ interface EntriesValuesData{
 
 
 export default function ModalContent() {
-    let rec
     let isLate = false
     const navigation = useNavigation()
 

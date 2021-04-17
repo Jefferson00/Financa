@@ -2,11 +2,11 @@ import React, { useContext, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Foundation , Ionicons, Entypo} from '@expo/vector-icons'
 import NumberFormat from 'react-number-format';
-import Functions from '../../../functions/index'
 import { DataBDContext } from '../../../contexts/dataBDContext';
 import CategoryIcon from './categoryIcon';
 import { MainContext } from '../../../contexts/mainContext';
 import { StylesContext } from '../../../contexts/stylesContext';
+import Functions from '../../../utils'
 
 
 export default function LatestTransactions() {

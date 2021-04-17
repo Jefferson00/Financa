@@ -1,11 +1,9 @@
 import React from "react"
 import { StyleSheet, Text, View, TouchableOpacity, Modal } from 'react-native'
 
-import { useStylesStates } from "../../../contexts/stylesStates"
 
 export default function SuccessModal({ props }: { props: any }) {
 
-    const { tittleTextColor } = useStylesStates()
 
     return (
         <Modal animationType="slide" visible={props.successModal} transparent>
@@ -23,7 +21,7 @@ export default function SuccessModal({ props }: { props: any }) {
                         }
                     </View>
                     <TouchableOpacity onPress={props.handleNavigateEntries} style={styles.modalButton}>
-                        <Text style={[styles.tittleText, { color: tittleTextColor }]}>Ok</Text>
+                        <Text style={[styles.tittleText, { color: "#fff" }]}>Ok</Text>
                     </TouchableOpacity>
                 </View>
             </View>

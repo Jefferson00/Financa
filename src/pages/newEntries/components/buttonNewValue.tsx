@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react"
 import { StyleSheet, Text, View, TextInput, Switch, TouchableOpacity } from 'react-native'
 
-import Functions from '../../../functions'
+import Functions from '../../../utils'
 
 import { Feather } from '@expo/vector-icons'
 

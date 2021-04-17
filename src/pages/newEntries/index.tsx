@@ -15,7 +15,6 @@ import { Feather } from '@expo/vector-icons'
 import Header from "../components/header"
 import ButtonSubmit from "./components/button"
 import FormContentCreate from "./components/formContentCreate"
-import FormContentUpdate from "./components/formContentUpdate"
 import ButtonNewValue from "./components/buttonNewValue"
 import FormContent from "./components/formContent"
 import SuccessModal from "./components/modal"

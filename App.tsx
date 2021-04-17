@@ -13,6 +13,7 @@ import { MainProvider } from './src/contexts/mainContext';
 import { DataBDProvider } from './src/contexts/dataBDContext';
 import { NewEntriesProvider } from './src/contexts/newEntriesContext';
 import { StylesProvider } from './src/contexts/stylesContext';
+import { SecurityProvider } from './src/contexts/securityContext';
 
 
 
@@ -31,6 +32,7 @@ export default function App() {
  
   return (
     <MainProvider>
+      <SecurityProvider>
         <DataBDProvider>
           <NewEntriesProvider>
             <StylesProvider>
@@ -38,6 +40,7 @@ export default function App() {
             </StylesProvider>
           </NewEntriesProvider>
         </DataBDProvider>
+        </SecurityProvider>
     </MainProvider>
   );
 }

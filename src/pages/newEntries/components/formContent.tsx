@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { StyleSheet, Text, View, TextInput, Switch } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import Functions from '../../../functions'
+import Functions from '../../../utils'
 
 import { Feather, Ionicons , FontAwesome5, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons'
 import { NewEntriesContext } from "../../../contexts/newEntriesContext";
