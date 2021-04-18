@@ -115,7 +115,7 @@ export default function FormContentCreate() {
                         <View style={styles.frequencyView}>
                             <Text style={[styles.secondColorText, { color: entrieSecondaryColor }]}>Mensal</Text>
                             <Switch
-                                trackColor={{ false: '#d2d2d2', true: entriePrimaryColor }}
+                                trackColor={{ false: '#b8b6b6', true: entriePrimaryColor }}
                                 thumbColor={values.monthly ? entrieSecondaryColor : entriePrimaryColor}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={e=> updateEntrieValuesBeforeCreate('monthly', index, e)}

@@ -7,7 +7,7 @@ import { StylesContext } from './contexts/stylesContext';
 import {Restart} from 'fiction-expo-restart';
 import { DrawerActions } from '@react-navigation/native';
 import db from '../src/services/database'
-import AsyncStorage from '@react-native-community/async-storage';
+import {expo} from '../app.json'
 
 const {Navigator, Screen} = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -20,6 +20,7 @@ import Security from './pages/security'
 import SecurityAccess from './pages/security/components/securityAccess'
 import { View, Text, Alert} from 'react-native';
 import { SecurityContext } from './contexts/securityContext';
+import { StatusBar } from 'expo-status-bar';
 
 function CustomDrawerContent(props: any) {
     const {changeTheme, colorScheme, isDarkTheme} = useContext(StylesContext)
@@ -76,6 +77,8 @@ function CustomDrawerContent(props: any) {
         return(
             <View style={{
                 height:150,
+                flex:1,
+                marginTop:-35,
                 backgroundColor: menuViewBgColor,
                 justifyContent:'center',
                 alignItems:'center'
@@ -193,7 +196,7 @@ function CustomDrawerContent(props: any) {
                 marginTop:50,
                 }}>
                 <Text style={{color:itemTextColor}}>
-                    Versão 1.1.0
+                    Versão {expo.version}
                 </Text>
             </View>
       </DrawerContentScrollView>

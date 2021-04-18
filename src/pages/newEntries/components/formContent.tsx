@@ -120,7 +120,7 @@ export default function FormContent() {
                                 {typeOfEntrie == "Ganhos" ?"Recebido" : "Pago"}
                             </Text>
                             <Switch
-                                trackColor={{ false: '#454545', true: entriePrimaryColor }}
+                                trackColor={{ false: '#b8b6b6', true: entriePrimaryColor }}
                                 thumbColor={isEnabledReceived ? entrieSecondaryColor : entriePrimaryColor}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={toggleSwitchReceived}
@@ -149,7 +149,7 @@ export default function FormContent() {
                             Mensal
                         </Text>
                         <Switch
-                            trackColor={{ false: '#454545', true: entriePrimaryColor }}
+                            trackColor={{ false: '#b8b6b6', true: entriePrimaryColor }}
                             thumbColor={isEnabledMonthly ? entrieSecondaryColor : entriePrimaryColor}
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={toggleSwitchMonthly}

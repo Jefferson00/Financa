@@ -88,7 +88,7 @@ function currencyFormatter(value:any) {
     const amount = new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency:'BRL',
-    }).format(value/100);
+    }).format(value/100).replace(/^(\D+)/, '$1 ');
     //amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
     return `${amount}`;
   }
