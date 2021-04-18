@@ -9,7 +9,7 @@ import * as SecureStore from 'expo-secure-store';
 
 export default function SecurityAccess() {
     const {updateAccess, isScanned, handleAuthentication, getPin } = useContext(SecurityContext)
-    const pinView = useRef(null)
+    const pinView = useRef<any>(null)
     const [showRemoveButton, setShowRemoveButton] = useState(false)
     const [enteredPin, setEnteredPin] = useState("")
     const [showCompletedButton, setShowCompletedButton] = useState(false)

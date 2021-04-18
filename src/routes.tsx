@@ -7,7 +7,7 @@ import { StylesContext } from './contexts/stylesContext';
 import {Restart} from 'fiction-expo-restart';
 import { DrawerActions } from '@react-navigation/native';
 import db from '../src/services/database'
-import * as LocalAuthentication from 'expo-local-authentication';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const {Navigator, Screen} = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -221,25 +221,25 @@ const SecurityNav = () =>{
 }
 
 const DrawerNav = () =>{
-    const {isSecurityEnable, getSecurityActive, isScanned} = useContext(SecurityContext)
-
-    
-
     return(
         <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
-                {!isScanned?
-                    <Screen name="Home" component={SecurityNav}/>
-                :
-                    <Screen name="Home" component={StackNav}/>
-                }
+            <Screen name="Home" component={StackNav}/>
         </Drawer.Navigator>
     )
 }
 
 export default function Routes(){
+    const {isSecurityEnable, isLoaded, isScanned, isLoadedSecurity} = useContext(SecurityContext)
+
+    if(!isLoaded || !isLoadedSecurity) return null
+
     return(
         <NavigationContainer>
-            <DrawerNav/>
+             {!isScanned && isSecurityEnable?
+                <SecurityNav/>
+                :
+                <DrawerNav/>
+             }
         </NavigationContainer>
     )
 }

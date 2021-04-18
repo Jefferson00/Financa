@@ -7,6 +7,8 @@ interface SecurityContextData{
     isSecurityEnable:boolean;
     isScanned:boolean;
     hasPin:boolean;
+    isLoaded:boolean;
+    isLoadedSecurity:boolean;
     toggleSwitchSecurity: () => void;
     getSecurityActive: () => Promise<string | undefined>;
     getPin: () => Promise<void>;
@@ -22,10 +24,19 @@ interface SecurityProviderProps{
 export const SecurityContext = createContext({} as SecurityContextData)
 
 export function SecurityProvider({children}: SecurityProviderProps){
+
     const [isSecurityEnable, setIsSecurityEnable] = useState(false)
+        
+    let item = getSecurityActive()
+        item.then((stringIsSecurityActive)=>{
+            stringIsSecurityActive == "true" ? setIsSecurityEnable(true) : setIsSecurityEnable(false)
+    })
+
     const [isScanned, setIsScanned] = useState(false)
     const [hasPin, setHasPin] = useState(false)
     const [securePin, setSecurePin] = useState('')
+    const [isLoaded, setLoaded] = useState(false)
+    const [isLoadedSecurity, setLoadedSecurity] = useState(false)
     //const toggleSwitchSecurity = () => setIsSecurityEnable(previousState => !previousState);
 
     function toggleSwitchSecurity(){
@@ -80,6 +91,7 @@ export function SecurityProvider({children}: SecurityProviderProps){
             }else{
                 setIsScanned(true)
             }
+            setLoaded(true)
         })
         getPin()
     },[isScanned])
@@ -96,14 +108,17 @@ export function SecurityProvider({children}: SecurityProviderProps){
         let item = getSecurityActive()
         item.then((stringIsSecurityActive)=>{
             stringIsSecurityActive == "true" ? setIsSecurityEnable(true) : setIsSecurityEnable(false)
+            setLoadedSecurity(true)
         })
-    })
+    },[isSecurityEnable])
 
     return(
         <SecurityContext.Provider value={{
             isSecurityEnable,
             isScanned,
             hasPin,
+            isLoaded,
+            isLoadedSecurity,
             toggleSwitchSecurity,
             getSecurityActive,
             handleAuthentication,
