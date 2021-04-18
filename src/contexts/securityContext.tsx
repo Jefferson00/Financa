@@ -40,9 +40,13 @@ export function SecurityProvider({children}: SecurityProviderProps){
     //const toggleSwitchSecurity = () => setIsSecurityEnable(previousState => !previousState);
 
     function toggleSwitchSecurity(){
-        setIsSecurityEnable(previousState => !previousState)
-        let stringIsSecurityActive = String(!isSecurityEnable)
-        storeSecurityActive(stringIsSecurityActive)
+        if(hasPin){
+            setIsSecurityEnable(previousState => !previousState)
+            let stringIsSecurityActive = String(!isSecurityEnable)
+            storeSecurityActive(stringIsSecurityActive)
+        }else{
+            alert('Defina uma senha para acesso!')
+        }
     }
 
     async function getSecurityActive (){

@@ -61,7 +61,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
     }, [item])
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
+       
             <LinearGradient
                 colors={item == "Ganhos" ? earningsGradientColors : expansesGradientColors}
                 start={{ x: -0.4, y: 0.1 }}
@@ -85,17 +85,17 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 }
 
                 <View style={[styles.mainContainer, { backgroundColor: containerBgColor }]}>
-                    <View style={styles.tittleTextView}>
-                        <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
-                            {entrieIdUpdate == 0 ?
-                                typeOfEntrie == "Ganhos" ? "Novo Ganho" : "Nova Despesa"
-                                :
-                                typeOfEntrie == "Ganhos" ? "Editar Ganho" : "Editar Despesa"
-                            }
-                        </Text>
-                    </View>
 
                     <ScrollView style={{ maxHeight: '100%' }}>
+                        <View style={styles.tittleTextView}>
+                            <Text style={[styles.tittleText, { color: entriePrimaryColor }]}>
+                                {entrieIdUpdate == 0 ?
+                                    typeOfEntrie == "Ganhos" ? "Novo Ganho" : "Nova Despesa"
+                                    :
+                                    typeOfEntrie == "Ganhos" ? "Editar Ganho" : "Editar Despesa"
+                                }
+                            </Text>
+                        </View>
                         <View style={styles.formView}>
                             <FormContent />
 
@@ -110,7 +110,7 @@ export default function NewEntries({ route }: { route: any }, { navigation }: { 
                 </View>
 
             </LinearGradient>
-        </KeyboardAvoidingView>
+
     )
 }
 

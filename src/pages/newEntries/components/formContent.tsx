@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { StyleSheet, Text, View, TextInput, Switch } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Switch, KeyboardAvoidingView, Platform } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Functions from '../../../utils'
@@ -77,6 +77,7 @@ export default function FormContent() {
 
     return (
         <>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
             {loadingActive ?
                 <LoaderUpdate/>
             :
@@ -405,7 +406,7 @@ export default function FormContent() {
                 </>
             }
 
-
+        </KeyboardAvoidingView>
         </>
     )
 }

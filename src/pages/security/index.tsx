@@ -9,11 +9,12 @@ import { SecurityContext } from '../../contexts/securityContext';
 import ReactNativePinView from "react-native-pin-view"
 import { Ionicons } from '@expo/vector-icons'
 import * as SecureStore from 'expo-secure-store';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function Security() {
     const colorScheme = useColorScheme()
     const { isDarkTheme, entriePrimaryColor, entrieSecondaryColor } = useContext(StylesContext)
-    const { isSecurityEnable, toggleSwitchSecurity, hasPin, savePin } = useContext(SecurityContext)
+    const { isSecurityEnable, toggleSwitchSecurity, hasPin, savePin, getPin } = useContext(SecurityContext)
 
     let containerBgColor = "#ffffff"
     let fromBackgroundColor
@@ -90,6 +91,7 @@ export default function Security() {
         if (enteredPin === comparePin) {
             alert('Senha definida co successo!')
             savePin(enteredPin)
+            getPin()
             setComparePin('')
             setEnteredPin('')
             setIsPinCorrect(false)
@@ -122,7 +124,7 @@ export default function Security() {
 
             {/*Container Principal*/}
             <View style={[styles.mainContainer, { backgroundColor: containerBgColor }]}>
-                <View style={styles.mainContent}>
+                <ScrollView style={styles.mainContent}>
                     <View style={styles.itemContent}>
                         <View>
                             <Text style={[styles.itemContentText, { color: textColor }]}>
@@ -276,7 +278,7 @@ export default function Security() {
                         />
                         :null
                     }
-                </View>
+                </ScrollView>
 
                 <MenuFooter />
 

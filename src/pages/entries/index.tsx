@@ -17,9 +17,6 @@ import NoResultsView from "./components/noResultsView"
 import EntriesDB from '../../services/entriesDB'
 import ValuesDB from '../../services/valuesDB';
 
-import Functions from "../../functions"
-
-import { EntriesValues, ValuesItemUpdate, ValuesValues } from '../../interfaces';
 import Loader from './components/loaders/loader';
 import { NewEntriesContext } from '../../contexts/newEntriesContext';
 import { StylesContext } from '../../contexts/stylesContext';

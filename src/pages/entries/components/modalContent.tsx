@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
       },
       modalContent: {
         backgroundColor: '#ffffff',
-        height: '80%',
+        height: '100%',
     },
       headerModal: {
         height: 75,
