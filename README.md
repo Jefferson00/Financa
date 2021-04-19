@@ -18,12 +18,23 @@
 
 ## 💻 Projeto
 
+O intuito da criação desse projeto foi de por em prática conhecimentos adquiridos através dos estudos em React Native, desenvolvendo uma aplicação simples, porém bastante útil para pessoas que procuram por algo que auxilie na organização e controle das finanças pessoais, sem ser complexo com centenas de funcionalidades, que às vezes acaba sendo contraintuitivo e de difícil utilização. 
+
+O foco da aplicação é justamente o contrário disso. Ser simples, intuitivo e de fácil utilização.
+
 ## 🚀 Tecnologias
 
 - TypeScript
 - React Native
 - Expo
 - SQLite
+
+## 🚀 Features
+
+- Controle e gerenciamento dos ganhos e despesas do mês
+- Segurança : Acesso através de digital ou senha
+- Tema dark
+- Notificações e lembretes de despesas próximas da data de pagamento
 
 ## 🔖 Layout
 
@@ -49,5 +60,9 @@ $ yarn start
 ```
 
 ## 📝 License
+
+<a href="/LICENSE">
+    <img alt="Made by Jefferson" src="https://img.shields.io/badge/licence-MIT-blue">
+ </a>
 
 Made with ♥ by Jefferson C Silva :wave: [Get in touch!](https://www.linkedin.com/in/jefferson-c-silva)
