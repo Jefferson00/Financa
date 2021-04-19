@@ -66,7 +66,7 @@ export function SecurityProvider({children}: SecurityProviderProps){
 
     async function getPin() {
         let result = await SecureStore.getItemAsync('SecurePin');
-        console.log(result)
+
         if (result) {
           setHasPin(true)
         } else {
